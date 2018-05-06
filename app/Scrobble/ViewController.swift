@@ -61,7 +61,7 @@ class LoginViewController: NSViewController {
     }
 
     @IBAction func docsClick(_ sender: Any) {
-        NSWorkspace.shared.open(URL(string: "https://scrobble.allele.cc")!)
+        NSWorkspace.shared.open(URL(string: AppDelegate.baseUrl)!)
     }
 
     @objc func onEnter() {
