@@ -32,7 +32,7 @@ type Account struct {
 }
 
 type Song struct {
-	Duration                   int64 // Unix timestamp, seconds
+	Duration                   int64 // milliseconds
 	Genre, Name, Artist, Album string
 	Year                       int64
 	Urlp, Urli                 string

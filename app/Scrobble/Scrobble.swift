@@ -14,14 +14,14 @@ struct Account: Decodable {
 }
 
 struct Song: Encodable {
-    var duration: TimeInterval
+    var duration: Int // milliseconds
     var genre, name, artist, album: String
     var year: Int
     var urlp, urli: String
 
     init(fromNotification info: Dictionary<AnyHashable, Any>) {
         if let v = info["Total Time"] as? Int {
-            self.duration = TimeInterval(v/1000)
+            self.duration = v
         } else {
             self.duration = 0
         }
@@ -223,7 +223,7 @@ class Watcher {
         self.lastPaused = nil
         self.lastPausedTime = 0
 
-        playbacks.append(Playback(song: s, startTime: now))
+        playbacks.append(Playback(song: s, startTime: floor(now)))
         let status = sender.send(playbacks, token!)
 
         switch status {
