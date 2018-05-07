@@ -202,6 +202,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, LoginViewControllerDelegate,
     func onSubmitToken() {
         loginViewController.validating()
         let token = loginViewController.tokenInput.stringValue
+            .trimmingCharacters(in: .whitespaces)
+        
+        guard !token.isEmpty else {
+            return
+        }
 
         validateToken(token, completion: {account, status in
             // TODO: consider sharing this with the similar block above
