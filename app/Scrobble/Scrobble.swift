@@ -14,35 +14,48 @@ struct Account: Decodable {
 }
 
 struct Song: Encodable {
-    var duration: TimeInterval?;
-    var genre, name, artist, album: String?;
-    var year: Int?;
-    var urlp, urli: String?
+    var duration: TimeInterval
+    var genre, name, artist, album: String
+    var year: Int
+    var urlp, urli: String
 
     init(fromNotification info: Dictionary<AnyHashable, Any>) {
         if let v = info["Total Time"] as? Int {
             self.duration = TimeInterval(v/1000)
+        } else {
+            self.duration = 0
         }
 
-        self.genre = info["Genre"] as? String
-        self.name = info["Name"] as? String
-        self.artist = info["Artist"] as? String
-        self.album = info["Album"] as? String
-        self.year = info["Year"] as? Int
+        self.genre = info["Genre"] as? String ?? ""
+        self.name = info["Name"] as? String ?? ""
+        self.artist = info["Artist"] as? String ?? ""
+        self.album = info["Album"] as? String ?? ""
+        self.year = info["Year"] as? Int ?? 0
 
         if let v = info["Store URL"] as? String {
             let c = URLComponents(string: v)
-            self.urlp = c?.queryItems?.first(where: {$0.name == "p"})?.value
-            self.urli = c?.queryItems?.first(where: {$0.name == "i"})?.value
+            self.urlp = c?.queryItems?.first(where: {$0.name == "p"})?.value ?? ""
+            self.urli = c?.queryItems?.first(where: {$0.name == "i"})?.value ?? ""
+        } else {
+            self.urlp = ""
+            self.urli = ""
         }
     }
 
     static func ==(lhs: Song, rhs: Song) -> Bool {
-        if lhs.urli == "" || lhs.urlp == "" {
-            // fall back to false for unknown songs
-            return false
+        // if urli and urlp are present in both, use
+        // that as the determining factor
+        if lhs.urlp != "" && lhs.urli != "" && rhs.urlp != "" && rhs.urli != "" {
+            return lhs.urlp == rhs.urlp
+                && lhs.urli == rhs.urli
         }
-        return lhs.urli == rhs.urli && lhs.urlp == rhs.urlp
+        // otherwise do a ghetto comparison of the attributes
+        return lhs.duration == rhs.duration
+            && lhs.genre == rhs.genre
+            && lhs.name == rhs.name
+            && lhs.artist == rhs.artist
+            && lhs.album == rhs.album
+            && lhs.year == rhs.year
     }
 }
 

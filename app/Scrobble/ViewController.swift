@@ -27,32 +27,29 @@ class LoginViewController: NSViewController {
     var enabled = true
     var introString = LoginViewController.enterToken
 
-    // TODO: some gross main thread scheduling here because
-    // "setNeedsDisplay" can't be called from background threads.
-
     func validating() {
         enabled = false
         introString = LoginViewController.loggingIn
-        performSelector(onMainThread: #selector(redraw), with: nil, waitUntilDone: false)
+        view.needsDisplay = true
     }
 
     func invalid(_ message: String) {
         enabled = true
         introString = message
-        performSelector(onMainThread: #selector(redraw), with: nil, waitUntilDone: false)
+        view.needsDisplay = true
     }
 
     func regular() {
         enabled = true
         introString = LoginViewController.enterToken
-        performSelector(onMainThread: #selector(redraw), with: nil, waitUntilDone: false)
+        view.needsDisplay = true
     }
 
     override func viewWillAppear() {
         redraw()
     }
 
-    @objc private func redraw() {
+    private func redraw() {
         tokenInput.isEnabled = enabled
         startButton.isEnabled = enabled
         introText.stringValue = introString // TODO: do a Core Animation transition?
@@ -135,6 +132,10 @@ class ScrobbleViewController: NSViewController {
     }
 
     override func viewWillAppear() {
+       redraw()
+    }
+
+    private func redraw() {
         usernameField.attributedTitle = NSMutableAttributedString(string: (username ?? ""), attributes: attrs)
         usernameField.toolTip = userUrl()
     }
