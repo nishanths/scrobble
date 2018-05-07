@@ -80,7 +80,7 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 
 	var ps []Playback
 	if err := json.NewDecoder(r.Body).Decode(&ps); err != nil {
-		log.Errorf(ctx, "failed to json-unmarshal request: %s", err)
+		log.Errorf(ns, "failed to json-unmarshal request: %s", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
