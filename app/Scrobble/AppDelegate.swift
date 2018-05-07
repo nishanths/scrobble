@@ -88,7 +88,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, LoginViewControllerDelegate,
 
     func initializePopoverController() {
         guard let token = UserDefaults.standard.string(forKey: AppDelegate.kAPIToken) else {
-            // no saved token
+            // no saved token (or weirdly enough, a wrong format)
             UserDefaults.standard.removeObject(forKey: AppDelegate.kAPIToken)
             self.loginMode()
             return
@@ -107,7 +107,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, LoginViewControllerDelegate,
             }
             // validation successful
             DispatchQueue.main.async {
-                UserDefaults.standard.set(token, forKey: AppDelegate.kAPIToken) // must happen on main thread
+                UserDefaults.standard.set(token, forKey: AppDelegate.kAPIToken)
                 self.scrobblingMode(token, a)
             }
         })
@@ -214,7 +214,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, LoginViewControllerDelegate,
             }
             // validation successful
             DispatchQueue.main.async {
-                UserDefaults.standard.set(token, forKey: AppDelegate.kAPIToken) // must happen on main thread
+                UserDefaults.standard.set(token, forKey: AppDelegate.kAPIToken)
                 self.scrobblingMode(token, a)
             }
         })
