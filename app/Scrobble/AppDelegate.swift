@@ -46,7 +46,7 @@ import Cocoa
 class AppDelegate: NSObject, NSApplicationDelegate, LoginViewControllerDelegate,
     ScrobbleViewControllerDelegate, WatcherDelegate {
 
-    static let kAPIToken = "API Token"
+    static let keyAPIToken = "API Token"
     static let baseUrl = "https://scrobble.allele.cc"
 
     let statusItem = NSStatusBar.system.statusItem(withLength:NSStatusItem.squareLength)
@@ -73,7 +73,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, LoginViewControllerDelegate,
             button.image?.isTemplate = true
             button.action = #selector(AppDelegate.togglePopover(_:))
         }
-        
+
         popover.behavior = .transient
         popover.animates = true // gross hack: if animation is disabled, layout messes up b/w popover views
         popover.appearance = NSAppearance.init(named: NSAppearance.Name.vibrantLight)
@@ -87,18 +87,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, LoginViewControllerDelegate,
     }
 
     func initializePopoverController() {
-        guard let token = UserDefaults.standard.string(forKey: AppDelegate.kAPIToken) else {
+        guard let token = UserDefaults.standard.string(forKey: AppDelegate.keyAPIToken) else {
             // no saved token (or weirdly enough, a wrong format)
-            UserDefaults.standard.removeObject(forKey: AppDelegate.kAPIToken)
+            UserDefaults.standard.removeObject(forKey: AppDelegate.keyAPIToken)
             self.loginMode()
             return
         }
-        
+
         validateToken(token, completion: {account, status in
             guard let a = account else {
                 // validation failed
                 DispatchQueue.main.async {
-                    UserDefaults.standard.removeObject(forKey: AppDelegate.kAPIToken)
+                    UserDefaults.standard.removeObject(forKey: AppDelegate.keyAPIToken)
                     self.loginViewController.invalid(status == .generalError ?
                         LoginViewController.tryAgainGeneral : LoginViewController.tryAgainClient)
                     self.loginMode()
@@ -107,7 +107,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, LoginViewControllerDelegate,
             }
             // validation successful
             DispatchQueue.main.async {
-                UserDefaults.standard.set(token, forKey: AppDelegate.kAPIToken)
+                UserDefaults.standard.set(token, forKey: AppDelegate.keyAPIToken)
                 self.scrobblingMode(token, a)
             }
         })
@@ -121,17 +121,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, LoginViewControllerDelegate,
                 completion(nil, .generalError)
                 return
             }
-            switch h.statusCode/100 {
-            case 2:
-                // data is guaranteed to exist according to the docs
-                let account = try? JSONDecoder().decode(Account.self, from: data!)
-                completion(account, .success)
-            case 3:
+            if h.statusCode == 401 {
                 completion(nil, .authError)
-            case 4:
-                completion(nil, .clientError)
-            default:
-                completion(nil, .generalError)
+            } else {
+                switch h.statusCode/100 {
+                case 2:
+                    // data is guaranteed to exist according to the docs
+                    let account = try? JSONDecoder().decode(Account.self, from: data!)
+                    completion(account, .success)
+                case 4:
+                    completion(nil, .clientError)
+                default:
+                    completion(nil, .generalError)
+                }
             }
         })
 
@@ -181,7 +183,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, LoginViewControllerDelegate,
 
     func onAuthError() {
         DispatchQueue.main.async {
-            UserDefaults.standard.removeObject(forKey: AppDelegate.kAPIToken)
+            UserDefaults.standard.removeObject(forKey: AppDelegate.keyAPIToken)
             self.loginViewController.regular()
             self.loginMode()
         }
@@ -189,7 +191,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, LoginViewControllerDelegate,
 
     func onLogout() {
         DispatchQueue.main.async {
-            UserDefaults.standard.removeObject(forKey: AppDelegate.kAPIToken)
+            UserDefaults.standard.removeObject(forKey: AppDelegate.keyAPIToken)
             self.loginViewController.regular()
             self.loginMode()
         }
@@ -206,15 +208,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, LoginViewControllerDelegate,
             guard let a = account else {
                 // validation failed
                 DispatchQueue.main.async {
-                    UserDefaults.standard.removeObject(forKey: AppDelegate.kAPIToken)
+                    UserDefaults.standard.removeObject(forKey: AppDelegate.keyAPIToken)
                     self.loginViewController.invalid(status == .generalError ?
                         LoginViewController.tryAgainGeneral : LoginViewController.tryAgainClient)
+                    self.loginViewController.redraw() // since there isn't a view change, for a redraw
                 }
                 return
             }
             // validation successful
             DispatchQueue.main.async {
-                UserDefaults.standard.set(token, forKey: AppDelegate.kAPIToken)
+                UserDefaults.standard.set(token, forKey: AppDelegate.keyAPIToken)
                 self.scrobblingMode(token, a)
             }
         })

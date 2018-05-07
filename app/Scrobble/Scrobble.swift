@@ -72,7 +72,7 @@ class API {
         var r = URLRequest(url: url)
         r.httpMethod = "POST"
         r.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        r.setValue("Token " + token, forHTTPHeaderField: "Authorization")
+        r.setValue("Token " + token, forHTTPHeaderField: "Authentication")
         r.httpBody = body
         return r
     }
@@ -81,7 +81,7 @@ class API {
         let url = URL(string: API.baseUrl + "/account")!
         var r = URLRequest(url: url)
         r.httpMethod = "GET"
-        r.setValue("Token " + token, forHTTPHeaderField: "Authorization")
+        r.setValue("Token " + token, forHTTPHeaderField: "Authentication")
         return r
     }
 }
@@ -107,15 +107,17 @@ class Sender {
         let semaphore = DispatchSemaphore(value: 0) // to wait synchronously for task completion
         let task = URLSession.shared.dataTask(with: self.req(p, token), completionHandler: {(_, rsp, err) in
             if let h = rsp as? HTTPURLResponse {
-                switch h.statusCode/100 {
-                case 2:
-                    status = .success
-                case 3:
+                if h.statusCode == 401 {
                     status = .authError
-                case 4:
-                    status = .clientError
-                default:
-                    status = .generalError
+                } else {
+                    switch h.statusCode/100 {
+                    case 2:
+                        status = .success
+                    case 4:
+                        status = .clientError
+                    default:
+                        status = .generalError
+                    }
                 }
             }
             semaphore.signal()

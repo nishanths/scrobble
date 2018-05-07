@@ -322,7 +322,7 @@
                             </button>
                             <textField verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bU1-FY-0Us">
                                 <rect key="frame" x="25" y="57" width="190" height="22"/>
-                                <textFieldCell key="cell" selectable="YES" editable="YES" state="on" borderStyle="bezel" alignment="center" placeholderString="API Token" usesSingleLineMode="YES" bezelStyle="round" id="1bA-KI-IxV">
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" continuous="YES" state="on" borderStyle="bezel" alignment="center" placeholderString="API Token" usesSingleLineMode="YES" bezelStyle="round" id="1bA-KI-IxV">
                                     <font key="font" size="13" name="Menlo-Regular"/>
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>

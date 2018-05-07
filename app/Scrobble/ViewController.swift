@@ -18,7 +18,7 @@ class LoginViewController: NSViewController {
     @IBOutlet weak var introText: NSTextField!
     @IBOutlet weak var startButton: NSButton!
 
-    static let enterToken = "Enter token to\nstart scrobbling";
+    static let enterToken = "Enter API token to\nstart scrobbling";
     static let loggingIn = "\nSigning in..."
     static let tryAgainClient = "Invalid token.\nTry again?"
     static let tryAgainGeneral = "Something went wrong.\nTry again?"
@@ -49,7 +49,7 @@ class LoginViewController: NSViewController {
         redraw()
     }
 
-    private func redraw() {
+    func redraw() {
         tokenInput.isEnabled = enabled
         startButton.isEnabled = enabled
         introText.stringValue = introString // TODO: do a Core Animation transition?
