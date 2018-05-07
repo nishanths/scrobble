@@ -73,7 +73,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, LoginViewControllerDelegate,
             button.image?.isTemplate = true
             button.action = #selector(AppDelegate.togglePopover(_:))
         }
-
+        
         popover.behavior = .transient
         popover.animates = true // gross hack: if animation is disabled, layout messes up b/w popover views
         popover.appearance = NSAppearance.init(named: NSAppearance.Name.vibrantLight)
@@ -87,52 +87,52 @@ class AppDelegate: NSObject, NSApplicationDelegate, LoginViewControllerDelegate,
     }
 
     func initializePopoverController() {
-        if let token = UserDefaults.standard.string(forKey: AppDelegate.kAPIToken) {
-            validateToken(token, completion: {account, status in
-                guard let a = account else {
-                    // validation failed
-                    UserDefaults.standard.removeObject(forKey: AppDelegate.kAPIToken)
-                    DispatchQueue.main.async {
-                        self.loginViewController.invalid(status == .generalError ?
-                            LoginViewController.tryAgainGeneral : LoginViewController.tryAgainClient)
-                        self.loginMode()
-                    }
-                    return
-                }
-                // validation successful
-                UserDefaults.standard.set(token, forKey: AppDelegate.kAPIToken)
-                DispatchQueue.main.async {
-                    self.scrobblingMode(token, a)
-                }
-            })
-        }
-
-        // no saved token or failed to validate
-        UserDefaults.standard.removeObject(forKey: AppDelegate.kAPIToken)
-        DispatchQueue.main.async {
+        guard let token = UserDefaults.standard.string(forKey: AppDelegate.kAPIToken) else {
+            // no saved token
+            UserDefaults.standard.removeObject(forKey: AppDelegate.kAPIToken)
             self.loginMode()
+            return
         }
+        
+        validateToken(token, completion: {account, status in
+            guard let a = account else {
+                // validation failed
+                DispatchQueue.main.async {
+                    UserDefaults.standard.removeObject(forKey: AppDelegate.kAPIToken)
+                    self.loginViewController.invalid(status == .generalError ?
+                        LoginViewController.tryAgainGeneral : LoginViewController.tryAgainClient)
+                    self.loginMode()
+                }
+                return
+            }
+            // validation successful
+            DispatchQueue.main.async {
+                UserDefaults.standard.set(token, forKey: AppDelegate.kAPIToken) // must happen on main thread
+                self.scrobblingMode(token, a)
+            }
+        })
     }
 
-    func validateToken(_ t: String, completion: @escaping (Account?, ResponseStatus) -> Void) {
-        let r = API.accountRequest(t)
+    func validateToken(_ token: String, completion: @escaping (Account?, ResponseStatus) -> Void) {
+        let r = API.accountRequest(token)
 
         let task = URLSession.shared.dataTask(with: r, completionHandler: {(data, rsp, err) in
-            if let h = rsp as? HTTPURLResponse {
-                switch h.statusCode/100 {
-                case 2:
-                    // data is guaranteed to exist according to the docs
-                    let account = try? JSONDecoder().decode(Account.self, from: data!)
-                    completion(account, .success)
-                case 3:
-                    completion(nil, .authError)
-                case 4:
-                    completion(nil, .clientError)
-                default:
-                    completion(nil, .generalError)
-                }
+            guard let h = rsp as? HTTPURLResponse else {
+                completion(nil, .generalError)
+                return
             }
-            completion(nil, .generalError)
+            switch h.statusCode/100 {
+            case 2:
+                // data is guaranteed to exist according to the docs
+                let account = try? JSONDecoder().decode(Account.self, from: data!)
+                completion(account, .success)
+            case 3:
+                completion(nil, .authError)
+            case 4:
+                completion(nil, .clientError)
+            default:
+                completion(nil, .generalError)
+            }
         })
 
         task.resume()
@@ -180,16 +180,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, LoginViewControllerDelegate,
     // MARK delegate functions for ScrobbleViewController
 
     func onAuthError() {
-        UserDefaults.standard.removeObject(forKey: AppDelegate.kAPIToken)
         DispatchQueue.main.async {
+            UserDefaults.standard.removeObject(forKey: AppDelegate.kAPIToken)
             self.loginViewController.regular()
             self.loginMode()
         }
     }
 
     func onLogout() {
-        UserDefaults.standard.removeObject(forKey: AppDelegate.kAPIToken)
         DispatchQueue.main.async {
+            UserDefaults.standard.removeObject(forKey: AppDelegate.kAPIToken)
             self.loginViewController.regular()
             self.loginMode()
         }
@@ -205,16 +205,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, LoginViewControllerDelegate,
             // TODO: consider sharing this with the similar block above
             guard let a = account else {
                 // validation failed
-                UserDefaults.standard.removeObject(forKey: AppDelegate.kAPIToken)
                 DispatchQueue.main.async {
+                    UserDefaults.standard.removeObject(forKey: AppDelegate.kAPIToken)
                     self.loginViewController.invalid(status == .generalError ?
                         LoginViewController.tryAgainGeneral : LoginViewController.tryAgainClient)
                 }
                 return
             }
             // validation successful
-            UserDefaults.standard.set(token, forKey: AppDelegate.kAPIToken)
             DispatchQueue.main.async {
+                UserDefaults.standard.set(token, forKey: AppDelegate.kAPIToken) // must happen on main thread
                 self.scrobblingMode(token, a)
             }
         })
