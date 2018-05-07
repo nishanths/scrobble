@@ -19,7 +19,6 @@ func main() {
 }
 
 const (
-	KindSong     = "Song"
 	KindAccount  = "Account"
 	KindPlayback = "Playback"
 )
@@ -54,6 +53,8 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 const theUsername = "nishanths"
 const theEmail = "nishanth.gerrard@gmail.com"
 
+// Acceptable namespaces must match /^[0-9A-Za-z._-]{0,100}$/
+// so we can't use an email address as is. So encode it.
 func namespace(email string) string {
 	dst := make([]byte, hex.EncodedLen(len(email)))
 	hex.Encode(dst, []byte(email))
