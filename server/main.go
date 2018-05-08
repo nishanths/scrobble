@@ -5,6 +5,8 @@ import (
 	cryptorand "crypto/rand"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"strings"
 
@@ -16,23 +18,58 @@ import (
 
 func main() {
 	http.HandleFunc("/", rootHandler)
+
 	// TODO: these can become authenticated handlers via middleware
 	http.HandleFunc("/api/scrobble", scrobbleHandler)
 	http.HandleFunc("/api/account", accountHandler)
+
 	// http.HandleFunc("/token/generate", tokenHandler)
 
 	appengine.Main()
 }
 
 const (
-	KindAccount  = "Account"
-	KindPlayback = "Playback"
+	KindAccount     = "Account"
+	KindUsername    = "Username"
+	KindPreferences = "Preferences"
+	KindPlayback    = "Playback"
 )
 
+// Namespace: [default]
 // Key: name key, email
 type Account struct {
 	APIToken string
 	Username string
+}
+
+// Namespace: [default]
+// Key: name key, username
+type Username struct {
+	Email string
+}
+
+type Visibility int // scrobbled playbacks visibility
+
+const (
+	Private   Visibility = 1
+	Whitelist Visibility = 2
+	Public    Visibility = 3
+)
+
+type Count int // whether to display counts on consecutively repeated playbacks
+
+const (
+	Show    Count = 1
+	Hide    Count = 2
+	Partial Count = 3 // only display an indicator, not the actual number
+)
+
+// Namespace: account
+// Key: name key, email
+type Preferences struct {
+	Visibility Visibility
+	Whitelist  []string
+	Count      Count
 }
 
 type Song struct {
@@ -42,6 +79,7 @@ type Song struct {
 	Urlp, Urli                 string
 }
 
+// Namespace: account
 // Key: ID key, auto-generated
 type Playback struct {
 	Song      Song
@@ -49,9 +87,47 @@ type Playback struct {
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := appengine.NewContext(r)
+
 	if r.Method != http.MethodGet {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
+	}
+
+	parts := strings.Split(r.URL.Path, "/")
+	if len(parts) == 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	maybeUsername := parts[1]
+	key := datastore.NewKey(ctx, KindUsername, maybeUsername, 0, nil)
+	var u Username
+
+	if err := datastore.Get(ctx, key, &u); err != nil {
+		if err == datastore.ErrNoSuchEntity {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	ns, err := appengine.Namespace(ctx, namespace(u.Email))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	var ps []Playback
+	if _, err := playbacks().Order("-StartTime").GetAll(ns, &ps); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/plain")
+	for _, p := range ps {
+		io.WriteString(w, fmt.Sprintf("%+v\n", p))
 	}
 }
 
@@ -69,6 +145,10 @@ func hexencode(b []byte) []byte {
 
 func accountsForToken(token string) *datastore.Query {
 	return datastore.NewQuery(KindAccount).Filter("APIToken=", token)
+}
+
+func playbacks() *datastore.Query {
+	return datastore.NewQuery(KindPlayback)
 }
 
 func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
