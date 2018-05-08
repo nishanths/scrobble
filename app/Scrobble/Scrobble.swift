@@ -138,6 +138,7 @@ class Watcher {
     var token: String?
     var delegate: WatcherDelegate?
     var playbacks: [Playback] = []
+    let itunes = iTunesApp()
 
     var lastPaused: Song?
     var lastPausedTime: TimeInterval? // Unix timestamp
@@ -152,15 +153,6 @@ class Watcher {
     func stop() {
         let d = DistributedNotificationCenter.default()
         d.removeObserver(self, name: NSNotification.Name("com.apple.iTunes.playerInfo"), object: nil)
-    }
-
-    private func isMusic(_ info: Dictionary<AnyHashable, Any>) -> Bool {
-        // this is kinda hacky
-        if let u = info["Store URL"] as? String {
-            let path = URL(string: u)?.path
-            return path == "/album" || path == "/link" // "link" indicates local files
-        }
-        return false
     }
 
     private func isPlaying(_ info: Dictionary<AnyHashable, Any>) -> Bool {
@@ -196,12 +188,11 @@ class Watcher {
     @objc private func trackChange(n: Notification)  {
         let info = n.userInfo!
         let now = Date().timeIntervalSince1970;
-
-        if !isMusic(info) {
-            // only consider music (don't include podcasts, etc.)
+        
+        if !itunes.currentTrackIsSong() {
             return
         }
-
+        
         if isPaused(info) {
             // record the latest pause info
             self.lastPaused = Song(fromNotification: info)

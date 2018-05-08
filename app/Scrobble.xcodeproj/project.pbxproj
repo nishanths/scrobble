@@ -14,6 +14,7 @@
 		8572478E209FB9A9005A5017 /* ScrobbleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8572478D209FB9A9005A5017 /* ScrobbleTests.swift */; };
 		85724799209FB9A9005A5017 /* ScrobbleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85724798209FB9A9005A5017 /* ScrobbleUITests.swift */; };
 		857247A7209FB9E7005A5017 /* Scrobble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857247A6209FB9E7005A5017 /* Scrobble.swift */; };
+		85A0A2E220A2605C00847A70 /* iTunesApp.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A0A2E120A2605C00847A70 /* iTunesApp.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +49,10 @@
 		85724798209FB9A9005A5017 /* ScrobbleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrobbleUITests.swift; sourceTree = "<group>"; };
 		8572479A209FB9A9005A5017 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		857247A6209FB9E7005A5017 /* Scrobble.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Scrobble.swift; sourceTree = "<group>"; };
+		85A0A2E020A2605C00847A70 /* Scrobble-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Scrobble-Bridging-Header.h"; sourceTree = "<group>"; };
+		85A0A2E120A2605C00847A70 /* iTunesApp.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = iTunesApp.m; sourceTree = "<group>"; };
+		85A0A2E420A261CD00847A70 /* iTunes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iTunes.h; sourceTree = "<group>"; };
+		85A0A2E520A264B700847A70 /* iTunesApp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iTunesApp.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +103,7 @@
 		85724779209FB9A9005A5017 /* Scrobble */ = {
 			isa = PBXGroup;
 			children = (
+				85A0A2E420A261CD00847A70 /* iTunes.h */,
 				85059402209FBAA5009E3996 /* Main.storyboard */,
 				857247A6209FB9E7005A5017 /* Scrobble.swift */,
 				8572477A209FB9A9005A5017 /* AppDelegate.swift */,
@@ -105,6 +111,9 @@
 				8572477E209FB9A9005A5017 /* Assets.xcassets */,
 				85724783209FB9A9005A5017 /* Info.plist */,
 				85724784209FB9A9005A5017 /* Scrobble.entitlements */,
+				85A0A2E120A2605C00847A70 /* iTunesApp.m */,
+				85A0A2E020A2605C00847A70 /* Scrobble-Bridging-Header.h */,
+				85A0A2E520A264B700847A70 /* iTunesApp.h */,
 			);
 			path = Scrobble;
 			sourceTree = "<group>";
@@ -195,6 +204,7 @@
 				TargetAttributes = {
 					85724776209FB9A9005A5017 = {
 						CreatedOnToolsVersion = 9.2;
+						LastSwiftMigration = 0920;
 						ProvisioningStyle = Automatic;
 					};
 					85724788209FB9A9005A5017 = {
@@ -263,6 +273,7 @@
 				8572477D209FB9A9005A5017 /* ViewController.swift in Sources */,
 				857247A7209FB9E7005A5017 /* Scrobble.swift in Sources */,
 				8572477B209FB9A9005A5017 /* AppDelegate.swift in Sources */,
+				85A0A2E220A2605C00847A70 /* iTunesApp.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -408,6 +419,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Scrobble/Scrobble.entitlements;
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
@@ -416,6 +428,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.nishanths.Scrobble;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Scrobble/Scrobble-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
@@ -424,6 +438,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Scrobble/Scrobble.entitlements;
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
@@ -432,6 +447,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.nishanths.Scrobble;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Scrobble/Scrobble-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
