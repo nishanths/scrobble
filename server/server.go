@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"context"
@@ -21,17 +21,13 @@ import (
 	"google.golang.org/appengine/urlfetch"
 )
 
-func main() {
+func RegisterHandlers() {
 	http.HandleFunc("/", rootHandler)
 
 	// TODO: these can become authenticated handlers via middleware
 	http.HandleFunc("/api/scrobble", scrobbleHandler)
 	http.HandleFunc("/api/account", accountHandler)
 	http.HandleFunc("/api/scrobbles", scrobblesHandler)
-
-	// http.HandleFunc("/token/generate", tokenHandler)
-
-	appengine.Main()
 }
 
 const (
@@ -299,6 +295,11 @@ func scrobblesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if appengine.IsDevAppServer() {
+		devScrobblesHandler(w, r)
+		return
+	}
+
 	username := r.FormValue("username")
 	if username == "" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -375,9 +376,8 @@ func scrobblesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type CoalescedPlayback struct {
-	Song                          Song
-	FirstStartTime, LastStartTime int64
-	Count                         int
+	Song       Song
+	StartTimes []int64
 }
 
 type PlaybackResponse struct {
@@ -390,28 +390,19 @@ func coalesce(ps []Playback) []CoalescedPlayback {
 		return nil
 	}
 
-	if len(ps) == 1 {
-		return []CoalescedPlayback{{ps[0].Song, ps[0].StartTime, ps[0].StartTime, 1}}
-	}
+	cs := []CoalescedPlayback{{ps[0].Song, []int64{ps[0].StartTime}}}
+	current := ps[0]
 
-	var cs []CoalescedPlayback
-	prev := ps[1]
-	count := 1
-	i := 2
-
-	for ; i < len(ps); i++ {
+	for i := 1; i < len(ps); i++ {
 		p := ps[i]
-		if !equal(prev.Song, p.Song) {
-			cs = append(cs, CoalescedPlayback{prev.Song, prev.StartTime, ps[i-1].StartTime, count})
-			// reset
-			prev = p
-			count = 1
+		if !equal(current.Song, p.Song) {
+			cs = append(cs, CoalescedPlayback{p.Song, []int64{p.StartTime}})
+			current = p
 		} else {
-			count++
+			cs[len(cs)-1].StartTimes = append(cs[len(cs)-1].StartTimes, p.StartTime)
 		}
 	}
 
-	cs = append(cs, CoalescedPlayback{prev.Song, prev.StartTime, ps[i-1].StartTime, count})
 	return cs
 }
 

@@ -1,0 +1,14 @@
+runtime: go
+api_version: go1
+
+handlers:
+- url: /
+  static_files: web/dist/index.html
+  upload: web/dist/index.html
+
+# Otherwise, find file in dist directory
+- url: /dist
+  static_dir: web/dist
+
+- url: /.*
+  script: _go_app
