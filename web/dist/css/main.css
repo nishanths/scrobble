@@ -1,0 +1,35 @@
+body {
+  font-family: "proxima nova", sans-serif; }
+
+.social-buttons__service-name {
+  margin-left: 9px; }
+
+.button {
+  background: #fff;
+  border-color: #c8d7e1;
+  border-style: solid;
+  border-width: 1px 1px 2px;
+  color: #2e4453;
+  cursor: pointer;
+  display: inline-block;
+  margin: 0;
+  outline: 0;
+  overflow: hidden;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  text-decoration: none;
+  vertical-align: top;
+  box-sizing: border-box;
+  font-size: 14px;
+  line-height: 21px;
+  border-radius: 4px;
+  padding: 7px 14px 9px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none; }
+
+.button:hover {
+  border-color: #a8bece;
+  color: #2e4453; }
+
+/*# sourceMappingURL=main.css.map */

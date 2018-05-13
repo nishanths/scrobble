@@ -2,13 +2,15 @@ runtime: go
 api_version: go1
 
 handlers:
-- url: /
-  static_files: web/dist/index.html
-  upload: web/dist/index.html
+- url: /favicon.ico
+  static_files: web/static/favicon.ico
+  upload: web/static/favicon.ico # TODO: add this icon
 
-# Otherwise, find file in dist directory
 - url: /dist
   static_dir: web/dist
+
+- url: /static
+  static_dir: web/static
 
 - url: /.*
   script: _go_app

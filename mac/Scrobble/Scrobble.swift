@@ -188,7 +188,7 @@ class Watcher {
     @objc private func trackChange(n: Notification)  {
         let info = n.userInfo!
         let now = Date().timeIntervalSince1970;
-        
+
         if !itunes.currentTrackIsSong() {
             return
         }
