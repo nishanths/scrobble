@@ -37,3 +37,4 @@ bindata:
 .PHONY: go-deps
 go-deps:
 	go get github.com/jteeuwen/go-bindata/...
+
