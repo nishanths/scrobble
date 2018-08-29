@@ -32,6 +32,8 @@ struct State {
     var account: API.Account?
     // whether there is a scrobble request inflight
     var scrobbling: Bool
+    // whether the latest scrobble request resulted in an auth error
+    var authError: Bool
 }
 
 @NSApplicationMain
@@ -62,7 +64,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                               lastScrobbled: nil,
                               latestPlayed: nil,
                               account: nil,
-                              scrobbling: false)
+                              scrobbling: false,
+                              authError: false)
     
     private var lib: ITLibrary? = nil
     
@@ -150,7 +153,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         }
         
         // Status item
-        if state.scrobbling {
+        if state.authError {
+            statusItem.title = "Failed to scrobble: outdated API Key?"
+            statusItem.isHidden = false
+        } else if state.scrobbling {
             statusItem.title = String(format: "Scrobbling now...")
             statusItem.isHidden = false
         } else {
@@ -194,17 +200,25 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
             
             guard err == nil else { return }
             guard let r = rsp as! HTTPURLResponse? else { return }
-            guard r.statusCode == 200 else { return }
             
-            DispatchQueue.main.async {
-                self.state.lastScrobbled = Date(timeIntervalSinceNow: 0)
-                self.state.latestPlayed = latest
-                UserDefaults.standard.set(self.state.lastScrobbled?.timeIntervalSince1970, forKey: AppDelegate.keyLastScrobbled)
-                UserDefaults.standard.set(self.state.latestPlayed?.timeIntervalSince1970, forKey: AppDelegate.keyLatestPlayed)
+            if r.statusCode == 401 {
+                self.state.authError = true
                 self.render()
+                return
             }
             
-            self.handleArtwork()
+            if r.statusCode == 200 {
+                DispatchQueue.main.async {
+                    self.state.lastScrobbled = Date(timeIntervalSinceNow: 0)
+                    self.state.latestPlayed = latest
+                    self.state.authError = false
+                    UserDefaults.standard.set(self.state.lastScrobbled?.timeIntervalSince1970, forKey: AppDelegate.keyLastScrobbled)
+                    UserDefaults.standard.set(self.state.latestPlayed?.timeIntervalSince1970, forKey: AppDelegate.keyLatestPlayed)
+                    self.render()
+                }
+                self.handleArtwork()
+                return
+            }
         }
     }
     
@@ -293,15 +307,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         a.showsSuppressionButton = false
         a.showsHelp = true
         a.delegate = self
-        a.addButton(withTitle: "Cancel")
         a.addButton(withTitle: "Clear API Key")
+        a.addButton(withTitle: "Cancel")
         
         let result = a.runModal()
         switch result {
         case NSApplication.ModalResponse.alertFirstButtonReturn:
-        break // nothing to do
-        case NSApplication.ModalResponse.alertSecondButtonReturn:
             clearAPIKey()
+        case NSApplication.ModalResponse.alertSecondButtonReturn:
+        break // nothing to do
         default:
             print("unhandled button", result)
         }
@@ -332,7 +346,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         textField!.cell?.wraps = false
         textField!.cell?.isScrollable = false
         textField!.delegate = self
-        textField!.font = NSFont.systemFont(ofSize: NSFont.systemFontSize)
+        textField!.font = NSFont.monospacedDigitSystemFont(ofSize: NSFont.systemFontSize, weight: .regular)
         textField!.placeholderString = "e.g., D1A3903GB"
         alert!.accessoryView = textField
         alert!.window.initialFirstResponder = alert!.accessoryView
@@ -346,7 +360,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         }
         return true
     }
-
+    
     @objc private func okButtonAction(_ sender: Any?) {
         let key = textField!.stringValue
         if key.isEmpty {
