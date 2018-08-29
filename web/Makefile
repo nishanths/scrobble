@@ -1,4 +1,4 @@
-WEBPACK := node_modules/.bin/webpack-cli --no-color
+WEBPACK := node_modules/.bin/webpack-cli
 
 default: dev
 
@@ -8,7 +8,7 @@ dev:
 
 .PHONY: dist
 dist:
-	$(WEBPACK) --mode=production
+	$(WEBPACK) --no-color --mode=production
 
 .PHONY: clean
 clean:
