@@ -9,7 +9,7 @@ export interface SetUsernameProps {
 
 export class SetUsername extends React.Component<SetUsernameProps, {username: string, error: string}> {
   private input: HTMLInputElement|null = null;
-  private static usernameRe = /^[a-z0-9]*$/
+  private static readonly usernameRe = /^[a-z0-9]*$/
 
   constructor(props: SetUsernameProps) {
     super(props)
@@ -23,7 +23,7 @@ export class SetUsername extends React.Component<SetUsernameProps, {username: st
     this.input!.focus();
   }
 
-  private setUsername(u: string) {
+  private initializeAccount(u: string) {
      let {reason, ok} = SetUsername.validate(u)
      if (!ok) {
        this.setState({error: reason})
@@ -31,17 +31,17 @@ export class SetUsername extends React.Component<SetUsernameProps, {username: st
      }
 
     this.setState({error: ""})
-    const genericError = "Something went wrong? Try again"
+    const genericError = "Something went wrong. Try again?"
     let success = false;
 
-    fetch(`https://${this.props.host}/setUsername?username=${u}`, {method: "POST"})
+    fetch(`https://${this.props.host}/initializeAccount?username=${u}`, {method: "POST"})
       .then(res => {
         if (res.status == 200) {
           success = true
           return res.json()
         }
         if (res.status == 406) {
-          this.setState({error: "That username is already taken."})
+          this.setState({error: "The username is already taken"})
           return res.text()
         }
         this.setState({error: genericError})
@@ -81,7 +81,7 @@ export class SetUsername extends React.Component<SetUsernameProps, {username: st
 
   private handleSubmit(e: any) {
     e.preventDefault()
-    this.setUsername(this.state.username)
+    this.initializeAccount(this.state.username)
   }
 
   render() {

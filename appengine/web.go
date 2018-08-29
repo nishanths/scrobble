@@ -23,6 +23,8 @@ var (
 	uTmpl     = template.Must(template.New("").Parse(string(MustAsset("appengine/template/u.html"))))
 )
 
+var defaultTxOpts = &datastore.TransactionOptions{XG: true}
+
 type BootstrapArgs struct {
 	Host      string  `json:"host"`
 	Email     string  `json:"email"`
@@ -84,8 +86,8 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var a Account
-	if err := datastore.Get(ctx, datastore.NewKey(ctx, KindAccount, u.Email, 0, nil), &a); err != nil {
+	a, err := ensureAccount(ctx, u.Email)
+	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -99,6 +101,32 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 			Account:   a,
 		},
 	})
+}
+
+func ensureAccount(ctx context.Context, email string) (Account, error) {
+	var account Account
+
+	err := datastore.RunInTransaction(ctx, func(tx context.Context) error {
+		aKey := datastore.NewKey(tx, KindAccount, email, 0, nil)
+
+		if err := datastore.Get(tx, aKey, &account); err != nil {
+			if err == datastore.ErrNoSuchEntity {
+				// account entity does not exists; create new account entity
+				if _, err := datastore.Put(tx, aKey, &account); err != nil {
+					return errors.Wrapf(err, "failed to put account for %s", email)
+				}
+				return nil
+			}
+
+			// generic error
+			return errors.Wrapf(err, "failed to get account for %s", email)
+		}
+
+		// account entity exists
+		return nil
+	}, defaultTxOpts)
+
+	return account, err
 }
 
 type UArgs struct {
@@ -179,7 +207,7 @@ func pathComponents(path string) []string {
 }
 
 // Sets the username for the account and initializes the account.
-func setUsernameHandler(w http.ResponseWriter, r *http.Request) {
+func initializeAccountHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 
 	if r.Method != "POST" {
@@ -238,9 +266,10 @@ func setUsernameHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		return nil
-	}, nil)
+	}, defaultTxOpts)
 
 	if err != nil {
+		log.Errorf(ctx, "%v", err.Error())
 		if inUse {
 			w.WriteHeader(http.StatusNotAcceptable) // gross, but whatever
 		} else {
@@ -291,7 +320,7 @@ func newAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 
 		apiKey = k
 		return nil
-	}, nil)
+	}, defaultTxOpts)
 
 	if err != nil {
 		log.Errorf(ctx, "%v", err.Error())
@@ -339,7 +368,7 @@ func setPrivacyHandler(w http.ResponseWriter, r *http.Request) {
 			return errors.Wrapf(err, "failed to put account for %s", u.Email)
 		}
 		return nil
-	}, nil)
+	}, defaultTxOpts)
 
 	if err != nil {
 		log.Errorf(ctx, "%v", err.Error())

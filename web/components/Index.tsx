@@ -52,7 +52,6 @@ export class Index extends React.Component<{p: IndexProps}, {account: Account}> 
       {this.signIn()}
       {this.state.account.username ? this.profile() : this.visit()}
       {this.download()}
-      <p><a href="https://github.com/nishanths/scrobble">More resources</a></p>
     </div>
   }
 }
