@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"crypto/rand"
 	"crypto/sha1"
 	"encoding/base64"
@@ -15,6 +14,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"golang.org/x/net/context"
 
 	"cloud.google.com/go/storage"
 	"github.com/pkg/errors"

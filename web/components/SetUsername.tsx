@@ -34,7 +34,7 @@ export class SetUsername extends React.Component<SetUsernameProps, {username: st
     const genericError = "Something went wrong. Try again?"
     let success = false;
 
-    fetch(`https://${this.props.host}/initializeAccount?username=${u}`, {method: "POST"})
+    fetch(`/initializeAccount?username=${u}`, {method: "POST"})
       .then(res => {
         if (res.status == 200) {
           success = true

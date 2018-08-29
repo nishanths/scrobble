@@ -4,6 +4,9 @@ import { Header } from "./Header"
 import "../scss/u.scss"
 
 class Songs extends React.Component<{songs: Song[]}, {}> {
+  render() {
+    return <div>{this.props.songs.length}</div>
+  }
 }
 
 type UsernamePageProps = UArgs
@@ -33,7 +36,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
   private fetchSongs() {
     let success = false
 
-    fetch("https://" + this.props.host + "/api/v1/scrobbled?username=" + this.props.profileUsername, {method: "GET"})
+    fetch("/api/v1/scrobbled?username=" + this.props.profileUsername, {method: "GET"})
       .then(r => {
         if (r.status == 200) {
           success = true
@@ -65,6 +68,13 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
       return <div>
         {this.header()}
         <div>This user's scrobbles are private.</div>
+      </div>
+    }
+
+    if (this.state.songs.length == 0) {
+      return <div>
+        {this.header()}
+        <div>{(this.props.self ? "You haven't" : "This user hasn't") + " scrobbled yet."}</div>
       </div>
     }
 

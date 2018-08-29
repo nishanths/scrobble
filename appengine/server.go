@@ -1,15 +1,30 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+
+	"google.golang.org/appengine"
+)
 
 func RegisterHandlers() {
 	http.Handle("/", withHTTPS(http.HandlerFunc(rootHandler)))
-	http.Handle("/u/", withHTTPS(http.HandlerFunc(uHandler)))
+
+	if appengine.IsDevAppServer() {
+		http.HandleFunc("/u/", devUHandler)
+	} else {
+		http.Handle("/u/", withHTTPS(http.HandlerFunc(uHandler)))
+	}
+
 	http.Handle("/initializeAccount", withHTTPS(http.HandlerFunc(initializeAccountHandler)))
 	http.Handle("/newAPIKey", withHTTPS(http.HandlerFunc(newAPIKeyHandler)))
 	http.Handle("/setPrivacy", withHTTPS(http.HandlerFunc(setPrivacyHandler)))
 
-	http.HandleFunc("/api/v1/scrobbled", scrobbledHandler)
+	if appengine.IsDevAppServer() {
+		http.HandleFunc("/api/v1/scrobbled", devScrobbledHandler)
+	} else {
+		http.HandleFunc("/api/v1/scrobbled", scrobbledHandler)
+	}
+
 	http.HandleFunc("/api/v1/scrobble", scrobbleHandler)
 	http.HandleFunc("/api/v1/account", accountHandler)
 	http.HandleFunc("/api/v1/artwork", artworkHandler)

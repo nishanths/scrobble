@@ -38,7 +38,7 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
 
     const genericErr = "Failed to generate API key. Try again?"
 
-    fetch(`https://${this.props.host}/newAPIKey`, {method: "POST"})
+    fetch(`/newAPIKey`, {method: "POST"})
       .then(res => {
         if (res.status == 200) {
           success = true
@@ -64,7 +64,7 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
     this.setState({showPrivacySaved: false, privacySaveErr: ""})
     let success = false
 
-    fetch(`https://${this.props.host}/setPrivacy?privacy=${v.toString()}`, {method: "POST"})
+    fetch(`/setPrivacy?privacy=${v.toString()}`, {method: "POST"})
       .then(
         r => {
           if (r.status == 200) {

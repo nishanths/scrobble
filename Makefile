@@ -1,5 +1,7 @@
 PWD        := $(shell pwd)
-PROJECT-ID := selective-scrobble
+PROJECT_ID := selective-scrobble
+DEV_APPSERVER     := dev_appserver.py
+DEV_APPSERVER_CMD := $(DEV_APPSERVER) appengine/app.yaml
 
 # NOTE: to deploy, typically you want `make all` followed by `make deploy`.
 
@@ -14,7 +16,7 @@ other: _bootstrap bindata ln-web
 
 .PHONY: deploy
 deploy:
-	gcloud --quiet --project $(PROJECT-ID) app deploy appengine/app.yaml
+	gcloud --quiet --project $(PROJECT_ID) app deploy appengine/app.yaml
 
 .PHONY: bindata
 bindata:
@@ -49,3 +51,7 @@ _bootstrap:
 
 .PHONY: build
 build: go web
+
+.PHONY: dev
+dev:
+	$(DEV_APPSERVER_CMD)
