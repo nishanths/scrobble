@@ -9,7 +9,7 @@ all: clean _bootstrap bindata ln-web
 
 .PHONY: deploy
 deploy:
-	gcloud app deploy --project $(PROJECT-ID) appengine/app.yaml
+	gcloud --quiet --project $(PROJECT-ID) app deploy appengine/app.yaml
 
 .PHONY: bindata
 bindata:

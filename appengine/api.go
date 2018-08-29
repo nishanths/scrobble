@@ -41,8 +41,8 @@ const (
 // Namespace: [default]
 // Key: email
 type Account struct {
-	APIKey   string
-	Username string
+	APIKey   string `json:"apiKey"`
+	Username string `json:"username"`
 }
 
 // Namespace: account
@@ -458,7 +458,7 @@ func namespaceFromAccount(ctx context.Context, accountID string, w http.Response
 	return ns, true
 }
 
-func generateAPIToken() (string, error) {
+func generateAPIKey() (string, error) {
 	b := make([]byte, 8)
 	_, err := rand.Read(b)
 	if err != nil {

@@ -2,26 +2,20 @@ package main
 
 import (
 	"regexp"
+	"strings"
 )
 
 var usernameRe = regexp.MustCompile(`^[a-z0-9]*$`)
 
-const (
-	reasonLengthShort = iota
-	reasonLengthLong
-	reasonDisallowedChar
-	reasonAlreadyTaken
-)
-
-func isAllowedUsername(s string) (bool, int) {
+func isAllowedUsername(s string) bool {
 	if len(s) <= 1 {
-		return false, reasonLengthShort
+		return false
 	}
 	if len(s) >= 31 {
-		return false, reasonLengthLong
+		return false
 	}
 	if !usernameRe.MatchString(s) {
-		return false, reasonDisallowedChar
+		return false
 	}
-	return true, 0
+	return strings.Index(s, "scrobble") == -1 && s != "username"
 }
