@@ -2,10 +2,10 @@ PWD        := $(shell pwd)
 PROJECT-ID := selective-scrobble
 
 default:
-	@echo "the default target does nothing"
+	@echo "the default target does nothing!"
 
 .PHONY: all
-all: bindata ln-web
+all: clean _bootstrap bindata ln-web
 
 .PHONY: deploy
 deploy:
@@ -15,8 +15,8 @@ deploy:
 bindata:
 	go-bindata -pkg=main -o=appengine/template.go appengine/template
 
-.PHONY: go-deps
-go-deps:
+.PHONY: deps
+deps:
 	go get github.com/jteeuwen/go-bindata/...
 
 .PHONY: ln-web
@@ -29,3 +29,7 @@ ln-web:
 clean:
 	rm -rf web/dist
 	rm -rf appengine/web
+
+.PHONY: _bootstrap
+_bootstrap:
+	mkdir -p web/dist

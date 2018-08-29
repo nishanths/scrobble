@@ -92,7 +92,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate {
         // initially fetch account info
         guard let key = state.apiKey else { return }
         NSURLConnection.sendAsynchronousRequest(API.accountRequest(key), queue: OperationQueue.main) {(rsp, data, err) in
-            guard err != nil else { return }
+            guard err == nil else { return }
             guard let rr = rsp as! HTTPURLResponse? else { return }
             guard rr.statusCode == 200 else { return }
             DispatchQueue.main.async {

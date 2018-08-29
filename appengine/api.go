@@ -392,7 +392,7 @@ func artworkMissingHandler(w http.ResponseWriter, r *http.Request) {
 		want[k.StringID()] = true
 	}
 
-	log.Infof(ns, "%d artwork records missing artwork data", len(want))
+	log.Infof(ns, "%d artwork records with missing data", len(want))
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(want); err != nil {
