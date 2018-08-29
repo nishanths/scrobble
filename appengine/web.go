@@ -27,7 +27,7 @@ type BootstrapArgs struct {
 	LoginURL    string  `json:"loginURL"`
 	LogoutURL   string  `json:"logoutURL"`
 	DownloadURL string  `json:"downloadURL"`
-	Account     Account `json:"Account"`
+	Account     Account `json:"account"`
 }
 
 type IndexArgs struct {
