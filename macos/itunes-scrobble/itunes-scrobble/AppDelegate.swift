@@ -35,7 +35,7 @@ struct State {
 }
 
 @NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlertDelegate {
     private static let menuIconName = "itunes-scrobble-18x18" // size from https://stackoverflow.com/a/33708433
     static let baseUrl = "selective-scrobble.appspot.com"
     private static let helpLink = "https://scrobble.allele.cc"
@@ -294,7 +294,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate {
         a.alertStyle = .informational
         a.messageText = String(format: "Scrobbling as %@.", state.account!.username)
         a.showsSuppressionButton = false
-        a.showsHelp = false
+        a.showsHelp = true
+        a.delegate = self
         a.addButton(withTitle: "Cancel")
         a.addButton(withTitle: "Clear API Key")
         
@@ -319,8 +320,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate {
         alert!.alertStyle = .informational
         alert!.messageText = "Enter API key."
         alert!.showsSuppressionButton = false
-        alert!.showsHelp = false
-        alert!.informativeText = String(format: "See %@.", AppDelegate.helpLink)
+        alert!.showsHelp = true
+        alert!.delegate = self
         
         let okButton = alert!.addButton(withTitle: "OK")
         oldOkButtonTarget = okButton.target
@@ -342,6 +343,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate {
         alert!.runModal()
     }
     
+    func alertShowHelp(_ alert: NSAlert) -> Bool {
+        if let u = URL(string: AppDelegate.helpLink) {
+            NSWorkspace.shared.open(u)
+        }
+        return true
+    }
+
     @objc private func okButtonAction(_ sender: Any?) {
         let key = textField!.stringValue
         if key.isEmpty {
