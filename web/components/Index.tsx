@@ -7,7 +7,7 @@ import "../scss/index.scss";
 type IndexProps = BootstrapArgs
 
 export class Index extends React.Component<{p: IndexProps}, {account: Account}> {
-  private static readonly downloadURL = "https://github.com/nishanths/scrobble/releases"
+  private static readonly downloadURL = "https://github.com/nishanths/scrobble/releases/latest"
 
   constructor(props: {p: IndexProps}) {
     super(props)
