@@ -11,7 +11,7 @@ interface AccountDetailState {
   apiKey: string
   keyGenerateErr: string
   private: boolean
-  showPrivacySaved: boolean // "saved" text for privacy input
+  showPrivacySaved: boolean
   privacySaveErr: string
 }
 

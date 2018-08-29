@@ -1,11 +1,16 @@
 PWD        := $(shell pwd)
 PROJECT-ID := selective-scrobble
 
+# NOTE: to deploy, typically you want `make all` followed by `make deploy`.
+
 default:
 	@echo "the default target does nothing!"
 
 .PHONY: all
 all: clean _bootstrap bindata build ln-web
+
+.PHONY: other
+other: _bootstrap bindata ln-web
 
 .PHONY: deploy
 deploy:

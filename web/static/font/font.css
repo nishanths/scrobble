@@ -1,0 +1,17 @@
+@font-face {
+  font-family: cooper-hewitt;
+  font-weight: 400;
+  src: url("/static/font/cooper-hewitt/CooperHewitt-Book.otf") format("opentype");
+}
+
+@font-face {
+  font-family: cooper-hewitt;
+  font-weight: 500;
+  src: url("/static/font/cooper-hewitt/CooperHewitt-Medium.otf") format("opentype");
+}
+
+@font-face {
+  font-family: cooper-hewitt;
+  font-weight: 700;
+  src: url("/static/font/cooper-hewitt/CooperHewitt-Bold.otf") format("opentype");
+}

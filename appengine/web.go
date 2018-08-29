@@ -12,6 +12,7 @@ import (
 	"github.com/pkg/errors"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/datastore"
+	"google.golang.org/appengine/file"
 	"google.golang.org/appengine/log"
 	"google.golang.org/appengine/user"
 )
@@ -131,9 +132,12 @@ func ensureAccount(ctx context.Context, email string) (Account, error) {
 
 type UArgs struct {
 	Title           string  `json:"title"`
+	Host            string  `json:"host"`
+	ArtworkBaseURL  string  `json:"artworkBaseURL"`
 	ProfileUsername string  `json:"profileUsername"`
 	LogoutURL       string  `json:"logoutURL"`
 	Account         Account `json:"account"`
+	Self            bool    `json:"self"`
 }
 
 func uHandler(w http.ResponseWriter, r *http.Request) {
@@ -151,7 +155,6 @@ func uHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	profileUsername := c[1]
-
 	profileAcc, profileAccID, ok := fetchAccountForUsername(ctx, profileUsername, w)
 	if !ok {
 		return
@@ -168,9 +171,11 @@ func uHandler(w http.ResponseWriter, r *http.Request) {
 	// If the user is logged in, gather a logout URL and the account info.
 	var logoutURL string
 	var account Account
+	self := false
+
 	if u != nil {
 		var err error
-		logoutURL, err = user.LogoutURL(ctx, "https://"+r.URL.Host+r.RequestURI)
+		logoutURL, err = user.LogoutURL(ctx, "https://"+r.Host+r.RequestURI)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -179,13 +184,24 @@ func uHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+		self = account.Username != "" && account.Username == profileUsername
+	}
+
+	bucketName, err := file.DefaultBucketName(ctx)
+	if err != nil {
+		log.Errorf(ctx, "failed to get default GCS bucket name: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	if err := uTmpl.Execute(w, UArgs{
 		Title:           profileUsername,
+		Host:            r.Host,
+		ArtworkBaseURL:  "https://storage.googleapis.com/" + bucketName + "/" + artworkStorageDirectory,
 		ProfileUsername: profileUsername,
 		LogoutURL:       logoutURL,
 		Account:         account,
+		Self:            self,
 	}); err != nil {
 		log.Errorf(ctx, "failed to execute template: %v", err.Error())
 	}
@@ -260,7 +276,6 @@ func initializeAccountHandler(w http.ResponseWriter, r *http.Request) {
 		account.Username = username
 		account.APIKey = gen
 		account.Private = true
-		account.PlayCount = false
 		if _, err := datastore.Put(tx, aKey, &account); err != nil {
 			return errors.Wrapf(err, "failed to put account for %s", u.Email)
 		}

@@ -42,10 +42,9 @@ const (
 // Namespace: [default]
 // Key: email
 type Account struct {
-	APIKey    string `json:"apiKey"`
-	Username  string `json:"username"`
-	Private   bool   `json:"private"`
-	PlayCount bool   `json:"playCount"`
+	APIKey   string `json:"apiKey"`
+	Username string `json:"username"`
+	Private  bool   `json:"private"`
 }
 
 // Namespace: account
@@ -59,9 +58,9 @@ type Song struct {
 	Year       int           `json:"year"`
 
 	// sorting fields
-	SortAlbumTitle string `datastore:",noindex" json:"sortAlbumTitle"`
-	SortArtistName string `datastore:",noindex" json:"sortArtistName"`
-	SortTitle      string `datastore:",noindex" json:"sortTitle"`
+	SortAlbumTitle string `json:"sortAlbumTitle"`
+	SortArtistName string `json:"sortArtistName"`
+	SortTitle      string `json:"sortTitle"`
 
 	// play info
 	LastPlayed int64 `json:"lastPlayed"`
@@ -141,8 +140,11 @@ func scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	q := datastore.NewQuery(KindSong).
+		Order("-LastPlayed")
+
 	var songs []Song
-	_, err := datastore.NewQuery(KindSong).GetAll(ns, &songs)
+	_, err := q.GetAll(ns, &songs)
 	if err != nil {
 		log.Errorf(ns, "failed to fetch songs: %v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
@@ -221,15 +223,27 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 
 	songs := make([]Song, len(mis))
 	for i, m := range mis {
+		sal := m.SortAlbumTitle
+		if sal == "" {
+			sal = m.AlbumTitle
+		}
+		sar := m.SortArtistName
+		if sar == "" {
+			sal = m.ArtistName
+		}
+		st := m.SortTitle
+		if st == "" {
+			st = m.Title
+		}
 		songs[i] = Song{
 			AlbumTitle:     m.AlbumTitle,
 			ArtistName:     m.ArtistName,
 			Title:          m.Title,
 			TotalTime:      time.Duration(m.TotalTime) * (time.Millisecond / time.Nanosecond),
 			Year:           int(m.Year),
-			SortAlbumTitle: m.SortAlbumTitle,
-			SortArtistName: m.SortArtistName,
-			SortTitle:      m.SortTitle,
+			SortAlbumTitle: sal,
+			SortArtistName: sar,
+			SortTitle:      st,
 			LastPlayed:     int64(m.LastPlayed),
 			PlayCount:      int(m.PlayCount),
 			ArtworkHash:    m.ArtworkHash,

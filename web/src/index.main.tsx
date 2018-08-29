@@ -6,6 +6,6 @@ import { BootstrapArgs } from "./shared";
 declare var bootstrap: BootstrapArgs;
 
 ReactDOM.render(
-  <Index p={bootstrap}/>,
+  <Index {...bootstrap}/>,
   document.querySelector("#app")
 );

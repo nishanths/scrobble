@@ -6,13 +6,13 @@ import "../scss/index.scss";
 
 type IndexProps = BootstrapArgs
 
-export class Index extends React.Component<{p: IndexProps}, {account: Account}> {
+export class Index extends React.Component<IndexProps, {account: Account}> {
   private static readonly downloadURL = "https://github.com/nishanths/scrobble/releases/latest"
 
-  constructor(props: {p: IndexProps}) {
+  constructor(props: IndexProps) {
     super(props)
     this.state = {
-      account: this.props.p.account
+      account: this.props.account
     }
   }
 
@@ -21,21 +21,21 @@ export class Index extends React.Component<{p: IndexProps}, {account: Account}> 
   }
 
   private signIn() {
-    if (this.props.p.email && this.props.p.logoutURL) {
-      return <p><a href={this.props.p.logoutURL}>Sign out</a> ({this.props.p.email})</p>
+    if (this.props.email && this.props.logoutURL) {
+      return <p><a href={this.props.logoutURL}>Sign out</a> ({this.props.email})</p>
     }
-    if (this.props.p.loginURL) {
-      return <p><a href={this.props.p.loginURL}>Sign in with Google</a> to get started</p>
+    if (this.props.loginURL) {
+      return <p><a href={this.props.loginURL}>Sign in with Google</a> to get started</p>
     }
     return null;
   }
 
   private visit() {
-    return <p>To see a user's scrobbled songs, go to <a href="">https://{this.props.p.host}/u/&lt;username&gt;</a></p>
+    return <p>To see a user's scrobbled songs, go to <a href="">https://{this.props.host}/u/&lt;username&gt;</a></p>
   }
 
   private profile() {
-    return this.state.account && <p><a href={"https://" + this.props.p.host + "/u/" + this.state.account.username}>Your scrobbles</a></p>
+    return this.state.account && <p><a href={"https://" + this.props.host + "/u/" + this.state.account.username}>Your scrobbles</a></p>
   }
 
   private download() {
@@ -44,11 +44,11 @@ export class Index extends React.Component<{p: IndexProps}, {account: Account}> 
 
   render() {
     return <div>
-      <h1>{this.props.p.host}</h1>
-      {this.props.p.email && !this.state.account.username &&
-        <SetUsername host={this.props.p.host} accountChange={this.updateAccount.bind(this)}/>}
-      {this.props.p.email && this.state.account.username &&
-        <AccountDetail account={this.state.account} host={this.props.p.host}/>}
+      <h1>{this.props.host}</h1>
+      {this.props.email && !this.state.account.username &&
+        <SetUsername host={this.props.host} accountChange={this.updateAccount.bind(this)}/>}
+      {this.props.email && this.state.account.username &&
+        <AccountDetail account={this.state.account} host={this.props.host}/>}
       {this.signIn()}
       {this.state.account.username ? this.profile() : this.visit()}
       {this.download()}
