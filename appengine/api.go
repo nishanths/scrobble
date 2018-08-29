@@ -24,6 +24,7 @@ import (
 	"google.golang.org/appengine/datastore"
 	"google.golang.org/appengine/file"
 	"google.golang.org/appengine/log"
+	"google.golang.org/appengine/user"
 )
 
 const (
@@ -43,6 +44,7 @@ const (
 type Account struct {
 	APIKey   string `json:"apiKey"`
 	Username string `json:"username"`
+	Private  bool   `json:"private"`
 }
 
 // Namespace: account
@@ -123,8 +125,13 @@ func scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, accID, ok := fetchAccountForUsername(ctx, username, w)
+	acc, accID, ok := fetchAccountForUsername(ctx, username, w)
 	if !ok {
+		return
+	}
+
+	if acc.Private && !canViewScrobbled(ctx, accID, user.Current(ctx), r.Header) {
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
@@ -145,6 +152,20 @@ func scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(songs); err != nil {
 		log.Errorf(ns, "failed to write response: %v", err.Error())
 	}
+}
+
+func canViewScrobbled(ctx context.Context, forAccountID string, u *user.User, h http.Header) bool {
+	if u != nil && u.Email == forAccountID {
+		return true
+	}
+
+	if key := h.Get(headerAPIKey); key != "" {
+		if _, id, _, err := accountForKey(ctx, key); err == nil && id == forAccountID {
+			return true
+		}
+	}
+
+	return false
 }
 
 func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
@@ -407,40 +428,52 @@ func min(a, b int) int {
 	return b
 }
 
-func fetchAccountForKey(ctx context.Context, apiKey string, w http.ResponseWriter) (Account, string, bool) {
+func accountForKey(ctx context.Context, apiKey string) (Account, string, int, error) {
 	var as []Account
 	keys, err := datastore.NewQuery(KindAccount).Filter("APIKey=", apiKey).Limit(1).GetAll(ctx, &as)
 	if err != nil {
-		log.Errorf(ctx, err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return Account{}, "", false
+		return Account{}, "", http.StatusInternalServerError, err
 	}
 
 	if len(keys) == 0 {
-		log.Infof(ctx, "no accounts for API key: %s", apiKey)
-		w.WriteHeader(http.StatusUnauthorized)
-		return Account{}, "", false
+		return Account{}, "", http.StatusUnauthorized, fmt.Errorf("no accounts for API key: %s", apiKey)
 	}
 
-	return as[0], keys[0].StringID(), true
+	return as[0], keys[0].StringID(), 0, nil
 }
 
-func fetchAccountForUsername(ctx context.Context, username string, w http.ResponseWriter) (Account, string, bool) {
+func accountForUsername(ctx context.Context, username string) (Account, string, int, error) {
 	var as []Account
 	keys, err := datastore.NewQuery(KindAccount).Filter("Username=", username).Limit(1).GetAll(ctx, &as)
 	if err != nil {
-		log.Errorf(ctx, err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return Account{}, "", false
+		return Account{}, "", http.StatusInternalServerError, err
 	}
 
 	if len(keys) == 0 {
-		log.Infof(ctx, "no accounts for username: %s", username)
-		w.WriteHeader(http.StatusNotFound)
-		return Account{}, "", false
+		return Account{}, "", http.StatusUnauthorized, fmt.Errorf("no accounts for username: %s", username)
 	}
 
-	return as[0], keys[0].StringID(), true
+	return as[0], keys[0].StringID(), 0, nil
+}
+
+func fetchAccountForKey(ctx context.Context, apiKey string, w http.ResponseWriter) (Account, string, bool) {
+	a, id, code, err := accountForKey(ctx, apiKey)
+	if err != nil {
+		log.Errorf(ctx, err.Error())
+		w.WriteHeader(code)
+		return Account{}, "", false
+	}
+	return a, id, true
+}
+
+func fetchAccountForUsername(ctx context.Context, username string, w http.ResponseWriter) (Account, string, bool) {
+	a, id, code, err := accountForUsername(ctx, username)
+	if err != nil {
+		log.Errorf(ctx, err.Error())
+		w.WriteHeader(code)
+		return Account{}, "", false
+	}
+	return a, id, true
 }
 
 func namespaceID(accountID string) string {

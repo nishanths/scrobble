@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/pkg/errors"
 	"google.golang.org/appengine"
@@ -43,8 +44,13 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if r.URL.Path != "/" {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
 	host := r.Host
-	dest := "https://" + host + "/"
+	dest := "https://" + host + r.RequestURI
 	title := "Scrobble"
 	download := "TODO"
 
@@ -98,7 +104,81 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+type UArgs struct {
+	Title           string  `json:"title"`
+	ProfileUsername string  `json:"profileUsername"`
+	LogoutURL       string  `json:"logoutURL"`
+	Account         Account `json:"account"`
+}
+
 func uHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := appengine.NewContext(r)
+
+	if r.Method != "GET" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	c := pathComponents(r.URL.Path)
+	if len(c) != 2 { // 'u', username
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	profileUsername := c[1]
+
+	profileAcc, profileAccID, ok := fetchAccountForUsername(ctx, profileUsername, w)
+	if !ok {
+		return
+	}
+
+	u := user.Current(ctx)
+
+	// Don't allow accessing private accounts.
+	if profileAcc.Private && !canViewProfile(profileAccID, u) {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	// If the user is logged in, gather a logout URL and the account info.
+	var logoutURL string
+	var account Account
+	if u != nil {
+		var err error
+		logoutURL, err = user.LogoutURL(ctx, "https://"+r.URL.Host+r.RequestURI)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if err := datastore.Get(ctx, datastore.NewKey(ctx, KindAccount, u.Email, 0, nil), &account); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	}
+
+	if err := uTmpl.Execute(w, UArgs{
+		Title:           profileUsername,
+		ProfileUsername: profileUsername,
+		LogoutURL:       logoutURL,
+		Account:         account,
+	}); err != nil {
+		log.Errorf(ctx, "failed to execute template: %v", err.Error())
+	}
+}
+
+func canViewProfile(profileAccID string, u *user.User) bool {
+	return u != nil || u.Email == profileAccID
+}
+
+func pathComponents(path string) []string {
+	var c []string
+	parts := strings.Split(path, "/")
+	for _, p := range parts {
+		if p != "" {
+			c = append(c, p)
+		}
+	}
+	return c
 }
 
 func setUsernameHandler(w http.ResponseWriter, r *http.Request) {
@@ -184,7 +264,7 @@ func newAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, k)
 }
 
-// Caller may provide a transaction context if they wish. The operations
+// Callers may provide a transaction context if they wish. The operations
 // performed by setAPIKey are safe to do in a transaction.
 func setAPIKey(ctx context.Context, generator func() (string, error)) (string, error) {
 	const maxTries = 10

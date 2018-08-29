@@ -5,7 +5,7 @@ default:
 	@echo "the default target does nothing!"
 
 .PHONY: all
-all: clean _bootstrap bindata web ln-web
+all: clean _bootstrap bindata build ln-web
 
 .PHONY: deploy
 deploy:
@@ -18,6 +18,10 @@ bindata:
 .PHONY: deps
 deps:
 	go get github.com/jteeuwen/go-bindata/...
+
+.PHONY: go
+go:
+	go build -o /dev/null ./appengine
 
 .PHONY: web
 web:
@@ -37,3 +41,6 @@ clean:
 .PHONY: _bootstrap
 _bootstrap:
 	mkdir -p web/dist
+
+.PHONY: build
+build: go web

@@ -4,8 +4,7 @@ import "net/http"
 
 func RegisterHandlers() {
 	http.Handle("/", withHTTPS(http.HandlerFunc(rootHandler)))
-	http.Handle("/u", withHTTPS(http.HandlerFunc(uHandler)))
-
+	http.Handle("/u/", withHTTPS(http.HandlerFunc(uHandler)))
 	http.Handle("/setUsername", withHTTPS(http.HandlerFunc(setUsernameHandler)))
 	http.Handle("/newAPIKey", withHTTPS(http.HandlerFunc(newAPIKeyHandler)))
 

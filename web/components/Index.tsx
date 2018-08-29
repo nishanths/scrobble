@@ -9,7 +9,7 @@ export class Index extends React.Component<{p: IndexProps}, {username?: string}>
   constructor(props: {p: IndexProps}) {
     super(props)
     this.state = {
-      username: this.props.p.account && this.props.p.account.username
+      username: this.props.p.account.username
     }
   }
 
@@ -28,7 +28,7 @@ export class Index extends React.Component<{p: IndexProps}, {username?: string}>
   }
 
   private visit() {
-    return <p>To see a user's scrobbled songs, visit {this.props.p.host}/u/<i>username</i></p>
+    return <p>To see a user's scrobbled songs, visit {this.props.p.host}/u/&lt;username&gt;</p>
   }
 
   private profile() {
@@ -36,7 +36,7 @@ export class Index extends React.Component<{p: IndexProps}, {username?: string}>
   }
 
   private download() {
-    return <p><a href={this.props.p.downloadURL} title="Last updated Aug 28 2018">Download</a> menu bar client (v1.0, macOS 10.13+)</p>
+    return <p><a href={this.props.p.downloadURL} title="v1.0, last updated Aug 28 2018">Download</a> menu bar client (macOS 10.13+)</p>
   }
 
   render() {
