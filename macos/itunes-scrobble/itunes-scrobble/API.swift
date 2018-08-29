@@ -10,7 +10,7 @@ import Foundation
 import iTunesLibrary
 
 class API {
-    static let apiKeyHeader = "X-Scrobble-API-Key"
+    static let headerAPIKey = "X-Scrobble-API-Key"
     
     static func scrobbleRequest(_ apiKey: String, _ body: Data) -> URLRequest {
         let url = URL(string: String(format: "https://%@/api/v1/scrobble", AppDelegate.baseUrl))!
@@ -53,7 +53,7 @@ class API {
     }
     
     private static func setStandardHeaders(_ r: inout URLRequest, _ apiKey: String) {
-        r.setValue(apiKey, forHTTPHeaderField: apiKeyHeader)
+        r.setValue(apiKey, forHTTPHeaderField: headerAPIKey)
     }
     
     struct Account: Decodable {

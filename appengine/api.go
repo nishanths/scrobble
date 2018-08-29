@@ -45,7 +45,7 @@ type Account struct {
 	Username string
 }
 
-// Namespace: Account ID
+// Namespace: account
 // Key: see Ident() method
 type Song struct {
 	// basic properties
@@ -62,7 +62,7 @@ type Song struct {
 
 	// play info
 	LastPlayed int64 `json:"lastPlayed"`
-	PlayCount  int   `datastore:",noindex" json:"playCount"`
+	PlayCount  int   `json:"playCount"`
 
 	ArtworkHash string `datastore:",noindex" json:"artworkHash"`
 }
@@ -317,7 +317,7 @@ func artworkHandler(w http.ResponseWriter, r *http.Request) {
 func artworkMissingHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 
-	if r.Method != "POST" {
+	if r.Method != "GET" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}

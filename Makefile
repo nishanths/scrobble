@@ -22,5 +22,10 @@ go-deps:
 .PHONY: ln-web
 ln-web:
 	mkdir -p appengine/web
-	ln -s $(PWD)/web/dist $(PWD)/appengine/web/dist
-	ln -s $(PWD)/web/static $(PWD)/appengine/web/static
+	ln -s $(PWD)/web/dist $(PWD)/appengine/web
+	ln -s $(PWD)/web/static $(PWD)/appengine/web
+
+.PHONY: clean
+clean:
+	rm -rf web/dist
+	rm -rf appengine/web

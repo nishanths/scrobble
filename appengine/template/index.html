@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{{.Title}}</title>
+	<link rel="stylesheet" href="/static/css/font.css">
+	<link rel="stylesheet" href="/dist/css/main.css">
+	<style>
+	html {
+		max-height: 100%;
+	    height: 100%;
+	}
+
+	body {
+		margin: 0 auto;
+	    width: 700px;
+	    display: flex;
+	    flex-direction: column;
+	    justify-content: center;
+	    max-height: 100%;
+	    height: 100%;
+	    font-family: "proxima nova";
+	}
+
+	header {
+		position: relative;
+	}
+
+	h1 {
+		font-size: 2.5em;
+	    color:  #111;
+	    letter-spacing: -0.05em;
+	    text-align: center;
+	    font-weight: 400;
+	    position: absolute;
+	    top: -100px;
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	    margin-left: auto;
+	    margin-right: auto;
+	    left: 0;
+	    right: 0;
+	}
+
+	input {
+		outline:  none;
+	    font-size: 360%;
+	    font-weight: 700;
+	    letter-spacing: -.04em;
+	    -webkit-hyphens: none;
+	    -ms-hyphens: none;
+	    hyphens: none;
+	    line-height: 1.1;
+	    border: none;
+	    font-size: 4.5em;
+	    background: rgb(0,0,0,0.05);
+	    font-family: "proxima nova";
+	    padding: 4px 8px;
+	    text-align: center;
+	    max-width: 700px;
+	    box-sizing: border-box;
+	}
+
+	p {
+		font-size:;
+	    font-size: 15px;
+	    color: #555;
+	    text-align: center;
+	}
+
+	button {
+	    background: #fcfcfc;
+	    color: #666;
+	    border-radius: 30px;
+	    padding: 6px 14px;
+	    font-size: 11px;
+	    cursor: pointer;
+	    box-shadow: 1px 1px 1px 0px #ccc;
+	    text-transform: uppercase;
+	    font-weight: 700;
+	}
+	</style>
+</head>
+<body>
+	<header>
+		<h1>Pick your username</h1>
+		<input type="text" placeholder="hikingfan">
+	</header>
+	<p>The username will be a part of your profile URL,<br>
+	{{.BaseURL}}/<em>username</em></p>
+	<p>({{.Email}}, <a href="">Sign out</a>)</p>
+	<script>
+		let input = document.querySelector("input");
+		let inProgress = false;
+
+		input.addEventListener("keydown", e => {
+			if (inProgress) {
+				return;
+			}
+			if (e.keyCode == 13 || e.key == "Enter") {
+				inProgress = true;
+				let data = new FormData();
+
+				fetch("/api/account", {
+					method: "POST",
+					headers: {
+					  'Accept': 'application/json, text/plain, */*',
+					  'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({Username: input.value}),
+				})
+				.then((res) => {
+					return res.json();
+				})
+				.then((res) => {
+					console.log(res);
+					inProgress = false;
+				})
+				.catch((e) => {
+					console.log(e);
+					inProgress = false;
+				});
+
+				e.preventDefault();
+			}
+		});
+	</script>
+</body>
+</html>

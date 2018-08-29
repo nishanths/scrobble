@@ -38,7 +38,7 @@ struct State {
 class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate {
     private static let menuIconName = "itunes-scrobble-18x18" // size from https://stackoverflow.com/a/33708433
     static let baseUrl = "selective-scrobble.appspot.com"
-    private static let helpLink = "scrobble.allele.cc"
+    private static let helpLink = "https://scrobble.allele.cc"
     private static let shortVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     
     // Keys for information saved to UserDefaults.
