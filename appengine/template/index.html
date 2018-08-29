@@ -1,32 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Scrobble</title>
-	<link rel="stylesheet" href="/static/css/font.css">
-	<link rel="stylesheet" href="/dist/css/main.css">
+	<title>{{.Title}}</title>
 	<style>
-	body {
-		padding: 10px;
-	    max-width: 700px;
-	}
-
-	button {
-	    background: #fcfcfc;
-	    color: #666;
-	    border-radius: 30px;
-	    padding: 6px 14px;
-	    font-size: 11px;
-	    cursor: pointer;
-	    box-shadow: 1px 1px 1px 0px #ccc;
-	    text-transform: uppercase;
-	    font-weight: 700;
-	}
+		a {
+			color: blue;
+		}
 	</style>
 </head>
 <body>
-	<h1>scrobble.allele.cc</h1>
+	<h1>{{.Host}}</h1>
 	<p>To get started, <a href="">sign in with Google</a>.</p>
-	<p>If you know the username of a profile, visit <a>scrobble.allele.cc/u/&lt;username&gt;</a>.</p>
+	<p>If you know the username of a profile, visit {{.Host}}/u/<i>username</i>.</p>
 	<p><a href="">Download</a> scrobble app for macOS (v1.0, updated Aug 28 2018)</p>
 </body>
 </html>

@@ -4,6 +4,7 @@ import "net/http"
 
 func RegisterHandlers() {
 	http.HandleFunc("/", rootHandler)
+	http.HandleFunc("/u", uHandler)
 
 	http.HandleFunc("/api/v1/scrobbled", scrobbledHandler)
 	http.HandleFunc("/api/v1/scrobble", scrobbleHandler)

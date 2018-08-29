@@ -48,7 +48,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate {
     // Scrobble timer frequnecies.
     // The timer fires frequently, but scrobbling happens less often.
     private static let timerFreq: TimeInterval = 60 * 10;
-    private static let scrobbleFreq: TimeInterval = 60 * 60 * 3;
+    private static let scrobbleFreq: TimeInterval = 60 * 60 * 1;
     private var timer: Timer? = nil
     
     private let statusBarItem = NSStatusBar.system.statusItem(withLength:NSStatusItem.squareLength)
