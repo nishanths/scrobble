@@ -215,6 +215,11 @@ func setUsernameHandler(w http.ResponseWriter, r *http.Request) {
 			return errors.Wrapf(err, "failed to put username")
 		}
 
+		gen, err := setAPIKey(tx, generateAPIKey)
+		if err != nil {
+			return errors.Wrapf(err, "failed to set API key")
+		}
+
 		var a Account
 		aKey := datastore.NewKey(tx, KindAccount, u.Email, 0, nil)
 		if err := datastore.Get(tx, aKey, &a); err != nil {
@@ -224,12 +229,9 @@ func setUsernameHandler(w http.ResponseWriter, r *http.Request) {
 			return fmt.Errorf("username already set for %s", u.Email)
 		}
 		a.Username = username
+		a.APIKey = gen
 		if _, err := datastore.Put(tx, aKey, &a); err != nil {
 			return errors.Wrapf(err, "failed to put account for %s", u.Email)
-		}
-
-		if _, err := setAPIKey(tx, generateAPIKey); err != nil {
-			return errors.Wrapf(err, "failed to set API key")
 		}
 
 		return nil

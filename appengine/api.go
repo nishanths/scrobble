@@ -235,7 +235,7 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	const n = 500 // datastore limit per operation
+	const n = 500 // datastore limit per operation?
 	s := 0
 	e := min(s+n, len(songs))
 	chunk := songs[s:e]
