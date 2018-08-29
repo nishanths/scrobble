@@ -72,7 +72,7 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
             this.setState({showPrivacySaved: true})
             this.savedTimeout = window.setTimeout(() => {
               this.setState({showPrivacySaved: false})
-            }, 1500)
+            }, 1000)
           }
         },
         err => {

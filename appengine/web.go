@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
-	"io"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -270,13 +270,88 @@ func newAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	k, err := setAPIKey(ctx, generateAPIKey)
+	u := user.Current(ctx)
+	if u == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	var apiKey string
+	err := datastore.RunInTransaction(ctx, func(tx context.Context) error {
+		k, err := setAPIKey(ctx, generateAPIKey)
+		if err != nil {
+			return err
+		}
+
+		var account Account
+		aKey := datastore.NewKey(tx, KindAccount, u.Email, 0, nil)
+		if err := datastore.Get(tx, aKey, &account); err != nil {
+			return errors.Wrapf(err, "failed to get account for %s", u.Email)
+		}
+		account.APIKey = k
+		if _, err := datastore.Put(tx, aKey, &account); err != nil {
+			return errors.Wrapf(err, "failed to put account for %s", u.Email)
+		}
+
+		apiKey = k
+		return nil
+	}, nil)
+
 	if err != nil {
+		log.Errorf(ctx, "%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	io.WriteString(w, k)
+	b, err := json.Marshal(apiKey)
+	if err != nil {
+		log.Errorf(ctx, "%v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write(b)
+}
+
+func setPrivacyHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := appengine.NewContext(r)
+
+	if r.Method != "POST" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	u := user.Current(ctx)
+	if u == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	privacy, err := strconv.ParseBool(r.FormValue("privacy"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	err = datastore.RunInTransaction(ctx, func(tx context.Context) error {
+		var account Account
+		aKey := datastore.NewKey(tx, KindAccount, u.Email, 0, nil)
+		if err := datastore.Get(tx, aKey, &account); err != nil {
+			return errors.Wrapf(err, "failed to get account for %s", u.Email)
+		}
+		account.Private = privacy
+		if _, err := datastore.Put(tx, aKey, &account); err != nil {
+			return errors.Wrapf(err, "failed to put account for %s", u.Email)
+		}
+		return nil
+	}, nil)
+
+	if err != nil {
+		log.Errorf(ctx, "%v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 // Callers may provide a transaction context if they wish. The operations

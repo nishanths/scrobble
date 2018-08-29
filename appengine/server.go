@@ -7,6 +7,7 @@ func RegisterHandlers() {
 	http.Handle("/u/", withHTTPS(http.HandlerFunc(uHandler)))
 	http.Handle("/setUsername", withHTTPS(http.HandlerFunc(setUsernameHandler)))
 	http.Handle("/newAPIKey", withHTTPS(http.HandlerFunc(newAPIKeyHandler)))
+	http.Handle("/setPrivacy", withHTTPS(http.HandlerFunc(setPrivacyHandler)))
 
 	http.HandleFunc("/api/v1/scrobbled", scrobbledHandler)
 	http.HandleFunc("/api/v1/scrobble", scrobbleHandler)

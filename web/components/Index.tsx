@@ -29,7 +29,7 @@ export class Index extends React.Component<{p: IndexProps}, {account: Account}> 
   }
 
   private visit() {
-    return <p>To see a user's scrobbled songs, vist <a href="">https://{this.props.p.host}/u/&lt;username&gt;</a></p>
+    return <p>To see a user's scrobbled songs, go to <a href="">https://{this.props.p.host}/u/&lt;username&gt;</a></p>
   }
 
   private profile() {
@@ -50,6 +50,7 @@ export class Index extends React.Component<{p: IndexProps}, {account: Account}> 
       {this.signIn()}
       {this.state.account.username ? this.profile() : this.visit()}
       {this.download()}
+      <p><a href="https://github.com/nishanths/scrobble">More resources</a></p>
     </div>
   }
 }
