@@ -35,7 +35,7 @@ export class Index extends React.Component<{p: IndexProps}, {account: Account}> 
   }
 
   private profile() {
-    return this.state.account && <p><a href={"https://" + this.props.p.host + "/u/" + this.state.account.username}>Your profile</a></p>
+    return this.state.account && <p><a href={"https://" + this.props.p.host + "/u/" + this.state.account.username}>Your scrobbles</a></p>
   }
 
   private download() {
