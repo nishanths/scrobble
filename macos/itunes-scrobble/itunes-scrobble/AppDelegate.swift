@@ -240,10 +240,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                     guard let p = items[h] else { continue }
                     guard let d = p.artwork?.imageData else { continue }
                     guard let f = p.artwork?.imageDataFormat else { continue }
-                    NSURLConnection.sendAsynchronousRequest(API.artworkRequest(key, f, d), queue: OperationQueue.main) {(_, data, _) in
-                        guard let d = data else {
-                            return
-                        }
+                    NSURLConnection.sendAsynchronousRequest(API.artworkRequest(key, f, d), queue: OperationQueue.main) {(_, _, _) in
                     }
                 }
             }
