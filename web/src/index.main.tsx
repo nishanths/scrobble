@@ -8,5 +8,5 @@ declare var bootstrap: BootstrapArgs;
 
 ReactDOM.render(
   <Index p={bootstrap}/>,
-  document.getElementById("app")
+  document.querySelector("#app")
 );

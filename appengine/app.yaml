@@ -7,6 +7,7 @@ handlers:
   upload: web/static/favicon.ico
 
 - url: /dist
+  default_expiration: 1m
   static_dir: web/dist
 
 - url: /static
