@@ -9,6 +9,5 @@ export interface BootstrapArgs {
   email: string
   loginURL: string
   logoutURL: string
-  downloadURL: string
   account: Account
 }

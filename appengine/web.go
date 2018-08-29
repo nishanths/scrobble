@@ -24,12 +24,11 @@ var (
 )
 
 type BootstrapArgs struct {
-	Host        string  `json:"host"`
-	Email       string  `json:"email"`
-	LoginURL    string  `json:"loginURL"`
-	LogoutURL   string  `json:"logoutURL"`
-	DownloadURL string  `json:"downloadURL"`
-	Account     Account `json:"account"`
+	Host      string  `json:"host"`
+	Email     string  `json:"email"`
+	LoginURL  string  `json:"loginURL"`
+	LogoutURL string  `json:"logoutURL"`
+	Account   Account `json:"account"`
 }
 
 type IndexArgs struct {
@@ -53,7 +52,6 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	host := r.Host
 	dest := "https://" + host + r.RequestURI
 	title := "Scrobble"
-	download := "TODO"
 
 	// helper function
 	exec := func(a IndexArgs) {
@@ -73,9 +71,8 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 		exec(IndexArgs{
 			Title: title,
 			Bootstrap: BootstrapArgs{
-				Host:        host,
-				LoginURL:    login,
-				DownloadURL: download,
+				Host:     host,
+				LoginURL: login,
 			},
 		})
 		return
@@ -96,11 +93,10 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	exec(IndexArgs{
 		Title: title,
 		Bootstrap: BootstrapArgs{
-			Host:        host,
-			Email:       u.Email,
-			LogoutURL:   logout,
-			DownloadURL: download,
-			Account:     a,
+			Host:      host,
+			Email:     u.Email,
+			LogoutURL: logout,
+			Account:   a,
 		},
 	})
 }

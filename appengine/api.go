@@ -90,7 +90,7 @@ func accountHandler(w http.ResponseWriter, r *http.Request) {
 
 	key := r.Header.Get(headerAPIKey)
 	if key == "" {
-		w.WriteHeader(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -179,7 +179,7 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 
 	key := r.Header.Get(headerAPIKey)
 	if key == "" {
-		w.WriteHeader(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -280,7 +280,7 @@ func artworkHandler(w http.ResponseWriter, r *http.Request) {
 
 	key := r.Header.Get(headerAPIKey)
 	if key == "" {
-		w.WriteHeader(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -346,7 +346,7 @@ func artworkMissingHandler(w http.ResponseWriter, r *http.Request) {
 
 	key := r.Header.Get(headerAPIKey)
 	if key == "" {
-		w.WriteHeader(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -431,13 +431,19 @@ func min(a, b int) int {
 
 func accountForKey(ctx context.Context, apiKey string) (Account, string, int, error) {
 	var as []Account
-	keys, err := datastore.NewQuery(KindAccount).Filter("APIKey=", apiKey).Limit(1).GetAll(ctx, &as)
+	keys, err := datastore.NewQuery(KindAccount).Filter("APIKey=", apiKey).Limit(2).GetAll(ctx, &as)
 	if err != nil {
 		return Account{}, "", http.StatusInternalServerError, err
 	}
 
+	if len(keys) > 1 {
+		m := fmt.Sprintf("multiple accounts for API key %q", apiKey)
+		log.Criticalf(ctx, m)
+		panic(m)
+	}
+
 	if len(keys) == 0 {
-		return Account{}, "", http.StatusUnauthorized, fmt.Errorf("no accounts for API key: %s", apiKey)
+		return Account{}, "", http.StatusNotFound, fmt.Errorf("no accounts for API key: %s", apiKey)
 	}
 
 	return as[0], keys[0].StringID(), 0, nil
@@ -445,13 +451,19 @@ func accountForKey(ctx context.Context, apiKey string) (Account, string, int, er
 
 func accountForUsername(ctx context.Context, username string) (Account, string, int, error) {
 	var as []Account
-	keys, err := datastore.NewQuery(KindAccount).Filter("Username=", username).Limit(1).GetAll(ctx, &as)
+	keys, err := datastore.NewQuery(KindAccount).Filter("Username=", username).Limit(2).GetAll(ctx, &as)
 	if err != nil {
 		return Account{}, "", http.StatusInternalServerError, err
 	}
 
+	if len(keys) > 1 {
+		m := fmt.Sprintf("multiple accounts for username %q", username)
+		log.Criticalf(ctx, m)
+		panic(m)
+	}
+
 	if len(keys) == 0 {
-		return Account{}, "", http.StatusUnauthorized, fmt.Errorf("no accounts for username: %s", username)
+		return Account{}, "", http.StatusNotFound, fmt.Errorf("no accounts for username: %s", username)
 	}
 
 	return as[0], keys[0].StringID(), 0, nil

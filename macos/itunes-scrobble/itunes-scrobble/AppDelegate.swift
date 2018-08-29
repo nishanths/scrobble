@@ -32,8 +32,12 @@ struct State {
     var account: API.Account?
     // whether there is a scrobble request inflight
     var scrobbling: Bool
-    // whether the latest scrobble request resulted in an auth error
+    // whether the latest request resulted in an auth error
     var authError: Bool
+    
+    // NOTE: when adding a new field, you may also need to handle its reset
+    // behavior in clearAPIKey()
+    // TODO: this is gross
 }
 
 @NSApplicationMain
@@ -97,11 +101,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         NSURLConnection.sendAsynchronousRequest(API.accountRequest(key), queue: OperationQueue.main) {(rsp, data, err) in
             guard err == nil else { return }
             guard let rr = rsp as! HTTPURLResponse? else { return }
-            guard rr.statusCode == 200 else { return }
-            DispatchQueue.main.async {
-                let account = try? JSONDecoder().decode(API.Account.self, from: data!)
-                self.state.account = account
-                self.render()
+            if (rr.statusCode == 200) {
+                DispatchQueue.main.async {
+                    let account = try? JSONDecoder().decode(API.Account.self, from: data!)
+                    self.state.account = account
+                    self.render()
+                }
+            } else if rr.statusCode == 404 {
+                DispatchQueue.main.async {
+                    self.state.authError = true
+                    self.render()
+                }
+                return
             }
         }
     }
@@ -201,7 +212,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
             guard err == nil else { return }
             guard let r = rsp as! HTTPURLResponse? else { return }
             
-            if r.statusCode == 401 {
+            if r.statusCode == 404 {
                 self.state.authError = true
                 self.render()
                 return
@@ -267,6 +278,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         state.lastScrobbled = nil
         state.latestPlayed = nil
         state.account = nil
+        state.scrobbling = false
+        state.authError = false
         UserDefaults.standard.set(state.running, forKey: AppDelegate.keyRunning)
         UserDefaults.standard.set(state.apiKey, forKey: AppDelegate.keyAPIKey)
         UserDefaults.standard.set(state.lastScrobbled, forKey: AppDelegate.keyLastScrobbled)
@@ -387,9 +400,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                             NSApplication.shared.sendAction(self.oldOkButtonAction!, to: self.oldOkButtonTarget, from: sender)
                         }
                         return
-                    } else if rr.statusCode == 401 {
+                    } else if rr.statusCode == 404 {
                         DispatchQueue.main.async {
-                            self.alert!.informativeText = String(format: "Invalid API key")
+                            self.alert!.informativeText = String(format: "Invalid API key.")
                         }
                         return
                     }

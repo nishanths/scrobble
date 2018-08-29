@@ -7,6 +7,8 @@ import "../scss/index.scss";
 type IndexProps = BootstrapArgs
 
 export class Index extends React.Component<{p: IndexProps}, {account: Account}> {
+  private static readonly downloadURL = "https://github.com/nishanths/scrobble/releases"
+
   constructor(props: {p: IndexProps}) {
     super(props)
     this.state = {
@@ -37,7 +39,7 @@ export class Index extends React.Component<{p: IndexProps}, {account: Account}> 
   }
 
   private download() {
-    return <p><a href={this.props.p.downloadURL} title="v1.0, last updated Aug 28 2018">Download</a> menu bar client for iTunes (macOS 10.13+)</p>
+    return <p><a href={Index.downloadURL}>Download</a> menu bar client for iTunes (macOS 10.13+)</p>
   }
 
   render() {
