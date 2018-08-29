@@ -42,9 +42,10 @@ const (
 // Namespace: [default]
 // Key: email
 type Account struct {
-	APIKey   string `json:"apiKey"`
-	Username string `json:"username"`
-	Private  bool   `json:"private"`
+	APIKey    string `json:"apiKey"`
+	Username  string `json:"username"`
+	Private   bool   `json:"private"`
+	PlayCount bool   `json:"playCount"`
 }
 
 // Namespace: account

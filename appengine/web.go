@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
@@ -181,6 +182,7 @@ func pathComponents(path string) []string {
 	return c
 }
 
+// Sets the username for the account and initializes the account.
 func setUsernameHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 
@@ -202,7 +204,9 @@ func setUsernameHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	inUse := false
+	var account Account
 	err := datastore.RunInTransaction(ctx, func(tx context.Context) error {
+		// Ensure username uniqueness.
 		uKey := datastore.NewKey(tx, KindUsername, username, 0, nil)
 		if err := datastore.Get(tx, uKey, ptrStruct()); err != datastore.ErrNoSuchEntity {
 			if err == nil {
@@ -215,22 +219,25 @@ func setUsernameHandler(w http.ResponseWriter, r *http.Request) {
 			return errors.Wrapf(err, "failed to put username")
 		}
 
+		// Ensure API key uniqueness.
 		gen, err := setAPIKey(tx, generateAPIKey)
 		if err != nil {
 			return errors.Wrapf(err, "failed to set API key")
 		}
 
-		var a Account
+		// Initialize the account.
 		aKey := datastore.NewKey(tx, KindAccount, u.Email, 0, nil)
-		if err := datastore.Get(tx, aKey, &a); err != nil {
+		if err := datastore.Get(tx, aKey, &account); err != nil {
 			return errors.Wrapf(err, "failed to get account for %s", u.Email)
 		}
-		if a.Username != "" {
+		if account.Username != "" {
 			return fmt.Errorf("username already set for %s", u.Email)
 		}
-		a.Username = username
-		a.APIKey = gen
-		if _, err := datastore.Put(tx, aKey, &a); err != nil {
+		account.Username = username
+		account.APIKey = gen
+		account.Private = true
+		account.PlayCount = false
+		if _, err := datastore.Put(tx, aKey, &account); err != nil {
 			return errors.Wrapf(err, "failed to put account for %s", u.Email)
 		}
 
@@ -246,7 +253,13 @@ func setUsernameHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	b, err := json.Marshal(account)
+	if err != nil {
+		log.Errorf(ctx, "failed to json-marshal account: %v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write(b)
 }
 
 func newAPIKeyHandler(w http.ResponseWriter, r *http.Request) {

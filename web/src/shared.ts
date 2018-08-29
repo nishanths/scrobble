@@ -1,6 +1,7 @@
-interface Account {
+export interface Account {
   username: string
   apiKey: string
+  private: boolean
 }
 
 export interface BootstrapArgs {

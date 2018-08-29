@@ -1,20 +1,21 @@
 import * as React from "react";
-import { BootstrapArgs } from "../src/shared";
+import { BootstrapArgs, Account } from "../src/shared";
 import { SetUsername, SetUsernameProps } from "./SetUsername";
-import { Account, AccountProps } from "./Account";
+import { AccountDetail, AccountDetailProps } from "./AccountDetail";
+import "../scss/index.scss";
 
 type IndexProps = BootstrapArgs
 
-export class Index extends React.Component<{p: IndexProps}, {username?: string}> {
+export class Index extends React.Component<{p: IndexProps}, {account: Account}> {
   constructor(props: {p: IndexProps}) {
     super(props)
     this.state = {
-      username: this.props.p.account.username
+      account: this.props.p.account
     }
   }
 
-  updateUsername(u: string) {
-    this.setState({username: u})
+  updateAccount(a: Account) {
+    this.setState({account: a})
   }
 
   private signIn() {
@@ -28,29 +29,28 @@ export class Index extends React.Component<{p: IndexProps}, {username?: string}>
   }
 
   private visit() {
-    return <p>To see a user's scrobbled songs, visit {this.props.p.host}/u/&lt;username&gt;</p>
+    return <p>To see a user's scrobbled songs, vist <a href="">https://{this.props.p.host}/u/&lt;username&gt;</a></p>
   }
 
   private profile() {
-    return this.state.username && <p><a href={"https://" + this.props.p.host + "/u/" + this.state.username}>Your profile</a></p>
+    return this.state.account && <p><a href={"https://" + this.props.p.host + "/u/" + this.state.account.username}>Your profile</a></p>
   }
 
   private download() {
-    return <p><a href={this.props.p.downloadURL} title="v1.0, last updated Aug 28 2018">Download</a> menu bar client (macOS 10.13+)</p>
+    return <p><a href={this.props.p.downloadURL} title="v1.0, last updated Aug 28 2018">Download</a> menu bar client for iTunes (macOS 10.13+)</p>
   }
 
   render() {
-    return [
-      <h1>{this.props.p.host}</h1>,
-      this.props.p.email && !this.state.username &&
-        <SetUsername host={this.props.p.host} usernameChange={this.updateUsername.bind(this)}/>,
-      this.props.p.email && this.state.username &&
-        <Account username={this.state.username} host={this.props.p.host} usernameChange={this.updateUsername.bind(this)}/>,
-      this.signIn(),
-      this.profile(),
-      this.download(),
-      this.visit(),
-    ]
+    return <div>
+      <h1>{this.props.p.host}</h1>
+      {this.props.p.email && !this.state.account.username &&
+        <SetUsername host={this.props.p.host} accountChange={this.updateAccount.bind(this)}/>}
+      {this.props.p.email && this.state.account.username &&
+        <AccountDetail account={this.state.account} host={this.props.p.host}/>}
+      {this.signIn()}
+      {this.state.account.username ? this.profile() : this.visit()}
+      {this.download()}
+    </div>
   }
 }
 
