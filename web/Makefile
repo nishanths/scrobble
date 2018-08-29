@@ -13,3 +13,6 @@ dist:
 .PHONY: clean
 clean:
 	rm -rf dist
+
+.PHONY: bootstrap
+	npm i
