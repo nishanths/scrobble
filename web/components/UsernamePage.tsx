@@ -4,13 +4,13 @@ import { Header } from "./Header"
 import { SongCard } from "./SongCard"
 import "../scss/u.scss"
 
-class Songs extends React.Component<{songs: Song[]}, {}> {
+class Songs extends React.Component<{songs: Song[], artworkBaseURL: string}, {}> {
   private static key(s: Song): string {
     return [s.title, s.albumTitle, s.artistName, s.year].join("|")
   }
 
   render() {
-    return this.props.songs.map(s => <SongCard key={Songs.key(s)} {...s}/>)
+    return this.props.songs.map(s => <SongCard key={Songs.key(s)} song={s} artworkBaseURL={this.props.artworkBaseURL} />)
   }
 }
 
@@ -106,7 +106,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
 
     return <div>
       {this.header()}
-      <Songs songs={this.state.songs.slice(0, this.state.endIdx)}/>
+      <Songs songs={this.state.songs.slice(0, this.state.endIdx)} artworkBaseURL={this.props.artworkBaseURL}/>
       {this.state.endIdx < this.state.songs.length && <div className="more" onClick={this.onMoreClick.bind(this)}>More songs</div>}
     </div>
   }
