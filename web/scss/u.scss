@@ -73,9 +73,9 @@ body {
   @include songCardProps($dim, $bb, $fa);
 }
 
-// TODO: the styles below can be generated using a loop
-// TODO: should validate that at a particular (min-width), the specified
-// number of cards (i.e. $n-cards) can really be shown.
+// TODO: the styles below can be generated using a loop.
+// TODO: should validate programatically that at each breakpoint, the
+// specified number of cards (i.e. $n-cards) can really be shown.
 
 @media screen and (min-width: 360px) {
   $cards: 2;

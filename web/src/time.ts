@@ -14,7 +14,7 @@ export function displayString(d: Date, now: Date): string {
     return "Yesterday"
   }
 
-  for (let c of [2,3,4,5]) {
+  for (let c of [2, 3, 4]) {
     copy.setDate(original - c)
     if (sameDate(d, copy)) {
       return c + " days ago"
