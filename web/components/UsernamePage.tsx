@@ -27,6 +27,9 @@ interface UsernamePageState {
 }
 
 export class UsernamePage extends React.Component<UsernamePageProps, UsernamePageState> {
+  // Divisble by 2, 3, and 4. This is appropriate because these are the number
+  // of cards typically displayed per row. Using such a number ensures that
+  // the last row isn't an incomplete row.
   private static readonly moreIncrement = 48
 
   constructor(props: UsernamePageProps) {
