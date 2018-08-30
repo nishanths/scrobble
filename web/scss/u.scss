@@ -1,5 +1,7 @@
 // TODO: this file is ugly
 
+@import "shared.scss";
+
 $muted: #333;
 
 $body-margin-w: 8px;
@@ -171,12 +173,12 @@ body {
 }
 
 @media screen and (min-width: 480px) {
-  $want-cards: 2;
+  $cards: 2;
   #app {
-    max-width: app-width($want-cards, $default-songcard-dimension)
+    max-width: app-width($cards, $default-songcard-dimension)
   }
   .header {
-    max-width: header-width($want-cards, $default-songcard-dimension)
+    max-width: header-width($cards, $default-songcard-dimension)
   }
   .username {
     max-width: 380px;
@@ -188,12 +190,12 @@ body {
 }
 
 @media screen and (min-width: 700px) {
-  $want-cards: 3;
+  $cards: 3;
   #app {
-    max-width: app-width($want-cards, $default-songcard-dimension)
+    max-width: app-width($cards, $default-songcard-dimension)
   }
   .header {
-    max-width: header-width($want-cards, $default-songcard-dimension)
+    max-width: header-width($cards, $default-songcard-dimension)
   }
 
   .songs {
@@ -210,21 +212,21 @@ body {
 }
 
 @media screen and (min-width: 915px) {
-  $want-cards: 4;
+  $cards: 4;
   #app {
-    max-width: app-width($want-cards, $default-songcard-dimension)
+    max-width: app-width($cards, $default-songcard-dimension)
   }
   .header {
-    max-width: header-width($want-cards, $default-songcard-dimension)
+    max-width: header-width($cards, $default-songcard-dimension)
   }
 }
 
 @media screen and (min-width: 1450px) {
-  $want-cards: 5;
+  $cards: 5;
   #app {
-    max-width: app-width($want-cards, $default-songcard-dimension)
+    max-width: app-width($cards, $default-songcard-dimension)
   }
   .header {
-    max-width: header-width($want-cards, $default-songcard-dimension)
+    max-width: header-width($cards, $default-songcard-dimension)
   }
 }
