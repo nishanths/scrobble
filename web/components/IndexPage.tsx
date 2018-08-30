@@ -39,7 +39,7 @@ export class IndexPage extends React.Component<IndexPageProps, {account: Account
   }
 
   private download() {
-    return <p><a href={IndexPage.downloadURL}>Download</a> menu bar client for iTunes (macOS 10.13+)</p>
+    return <p><a href={IndexPage.downloadURL}>Download</a> menu bar scrobble client for iTunes (macOS 10.13+)</p>
   }
 
   render() {

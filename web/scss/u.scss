@@ -1,3 +1,5 @@
+$muted: #333;
+
 body {
   font-family: cooper-hewitt, sans-serif;
 }
@@ -8,12 +10,14 @@ body {
 }
 
 .header {
+  // Aligning elements center and right:
+  // https://stackoverflow.com/a/38948646
   display: grid;
   grid-template-columns: 1fr repeat(1, auto) 1fr;
   grid-column-gap: 5px;
   justify-items: center;
   font-size: 24px;
-  color: #555;
+  color: $muted;
   margin-top: 30px;
 }
 
@@ -32,7 +36,6 @@ body {
   font-weight: 500;
   position: relative;
   top: 6px;
-
   a {
     text-decoration: none;
     color: inherit;
@@ -42,7 +45,7 @@ body {
 .info {
   margin: 0 auto;
   text-align: center;
-  margin-top: 75px;
+  margin-top: 50px;
   font-size: 20px;
-  color: #555;
+  color: $muted;
 }

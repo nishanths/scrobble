@@ -156,18 +156,12 @@ func uHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	profileUsername := c[1]
-	profileAcc, profileAccID, ok := fetchAccountForUsername(ctx, profileUsername, w)
+	_, _, ok := fetchAccountForUsername(ctx, profileUsername, w)
 	if !ok {
 		return
 	}
 
 	u := user.Current(ctx)
-
-	// Don't allow accessing private accounts.
-	if profileAcc.Private && !canViewProfile(profileAccID, u) {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
 
 	// If the user is logged in, gather a logout URL and the account info.
 	var logoutURL string
@@ -206,10 +200,6 @@ func uHandler(w http.ResponseWriter, r *http.Request) {
 	}); err != nil {
 		log.Errorf(ctx, "failed to execute template: %v", err.Error())
 	}
-}
-
-func canViewProfile(profileAccID string, u *user.User) bool {
-	return u != nil && u.Email == profileAccID
 }
 
 func pathComponents(path string) []string {

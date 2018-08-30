@@ -5,8 +5,9 @@ APP_YAML          := appengine/app.yaml
 
 # NOTE: To deploy, typically you want `make all` followed by `make deploy`.
 #
-# For local development, run `make dev` and the web directory's default
-# `make` target. Only certain paths may be supported (see appengine/server.go).
+# For local development, run `make dev` and the web directory's `make dist`.
+# Only certain paths may be supported with fake data in local dev
+# (see appengine/server.go).
 
 default:
 	@echo "the default target does nothing!"

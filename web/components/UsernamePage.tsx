@@ -15,17 +15,19 @@ interface UsernamePageState {
   fetched: boolean
   songs: Song[]
   private: boolean
-  idx: number
+  endIdx: number
 }
 
 export class UsernamePage extends React.Component<UsernamePageProps, UsernamePageState> {
+  private static readonly moreIncrement = 48
+
   constructor(props: UsernamePageProps) {
     super(props)
     this.state = {
       fetched: false,
       songs: [],
       private: true,
-      idx: 0,
+      endIdx: 0,
     }
   }
 
@@ -49,15 +51,33 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
         }
       }).then(r => {
         if (!success) { return }
-        this.setState({fetched: true, songs: r as Song[]})
+        let s = r as Song[];
+        this.setState({
+          fetched: true,
+          songs: s,
+          endIdx: UsernamePage.determineNextEndIdx(this.state.endIdx, s.length),
+        })
       }, err => {
         console.error(err)
-        this.setState({fetched: false})
       })
   }
 
-  header() {
+  private header() {
     return <Header username={this.props.profileUsername} logoutURL={this.props.logoutURL} />
+  }
+
+  private onMoreClick() {
+    this.setState({
+      endIdx: UsernamePage.determineNextEndIdx(this.state.endIdx, this.state.songs.length)
+    })
+  }
+
+  private static determineNextEndIdx(idx: number, nSongs: number): number {
+    // increment, but make sure we don't go over the number of songs itself
+    let b = Math.min(idx + UsernamePage.moreIncrement, nSongs)
+    // if there aren't sufficient songs left for the next time, just include
+    // them now
+    return nSongs - b < UsernamePage.moreIncrement ? nSongs : b;
   }
 
   render() {
@@ -81,8 +101,8 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
 
     return <div>
       {this.header()}
-      <Songs songs={this.state.songs}/>
-      <div>more</div>
+      <Songs songs={this.state.songs.slice(0, this.state.endIdx)}/>
+      {this.state.endIdx < this.state.songs.length && <div className="more" onClick={this.onMoreClick.bind(this)}>More songs</div>}
     </div>
   }
 }
