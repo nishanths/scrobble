@@ -209,7 +209,7 @@ func uHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func canViewProfile(profileAccID string, u *user.User) bool {
-	return u != nil || u.Email == profileAccID
+	return u != nil && u.Email == profileAccID
 }
 
 func pathComponents(path string) []string {

@@ -31,7 +31,7 @@ export class IndexPage extends React.Component<IndexPageProps, {account: Account
   }
 
   private visit() {
-    return <p>Profiles can be found at /u/&lt;username&gt;, e.g., <a href="/u/nishanth">/u/nishanth</a>, <a href="/u/888">/u/888</a></p>
+    return <p>Profiles can be found at <i>/u/username</i>, e.g., <a href="/u/nishanth">/u/nishanth</a>, <a href="/u/888">/u/888</a></p>
   }
 
   private profile() {

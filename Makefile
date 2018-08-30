@@ -31,7 +31,7 @@ deps:
 
 .PHONY: go
 go:
-	go build -o /dev/null ./appengine
+	go build -o /dev/null ./appengine # to check successful compilation
 
 .PHONY: web
 web:
