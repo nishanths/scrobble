@@ -1,9 +1,12 @@
-PWD        := $(shell pwd)
-PROJECT_ID := selective-scrobble
+PWD               := $(shell pwd)
+PROJECT_ID        := selective-scrobble
 DEV_APPSERVER     := dev_appserver.py
-DEV_APPSERVER_CMD := $(DEV_APPSERVER) appengine/app.yaml
+APP_YAML          := appengine/app.yaml
 
-# NOTE: to deploy, typically you want `make all` followed by `make deploy`.
+# NOTE: To deploy, typically you want `make all` followed by `make deploy`.
+#
+# For local development, run `make dev` and the web directory's default
+# `make` target. Only certain paths may be supported (see appengine/server.go).
 
 default:
 	@echo "the default target does nothing!"
@@ -16,7 +19,7 @@ other: _bootstrap bindata ln-web
 
 .PHONY: deploy
 deploy:
-	gcloud --quiet --project $(PROJECT_ID) app deploy appengine/app.yaml
+	gcloud --quiet --project $(PROJECT_ID) app deploy $(APP_YAML)
 
 .PHONY: bindata
 bindata:
@@ -54,4 +57,4 @@ build: go web
 
 .PHONY: dev
 dev:
-	$(DEV_APPSERVER_CMD)
+	$(DEV_APPSERVER) $(APP_YAML)

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io"
 	"net/http"
 
 	"google.golang.org/appengine"
@@ -33,7 +32,8 @@ func devUHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func devScrobbledHandler(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, devScrobbledResponse)
+	w.WriteHeader(http.StatusNotFound)
+	// io.WriteString(w, devScrobbledResponse)
 }
 
 const devScrobbledResponse = `

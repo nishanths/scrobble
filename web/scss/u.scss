@@ -1,3 +1,48 @@
 body {
   font-family: cooper-hewitt, sans-serif;
 }
+
+#app {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 1fr repeat(1, auto) 1fr;
+  grid-column-gap: 5px;
+  justify-items: center;
+  font-size: 24px;
+  color: #555;
+  margin-top: 30px;
+}
+
+.username {
+  grid-column-start: 2;
+  display: block;
+  .emph {
+    font-weight: 600;
+  }
+}
+
+.logout {
+  margin-left: auto;
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  position: relative;
+  top: 6px;
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+}
+
+.info {
+  margin: 0 auto;
+  text-align: center;
+  margin-top: 75px;
+  font-size: 20px;
+  color: #555;
+}

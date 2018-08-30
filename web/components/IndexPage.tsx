@@ -4,12 +4,12 @@ import { SetUsername, SetUsernameProps } from "./SetUsername";
 import { AccountDetail, AccountDetailProps } from "./AccountDetail";
 import "../scss/index.scss";
 
-type IndexProps = BootstrapArgs
+type IndexPageProps = BootstrapArgs
 
-export class Index extends React.Component<IndexProps, {account: Account}> {
+export class IndexPage extends React.Component<IndexPageProps, {account: Account}> {
   private static readonly downloadURL = "https://github.com/nishanths/scrobble/releases/latest"
 
-  constructor(props: IndexProps) {
+  constructor(props: IndexPageProps) {
     super(props)
     this.state = {
       account: this.props.account
@@ -31,7 +31,7 @@ export class Index extends React.Component<IndexProps, {account: Account}> {
   }
 
   private visit() {
-    return <p>To see a user's scrobbled songs, go to <a href="">https://{this.props.host}/u/&lt;username&gt;</a></p>
+    return <p>Profiles can be found at /u/&lt;username&gt;, e.g., <a href="/u/nishanth">/u/nishanth</a>, <a href="/u/888">/u/888</a></p>
   }
 
   private profile() {
@@ -39,7 +39,7 @@ export class Index extends React.Component<IndexProps, {account: Account}> {
   }
 
   private download() {
-    return <p><a href={Index.downloadURL}>Download</a> menu bar client for iTunes (macOS 10.13+)</p>
+    return <p><a href={IndexPage.downloadURL}>Download</a> menu bar client for iTunes (macOS 10.13+)</p>
   }
 
   render() {

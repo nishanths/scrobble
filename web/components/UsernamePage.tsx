@@ -34,9 +34,9 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
   }
 
   private fetchSongs() {
-    let success = false
+    let success = false // TODO: learn to use `fetch`
 
-    fetch("/api/v1/scrobbled?username=" + this.props.profileUsername, {method: "GET"})
+    fetch("/api/v1/scrobbled?username=" + this.props.profileUsername)
       .then(r => {
         if (r.status == 200) {
           success = true
@@ -51,6 +51,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
         if (!success) { return }
         this.setState({fetched: true, songs: r as Song[]})
       }, err => {
+        console.error(err)
         this.setState({fetched: false})
       })
   }
@@ -67,14 +68,14 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
     if (this.state.private) {
       return <div>
         {this.header()}
-        <div>This user's scrobbles are private.</div>
+        <div className="info">(This user's scrobbles are private.)</div>
       </div>
     }
 
     if (this.state.songs.length == 0) {
       return <div>
         {this.header()}
-        <div>{(this.props.self ? "You haven't" : "This user hasn't") + " scrobbled yet."}</div>
+        <div className="info">({this.props.self ? "You haven't" : "This user hasn't"}) scrobbled yet.</div>
       </div>
     }
 
