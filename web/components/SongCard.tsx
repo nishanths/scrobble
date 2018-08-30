@@ -1,7 +1,8 @@
 import * as React from "react";
+import { Song } from "../src/shared"
 
-export class SongCard extends React.Component<{}, {}> {
+export class SongCard extends React.Component<Song, {}> {
   render() {
-    return <div></div>
+    return <div>{this.props.title}</div>
   }
 }

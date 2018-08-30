@@ -1,11 +1,16 @@
 import * as React from "react";
 import { UArgs, Song } from "../src/shared"
 import { Header } from "./Header"
+import { SongCard } from "./SongCard"
 import "../scss/u.scss"
 
 class Songs extends React.Component<{songs: Song[]}, {}> {
+  private static key(s: Song): string {
+    return [s.title, s.albumTitle, s.artistName, s.year].join("|")
+  }
+
   render() {
-    return <div>{this.props.songs.length}</div>
+    return this.props.songs.map(s => <SongCard key={Songs.key(s)} {...s}/>)
   }
 }
 
