@@ -59,13 +59,13 @@ type Song struct {
 	Year       int           `json:"year"`
 
 	// sorting fields
-	SortAlbumTitle string `json:"sortAlbumTitle"`
-	SortArtistName string `json:"sortArtistName"`
-	SortTitle      string `json:"sortTitle"`
+	SortAlbumTitle string `json:"-"`
+	SortArtistName string `json:"-"`
+	SortTitle      string `json:"-"`
 
 	// play info
 	LastPlayed int64 `json:"lastPlayed"`
-	PlayCount  int   `json:"playCount"`
+	PlayCount  int   `json:"-"`
 
 	ArtworkHash string `datastore:",noindex" json:"artworkHash"`
 }

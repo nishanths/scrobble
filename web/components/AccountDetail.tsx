@@ -36,7 +36,7 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
     this.generating = true
     let success = false
 
-    const genericErr = "Failed to generate API key. Try again?"
+    const genericErr = "Failed to generate API Key. Try again?"
 
     fetch(`/newAPIKey`, {method: "POST"})
       .then(res => {
@@ -107,7 +107,7 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
         <tbody>
           <tr><td>Username</td><td>{this.props.account.username}</td></tr>
           <tr>
-            <td>API key</td>
+            <td>API Key</td>
             <td className="mono">{this.state.apiKey}</td>
             <td><a href="" onClick={this.onRegenerateClick.bind(this)}>Regenerate</a></td>
             <td><span className={errClass}>{this.state.keyGenerateErr}</span></td>

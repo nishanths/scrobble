@@ -1,18 +1,20 @@
+// TODO: this file is ugly
+
 $muted: #333;
 
 body {
-  font-family: cooper-hewitt, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, cooper-hewitt, sans-serif;
 }
 
-$songcard-w: 205px;
+$songcard-w: 180px;
 $songcard-h: $songcard-w;
-$songcard-b: 20px;
+$songcard-b: 18px;
 $want-cards: 4;
 
 #app {
   max-width: $want-cards * ($songcard-w + ($songcard-b * 2));
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 18px;
 }
 
 .header {
@@ -63,7 +65,7 @@ $want-cards: 4;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
-  margin-top: 75px;
+  margin-top: 60px;
 }
 
 .SongCard {
@@ -71,16 +73,80 @@ $want-cards: 4;
   max-height: $songcard-h;
   border-left: $songcard-b solid transparent;
   border-right: $songcard-b solid transparent;
-  border-bottom: 60px solid transparent;
+  border-bottom: 90px solid transparent;
+
+  .scaleArea {
+    &:hover {
+      .pict {
+        transform: scale(1.10);
+        transition: 250ms ease transform;
+      }
+      .title, .other {
+        transform: scale(1.1) translateY($songcard-w * .1 / 2);
+        transition: 250ms ease transform;
+      }
+      .date {
+        transform: scale(1.1) translateY($songcard-w * .1 / 2);
+        transition: 250ms ease transform, 500ms ease opacity;
+      }
+      .other {
+        transform: scale(1.1) translateY($songcard-w * .1 / 2 + 1px);
+      }
+      .date {
+        // transition-delay: -100ms;
+        transform: scale(1.1) translateY($songcard-w * .1 / 2 + 2px);
+        opacity: 1;
+      }
+    }
+  }
 
   .pict {
     width: $songcard-w;
     height: $songcard-h;
     background-size: contain;
-    border-radius: 5px;
-    border: 1px solid #efefef;
+    border-radius: 4px;
+    border: 1px solid #e5e5e5;
+    transition: 200ms ease transform;
+  }
+
+  .meta {
+    padding-left: 2px;
+    padding-right: 6px;
+    cursor: default;
+  }
+
+  .title {
+    font-size: 13px;
+    margin-top: 8px;
+    transition: 200ms ease all;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: rgba(130,130,130,1);
+  }
+
+  .other {
+    font-size: 12px;
+    transition: 200ms ease all;
+    line-height: 1.5;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    color: rgba(130,130,130,1);
+  }
+
+  .date {
+    font-size: 11px;
+    color: rgba(130,130,130,1);
+    line-height: 1.3;
+    transition: 200ms ease all;
+    opacity: 0
   }
 }
+
 
 @media screen and (max-width: 700px) {
   .logout {

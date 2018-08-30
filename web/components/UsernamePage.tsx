@@ -10,7 +10,10 @@ class Songs extends React.Component<{songs: Song[], artworkBaseURL: string}, {}>
   }
 
   render() {
-    return this.props.songs.map(s => <SongCard key={Songs.key(s)} song={s} artworkBaseURL={this.props.artworkBaseURL} />)
+    let now = new Date()
+    return this.props.songs.map(s => {
+      return <SongCard key={Songs.key(s)} song={s} artworkBaseURL={this.props.artworkBaseURL} now={now}/>
+    })
   }
 }
 
@@ -37,6 +40,12 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
   }
 
   componentDidMount() {
+    const leeway = 100
+    window.addEventListener("scroll", () => {
+      if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight - leeway)) {
+        this.showMore()
+      }
+    })
     this.fetchSongs()
   }
 
@@ -71,9 +80,9 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
     return <Header username={this.props.profileUsername} logoutURL={this.props.logoutURL} />
   }
 
-  private onMoreClick() {
-    this.setState({
-      endIdx: UsernamePage.determineNextEndIdx(this.state.endIdx, this.state.songs.length)
+  private showMore() {
+    this.setState(s => {
+      return {endIdx: UsernamePage.determineNextEndIdx(s.endIdx, s.songs.length)}
     })
   }
 
@@ -100,7 +109,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
     if (this.state.songs.length == 0) {
       return <div>
         {this.header()}
-        <div className="info">({this.props.self ? "You haven't" : "This user hasn't"}) scrobbled yet.</div>
+        <div className="info">({this.props.self ? "You haven't" : "This user hasn't"} scrobbled yet.)</div>
       </div>
     }
 
@@ -109,7 +118,6 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
       <div className="songs">
         <Songs songs={this.state.songs.slice(0, this.state.endIdx)} artworkBaseURL={this.props.artworkBaseURL}/>
       </div>
-      {this.state.endIdx < this.state.songs.length && <div className="more" onClick={this.onMoreClick.bind(this)}>More songs</div>}
     </div>
   }
 }

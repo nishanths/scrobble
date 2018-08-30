@@ -71,16 +71,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                               scrobbling: false,
                               authError: false)
     
-    private var lib: ITLibrary? = nil
-    
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        if let l = try? ITLibrary.init(apiVersion: "1.0") {
-            lib = l
-        } else {
-            os_log("failed to initialize ITLibrary")
-            return
-        }
-        
         // make status bar item and menu
         let button = statusBarItem.button!
         button.image = NSImage(named:NSImage.Name(AppDelegate.menuIconName))
@@ -137,6 +128,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         return m
     }
     
+    // TODO: there are several assignment to State's fields followed by
+    // a render() call. Instead make it so that setting State's fields
+    // automatically calls render().
     private func render() {
         defer { prevState = state }
         
@@ -154,10 +148,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                 if state.authError {
                     // If it's an auth error, clicking clear should prompt
                     // entering a new key
-                    multiItem.title = String(format: "Re-enter API key")
+                    multiItem.title = String(format: "Re-enter API Key")
                     multiItem.action = #selector(clearThenEnterAPIKeyAction(_:))
                 } else {
-                    multiItem.title = String(format: "Clear API key")
+                    multiItem.title = String(format: "Clear API Key")
                     multiItem.action = #selector(clearAPIKeyAction(_:))
                 }
             }
@@ -173,7 +167,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         
         // Status item
         if state.authError {
-            statusItem.title = "Failed to scrobble: API key outdated?"
+            statusItem.title = "Failed to scrobble: API Key outdated?"
             statusItem.isHidden = false
         } else if state.scrobbling {
             statusItem.title = String(format: "Scrobbling now...")
@@ -204,11 +198,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
             return
         }
         
+        // NOTE: unverified, but it appears that init-ing the library each time
+        // is required to properly pick up "Last Played", et. al.
+        guard let lib = try? ITLibrary.init(apiVersion: "1.0") else {
+            os_log("failed to initialize ITLibrary")
+            return
+        }
+        
         state.scrobbling = true
         render()
         
-        lib!.reloadData()
-        let (items, latest) = scrobblableItems(from: lib!.allMediaItems)
+        let (items, latest) = scrobblableItems(from: lib.allMediaItems)
         guard let data = try? JSONEncoder().encode(items) else { return }
         
         NSURLConnection.sendAsynchronousRequest(API.scrobbleRequest(state.apiKey!, data), queue: OperationQueue.main) {(rsp, data, err) in
@@ -235,13 +235,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                     UserDefaults.standard.set(self.state.latestPlayed?.timeIntervalSince1970, forKey: AppDelegate.keyLatestPlayed)
                     self.render()
                 }
-                self.handleArtwork()
+                self.handleArtwork(lib)
                 return
             }
         }
     }
     
-    private func handleArtwork() {
+    private func handleArtwork(_ lib: ITLibrary) {
         guard let key = state.apiKey else { return }
         NSURLConnection.sendAsynchronousRequest(API.missingArtworkRequest(key), queue: OperationQueue.main) {(rsp, data, err) in
             if err != nil {
@@ -261,7 +261,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
             
             DispatchQueue.global(qos: .userInitiated).async {
                 var items = Dictionary<String, ITLibMediaItem>()
-                for p in self.lib!.allMediaItems {
+                for p in lib.allMediaItems {
                     guard let hash = API.MediaItem(fromITLibMediaItem: p).artworkHash else { continue }
                     items[hash] = p
                 }
@@ -328,7 +328,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         a.showsSuppressionButton = false
         a.showsHelp = true
         a.delegate = self
-        a.addButton(withTitle: "Clear API key")
+        a.addButton(withTitle: "Clear API Key")
         a.addButton(withTitle: "Cancel")
         
         let result = a.runModal()
@@ -350,7 +350,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
     @objc private func enterAPIKeyAction(_ sender: Any?) {
         alert = NSAlert()
         alert!.alertStyle = .informational
-        alert!.messageText = "Enter API key."
+        alert!.messageText = "Enter API Key."
         alert!.showsSuppressionButton = false
         alert!.showsHelp = true
         alert!.delegate = self
@@ -410,7 +410,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                         return
                     } else if rr.statusCode == 404 {
                         DispatchQueue.main.async {
-                            self.alert!.informativeText = String(format: "Invalid API key.")
+                            self.alert!.informativeText = String(format: "Invalid API Key.")
                         }
                         return
                     }

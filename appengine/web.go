@@ -54,7 +54,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	host := r.Host
-	dest := "https://" + host + r.RequestURI
+	dest := r.RequestURI
 	title := "Scrobble"
 
 	// helper function
@@ -170,7 +170,7 @@ func uHandler(w http.ResponseWriter, r *http.Request) {
 
 	if u != nil {
 		var err error
-		logoutURL, err = user.LogoutURL(ctx, "https://"+r.Host+r.RequestURI)
+		logoutURL, err = user.LogoutURL(ctx, r.RequestURI)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
