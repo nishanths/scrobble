@@ -4,42 +4,50 @@ body {
   font-family: cooper-hewitt, sans-serif;
 }
 
+$songcard-w: 205px;
+$songcard-h: $songcard-w;
+$songcard-b: 20px;
+$want-cards: 4;
+
 #app {
-  max-width: 900px;
+  max-width: $want-cards * ($songcard-w + ($songcard-b * 2));
   margin: 0 auto;
   padding: 0 20px;
 }
 
 .header {
-  // Aligning elements center and right:
-  // https://stackoverflow.com/a/38948646
+  // Aligning elements center and right: // https://stackoverflow.com/a/38948646
   display: grid;
   grid-template-columns: 1fr repeat(1, auto) 1fr;
   grid-column-gap: 5px;
   justify-items: center;
+
   font-size: 24px;
   color: $muted;
   margin-top: 30px;
-}
-
-.username {
-  grid-column-start: 2;
-  display: block;
-  .emph {
-    font-weight: 600;
-  }
-}
-
-.logout {
   margin-left: auto;
-  display: block;
-  font-size: 13px;
-  font-weight: 500;
-  position: relative;
-  top: 6px;
-  a {
-    text-decoration: none;
-    color: inherit;
+  margin-right: auto;
+  max-width: $want-cards * ($songcard-w + ($songcard-b * 2)) - $songcard-b*12;
+
+  .username {
+    grid-column-start: 2;
+    display: block;
+    .emph {
+      font-weight: 600;
+    }
+  }
+
+  .logout {
+    margin-left: auto;
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    position: relative;
+    top: 6px;
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
   }
 }
 
@@ -51,8 +59,37 @@ body {
   color: $muted;
 }
 
+.songs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin-top: 75px;
+}
+
+.SongCard {
+  max-width: $songcard-w;
+  max-height: $songcard-h;
+  border-left: $songcard-b solid transparent;
+  border-right: $songcard-b solid transparent;
+  border-bottom: 60px solid transparent;
+
+  .pict {
+    width: $songcard-w;
+    height: $songcard-h;
+    background-size: contain;
+    border-radius: 5px;
+    border: 1px solid #efefef;
+  }
+}
+
 @media screen and (max-width: 700px) {
   .logout {
     display: none;
+  }
+}
+
+@media screen and (max-width: 760px) { // TODO: calc
+  .songs {
+    justify-content: center;
   }
 }
