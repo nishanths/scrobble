@@ -57,11 +57,11 @@ export class SetUsername extends React.Component<SetUsernameProps, {username: st
   }
 
   private static validate(u: string): {reason: string, ok: boolean} {
-    if (u.length <= 1) {
-      return {reason: "Username must be longer than 2 characters", ok: false}
+    if (!(u.length > 2)) {
+      return {reason: "Username must be at least 2 characters", ok: false}
     }
-    if (u.length >= 31) {
-      return {reason: "Username must be shorter than 32 characters", ok: false}
+    if (!(u.length < 24)) {
+      return {reason: "Username must not be more than 24 characters", ok: false}
     }
     if (!SetUsername.usernameRe.test(u)) {
       return {reason: "Username must contain only a-z and 0-9", ok: false}
