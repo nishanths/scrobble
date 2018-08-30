@@ -140,6 +140,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
     private func render() {
         defer { prevState = state }
         
+        // TODO: clean this up, gosh it's gnarly
         if state.apiKey == nil {
             assert(!state.running)
             multiItem.title = "Start scrobbling..."
@@ -150,8 +151,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                 multiItem.title = String(format: "Signed in as %@...", a.username)
                 multiItem.action = #selector(scrobblingAsAction(_:))
             } else {
-                multiItem.title = String(format: "Clear API Key")
-                multiItem.action = #selector(clearAPIKeyAction(_:))
+                if state.authError {
+                    // If it's an auth error, clicking clear should prompt
+                    // entering a new key
+                    multiItem.title = String(format: "Re-enter API key")
+                    multiItem.action = #selector(clearThenEnterAPIKeyAction(_:))
+                } else {
+                    multiItem.title = String(format: "Clear API key")
+                    multiItem.action = #selector(clearAPIKeyAction(_:))
+                }
             }
             if (state.running) {
                 pauseItem.title = "Pause scrobbling"
@@ -165,7 +173,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         
         // Status item
         if state.authError {
-            statusItem.title = "Failed to scrobble: outdated API Key?"
+            statusItem.title = "Failed to scrobble: API key outdated?"
             statusItem.isHidden = false
         } else if state.scrobbling {
             statusItem.title = String(format: "Scrobbling now...")
@@ -308,7 +316,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
     }
     
     @objc private func clearAPIKeyAction(_ sender: Any?) {
-        assert(state.apiKey != nil && state.account == nil)
+        assert(state.apiKey != nil)
         clearAPIKey()
     }
     
@@ -320,7 +328,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         a.showsSuppressionButton = false
         a.showsHelp = true
         a.delegate = self
-        a.addButton(withTitle: "Clear API Key")
+        a.addButton(withTitle: "Clear API key")
         a.addButton(withTitle: "Cancel")
         
         let result = a.runModal()
@@ -359,8 +367,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         textField!.cell?.wraps = false
         textField!.cell?.isScrollable = false
         textField!.delegate = self
-        textField!.font = NSFont.monospacedDigitSystemFont(ofSize: NSFont.systemFontSize, weight: .regular)
-        textField!.placeholderString = "e.g., D1A3903GB"
+        textField!.font = NSFont(name: "Menlo", size: NSFont.systemFontSize) // NSFont.monospacedDigitSystemFont(ofSize: NSFont.systemFontSize, weight: .regular)
+        textField!.placeholderString = "D1A3903GB"
         alert!.accessoryView = textField
         alert!.window.initialFirstResponder = alert!.accessoryView
         
@@ -415,6 +423,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         }
     }
     
+    @objc private func clearThenEnterAPIKeyAction(_ sender: Any?) {
+        clearAPIKey()
+        enterAPIKeyAction(sender)
+    }
+
     // uppercase API key input
     override func controlTextDidChange(_ obj: Notification) {
         if let text = obj.userInfo!["NSFieldEditor"] as? NSText {

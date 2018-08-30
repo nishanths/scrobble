@@ -7,6 +7,7 @@ body {
 #app {
   max-width: 900px;
   margin: 0 auto;
+  padding: 0 20px;
 }
 
 .header {
@@ -48,4 +49,10 @@ body {
   margin-top: 50px;
   font-size: 20px;
   color: $muted;
+}
+
+@media screen and (max-width: 700px) {
+  .logout {
+    display: none;
+  }
 }
