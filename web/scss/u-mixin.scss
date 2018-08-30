@@ -1,0 +1,101 @@
+$muted-color: #333;
+$meta-color: rgb(130, 130, 130);
+$body-margin-w: 8px;
+$app-padding-w: 18px;
+$songcard-border-w: 18px;
+$default-songcard-dimension: 180px;
+
+@mixin ellipsis() {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@function card-width($songcard-dim) {
+  @return $songcard-dim + ($songcard-border-w * 2)
+}
+
+@function app-width($n-cards, $songcard-dim) {
+  @return $n-cards * card-width($songcard-dim)
+}
+
+@function header-width($n-cards, $songcard-dim) {
+  $cut: $songcard-border-w * $n-cards * 3; /* arbitrary */
+  @return $n-cards * ($songcard-dim + ($songcard-border-w * 2)) - $cut;
+}
+
+@function breakpoint-width($n-cards, $songcard-dim) {
+  @return app-width($n-cards, $songcard-dim) + (2 * $body-margin-w) + (2 * $app-padding-w)
+}
+
+@mixin songCardProps($songcard-dim, $border-bottom, $adjust-font-size) {
+  max-width: $songcard-dim;
+  max-height: $songcard-dim;
+  border-left: $songcard-border-w solid transparent;
+  border-right: $songcard-border-w solid transparent;
+  border-bottom: $border-bottom solid transparent;
+
+  $transition-enter-duration: 250ms;
+  $transition-exit-duration: 200ms;
+
+  .scaleArea {
+    &:hover {
+      .pict {
+        transform: scale(1.10);
+        transition: $transition-enter-duration ease transform;
+      }
+      .title, .other {
+        transform: scale(1.1) translateY($songcard-dim * .1 / 2);
+        transition: $transition-enter-duration ease transform;
+      }
+      .date {
+        transform: scale(1.1) translateY($songcard-dim * .1 / 2);
+        transition: $transition-enter-duration ease transform, 500ms ease opacity;
+      }
+      .other {
+        transform: scale(1.1) translateY($songcard-dim * .1 / 2 + 1px);
+      }
+      .date {
+        transform: scale(1.1) translateY($songcard-dim * .1 / 2 + 2px);
+        opacity: 1;
+      }
+    }
+  }
+
+  .pict {
+    width: $songcard-dim;
+    height: $songcard-dim;
+    background-size: contain;
+    border-radius: 4px;
+    border: 1px solid #e5e5e5;
+    transition: $transition-exit-duration ease transform;
+  }
+
+  .meta {
+    padding-left: 2px;
+    padding-right: 6px;
+    cursor: default;
+    color: $meta-color;
+
+    .title {
+      font-size: 13px + $adjust-font-size;
+      margin-top: 8px;
+      transition: $transition-exit-duration ease all;
+      @include ellipsis();
+    }
+
+    .other {
+      font-size: 12px + $adjust-font-size;
+      transition: $transition-exit-duration ease all;
+      line-height: 1.5;
+      @include ellipsis();
+    }
+
+    .date {
+      font-size: 11px + $adjust-font-size;
+      line-height: 1.3;
+      transition: $transition-exit-duration ease all;
+      opacity: 0;
+    }
+  }
+}
