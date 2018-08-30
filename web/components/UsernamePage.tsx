@@ -106,7 +106,9 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
 
     return <div>
       {this.header()}
-      <Songs songs={this.state.songs.slice(0, this.state.endIdx)} artworkBaseURL={this.props.artworkBaseURL}/>
+      <div className="songs">
+        <Songs songs={this.state.songs.slice(0, this.state.endIdx)} artworkBaseURL={this.props.artworkBaseURL}/>
+      </div>
       {this.state.endIdx < this.state.songs.length && <div className="more" onClick={this.onMoreClick.bind(this)}>More songs</div>}
     </div>
   }
