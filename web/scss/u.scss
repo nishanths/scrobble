@@ -219,7 +219,7 @@ body {
   }
 }
 
-@media screen and (min-width: 1500px) {
+@media screen and (min-width: 1450px) {
   $want-cards: 5;
   #app {
     max-width: app-width($want-cards, $default-songcard-dimension)
