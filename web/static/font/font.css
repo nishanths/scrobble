@@ -1,3 +1,32 @@
+@charset "UTF-8";
+
+/*!
+ * @license
+ * MyFonts Webfont Build ID 3080370, 2015-08-24T23:39:27-0400
+ *
+ * The fonts listed in this notice are subject to the End User License
+ * Agreement(s) entered into by the website owner. All other parties are
+ * explicitly restricted from using the Licensed Webfonts(s).
+ *
+ * You may obtain a valid license at the URLs below.
+ *
+ * Webfont: ProximaNova-Regular by Mark Simonson
+ * URL: http://www.myfonts.com/fonts/marksimonson/proxima-nova/regular/
+ *
+ * Webfont: ProximaNova-Bold by Mark Simonson
+ * URL: http://www.myfonts.com/fonts/marksimonson/proxima-nova/bold/
+ *
+ *
+ * License: http://www.myfonts.com/viewlicense?type=web&buildid=3080370
+ * Licensed pageviews: 1,000,000
+ * Webfonts copyright: Copyright (c) Mark Simonson, 2005. All rights reserved.
+ *
+ * © 2015 MyFonts Inc
+*/
+
+/* @import must be at top of file, otherwise CSS will not work */
+@import url("//hello.myfonts.net/count/2f00b2");
+
 @font-face {
   font-family: cooper-hewitt;
   font-weight: 400;
@@ -20,4 +49,19 @@
   font-family: cooper-hewitt;
   font-weight: 700;
   src: url("/static/font/cooper-hewitt/CooperHewitt-Bold.otf") format("opentype");
+}
+
+
+@font-face {
+  font-family: 'proxima-nova';
+  font-weight: normal;
+  font-style: normal;
+  src: url("/static/font/proxima-nova/2F00B2_0_0.woff2") format("woff2"), url("webfonts/2F00B2_0_0.woff") format("woff"), url("webfonts/2F00B2_0_0.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: 'proxima-nova';
+  font-weight: bold;
+  font-style: normal;
+  src: url("/static/font/proxima-nova/2F00B2_1_0.woff2") format("woff2"), url("webfonts/2F00B2_1_0.woff") format("woff"), url("webfonts/2F00B2_1_0.ttf") format("truetype");
 }
