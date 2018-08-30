@@ -308,7 +308,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
     }
     
     @objc private func timerFired(_ sender: Any?) {
-        if state.lastScrobbled != nil && abs(state.lastScrobbled!.timeIntervalSinceNow) < AppDelegate.scrobbleFreq {
+        let leeway: TimeInterval = 60
+        if state.lastScrobbled != nil && abs(state.lastScrobbled!.timeIntervalSinceNow) < AppDelegate.scrobbleFreq - leeway {
             // already scrobbled in near past
             return
         }
