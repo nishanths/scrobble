@@ -6,7 +6,7 @@ import "../scss/index.scss";
 
 const deleteMessage = `Deleting your account will remove your account and the list of scrobbled songs. Artwork you may have uploaded might not be removed, and your username can be reused.
 
-Delete your account?`
+Delete account?`
 
 type IndexPageProps = BootstrapArgs
 
