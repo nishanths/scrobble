@@ -18,8 +18,6 @@ import (
 	"google.golang.org/appengine/user"
 )
 
-const host = "scrobble.allele.cc"
-
 var (
 	indexTmpl = template.Must(template.New("").Parse(string(MustAsset("appengine/template/index.html"))))
 	uTmpl     = template.Must(template.New("").Parse(string(MustAsset("appengine/template/u.html"))))
