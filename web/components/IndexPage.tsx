@@ -4,20 +4,52 @@ import { SetUsername, SetUsernameProps } from "./SetUsername";
 import { AccountDetail, AccountDetailProps } from "./AccountDetail";
 import "../scss/index.scss";
 
+const deleteMessage = `Deleting your account will remove your account and the list of scrobbled songs. Artwork you may have uploaded might not be removed, and your username can be reused.
+
+Delete your account?`
+
 type IndexPageProps = BootstrapArgs
 
-export class IndexPage extends React.Component<IndexPageProps, {account: Account}> {
+export class IndexPage extends React.Component<IndexPageProps, {account: Account, deleteFail: boolean}> {
   private static readonly downloadURL = "https://github.com/nishanths/scrobble/releases/latest"
 
   constructor(props: IndexPageProps) {
     super(props)
     this.state = {
-      account: this.props.account
+      account: this.props.account,
+      deleteFail: false,
     }
   }
 
   updateAccount(a: Account) {
     this.setState({account: a})
+  }
+
+  private doDelete() {
+    fetch(`/api/v1/account/delete`, {method: "POST"})
+      .then(
+        r => {
+          if (r.status == 200) {
+            window.location.assign(this.props.logoutURL)
+            return
+          }
+          console.log("failed to delete: status=%d", r.status)
+          this.setState({deleteFail: true})
+        },
+        err => {
+          console.error(err)
+          this.setState({deleteFail: true})
+        }
+      )
+  }
+
+  private onDeleteAccountClick(e: MouseEvent) {
+    e.preventDefault()
+    let ok = confirm(deleteMessage)
+    if (!ok) {
+      return
+    }
+    this.doDelete()
   }
 
   private signIn() {
@@ -43,6 +75,8 @@ export class IndexPage extends React.Component<IndexPageProps, {account: Account
   }
 
   render() {
+    let errClass = (b: boolean) => b ? "error" : "error hidden"
+
     return <div>
       <h1>{this.props.host}</h1>
       {this.props.email && !this.state.account.username &&
@@ -51,8 +85,16 @@ export class IndexPage extends React.Component<IndexPageProps, {account: Account
         <AccountDetail account={this.state.account} host={this.props.host}/>}
       {this.signIn()}
       {this.state.account.username ? this.profile() : this.visit()}
+
+      {/* TODO: a little gross that we're relying on logoutURL to indicate "existence of account" */}
+      {this.props.logoutURL &&
+        <p>
+          <a href="" onClick={this.onDeleteAccountClick.bind(this)}>Delete account…</a>
+          <span className={errClass(this.state.deleteFail)}>&nbsp;Failed to delete. Try again?</span>
+        </p>
+      }
+
       {this.download()}
     </div>
   }
 }
-

@@ -8,9 +8,34 @@ import (
 	"google.golang.org/appengine/log"
 )
 
+const devSignedInUsername = "devuser2"
+
+var devFakeAccount = Account{
+	Username: devSignedInUsername,
+	APIKey:   "FAKE",
+	Private:  true,
+}
+
+func devRootHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := appengine.NewContext(r)
+
+	a := IndexArgs{
+		Title: "Dev Scrobble",
+		Bootstrap: BootstrapArgs{
+			Host:      r.Host,
+			Email:     "fake@gmail.com",
+			LogoutURL: "/fake",
+			Account:   devFakeAccount,
+		},
+	}
+
+	if err := indexTmpl.Execute(w, a); err != nil {
+		log.Errorf(ctx, "failed to execute template: %v", err.Error())
+	}
+}
+
 func devUHandler(w http.ResponseWriter, r *http.Request) {
 	const profileUsername = "devuser"
-	const signedInUsername = "devuser2"
 	const bucketName = "selective-scrobble.appspot.com"
 
 	ctx := appengine.NewContext(r)
@@ -21,12 +46,8 @@ func devUHandler(w http.ResponseWriter, r *http.Request) {
 		ArtworkBaseURL:  "https://storage.googleapis.com/" + bucketName + "/" + artworkStorageDirectory,
 		ProfileUsername: profileUsername,
 		LogoutURL:       "/fake",
-		Account: Account{
-			Username: signedInUsername,
-			APIKey:   "FAKE",
-			Private:  true,
-		},
-		Self: profileUsername == signedInUsername,
+		Account:         devFakeAccount,
+		Self:            profileUsername == devSignedInUsername,
 	}); err != nil {
 		log.Errorf(ctx, "failed to execute template: %v", err.Error())
 	}

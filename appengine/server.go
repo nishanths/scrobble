@@ -7,11 +7,11 @@ import (
 )
 
 func RegisterHandlers() {
-	http.Handle("/", withHTTPS(http.HandlerFunc(rootHandler)))
-
 	if appengine.IsDevAppServer() {
+		http.HandleFunc("/", devRootHandler)
 		http.HandleFunc("/u/", devUHandler)
 	} else {
+		http.Handle("/", withHTTPS(http.HandlerFunc(rootHandler)))
 		http.Handle("/u/", withHTTPS(http.HandlerFunc(uHandler)))
 	}
 
@@ -27,6 +27,7 @@ func RegisterHandlers() {
 
 	http.HandleFunc("/api/v1/scrobble", scrobbleHandler)
 	http.HandleFunc("/api/v1/account", accountHandler)
+	http.HandleFunc("/api/v1/account/delete", deleteAccountHandler)
 	http.HandleFunc("/api/v1/artwork", artworkHandler)
 	http.HandleFunc("/api/v1/artwork/missing", artworkMissingHandler)
 }

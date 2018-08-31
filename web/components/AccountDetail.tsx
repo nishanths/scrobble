@@ -12,7 +12,7 @@ interface AccountDetailState {
   keyGenerateErr: string
   private: boolean
   showPrivacySaved: boolean
-  privacySaveErr: string
+  privacyFail: boolean
 }
 
 export class AccountDetail extends React.Component<AccountDetailProps, AccountDetailState> {
@@ -27,7 +27,7 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
       keyGenerateErr: "",
       private: this.props.account.private,
       showPrivacySaved: false,
-      privacySaveErr: ""
+      privacyFail: false,
     }
   }
 
@@ -44,6 +44,8 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
           success = true
           return res.json()
         }
+        console.log("failed to generate API key: status=%d", res.status)
+        this.setState({keyGenerateErr: genericErr})
         return res.blob()
       })
       .then(
@@ -61,7 +63,7 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
   }
 
   private setPrivacy(v: boolean) {
-    this.setState({showPrivacySaved: false, privacySaveErr: ""})
+    this.setState({showPrivacySaved: false, privacyFail: false})
     let success = false
 
     fetch(`/setPrivacy?privacy=${v.toString()}`, {method: "POST"})
@@ -73,13 +75,19 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
             this.savedTimeout = window.setTimeout(() => {
               this.setState({showPrivacySaved: false})
             }, 1000)
+          } else {
+            console.log("failed to update privacy: status=%d", r.status)
+            this.setState({
+              private: !v, // revert
+              privacyFail: true,
+            })
           }
         },
         err => {
           console.error(err)
           this.setState({
             private: !v, // revert
-            privacySaveErr: "Failed to toggle privacy. Try again?",
+            privacyFail: true,
           })
         }
       )
@@ -98,9 +106,8 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
   }
 
   render() {
-    let errClass = this.state.keyGenerateErr ? "error" : "error hidden"
-    let savedClass = this.state.showPrivacySaved ? "success" : "success hidden"
-    let failedSaveClass = this.state.privacySaveErr ? "error" : "error hidden"
+    let errClass = (b: string|boolean) => b ? "error" : "error hidden"
+    let savedClass = (b: boolean) => this.state.showPrivacySaved ? "success" : "success hidden"
 
     return <div className="account">
       <table>
@@ -110,16 +117,16 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
             <td>API Key</td>
             <td className="mono">{this.state.apiKey}</td>
             <td><a href="" onClick={this.onRegenerateClick.bind(this)}>Regenerate</a></td>
-            <td><span className={errClass}>{this.state.keyGenerateErr}</span></td>
+            <td><span className={errClass(this.state.keyGenerateErr)}>{this.state.keyGenerateErr}</span></td>
           </tr>
           <tr>
             <td>Private</td>
             <td>
-              <input type="checkbox" checked={this.state.private} onClick={this.onPrivacyClick.bind(this)} ref={r => {this.privacyCheckbox = r}}/>
+              <input type="checkbox" defaultChecked={this.state.private} onClick={this.onPrivacyClick.bind(this)} ref={r => {this.privacyCheckbox = r}}/>
             </td>
-            <td className={savedClass}>Saved</td>
+            <td className={savedClass(this.state.showPrivacySaved)}>Saved</td>
             <td></td>
-            <td className={failedSaveClass}>{this.state.privacySaveErr}</td>
+            <td className={errClass(this.state.privacyFail)}>Failed to toggle privacy. Try again?</td>
           </tr>
         </tbody>
       </table>

@@ -112,6 +112,76 @@ func accountHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(b)
 }
 
+func deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := appengine.NewContext(r)
+
+	if r.Method != "POST" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	var accID string
+	if u := user.Current(ctx); u == nil {
+		key := r.Header.Get(headerAPIKey)
+		if key == "" {
+			log.Errorf(ctx, "not signed in and missing API key header")
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		var ok bool
+		_, accID, ok = fetchAccountForKey(ctx, key, w)
+		if !ok {
+			return
+		}
+	} else {
+		accID = u.Email
+	}
+
+	log.Infof(ctx, "deleting account %q", accID)
+
+	if err := datastore.RunInTransaction(ctx, func(tx context.Context) error {
+		// synchronously delete Username, Account entities
+		// NOTE: we intentionally do not delete the APIKey entity because
+		// those should always exist to guarantee non-reuse.
+		aKey := datastore.NewKey(tx, KindAccount, accID, 0, nil)
+		var account Account
+		if err := datastore.Get(tx, aKey, &account); err != nil {
+			return errors.Wrapf(err, "failed to get account")
+		}
+
+		log.Infof(tx, "Account entity %+v for key %s", account, aKey)
+
+		// If the account isn't initialized, the username won't be set
+		// and a corresponding Username entity won't exist. So only
+		// attempt to delete the Username entity if the username is
+		// set.
+		if account.Username != "" {
+			if err := datastore.Delete(tx, datastore.NewKey(tx, KindUsername, account.Username, 0, nil)); err != nil {
+				return errors.Wrapf(err, "failed to delete Username entity")
+			}
+		}
+
+		if err := datastore.Delete(tx, aKey); err != nil {
+			return errors.Wrapf(err, "failed to delete Account entity")
+		}
+		// asynchronously delete the namespace's entities
+		namespace := namespaceID(accID)
+		if err := deleteFunc.Call(tx, namespace, KindArtworkRecord); err != nil {
+			return errors.Wrapf(err, "failed to call deleteFunc for %s,%s", namespace, KindArtworkRecord)
+		}
+		if err := deleteFunc.Call(tx, namespace, KindSong); err != nil {
+			return errors.Wrapf(err, "failed to call deleteFunc for %s,%s", namespace, KindSong)
+		}
+		return nil
+	}, defaultTxOpts); err != nil {
+		log.Errorf(ctx, "%v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
 func scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 
@@ -251,9 +321,8 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	const n = 500 // datastore limit per operation?
 	s := 0
-	e := min(s+n, len(songs))
+	e := min(s+datastoreLimitPerOp, len(songs))
 	chunk := songs[s:e]
 
 	for len(chunk) > 0 {
@@ -278,7 +347,7 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		s = e
-		e = min(s+n, len(songs))
+		e = min(s+datastoreLimitPerOp, len(songs))
 		chunk = songs[s:e]
 	}
 
