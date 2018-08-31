@@ -184,6 +184,7 @@ func deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 
 func scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate, private")
 
 	if r.Method != "GET" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
