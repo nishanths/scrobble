@@ -13,10 +13,10 @@ default:
 	@echo "the default target does nothing!"
 
 .PHONY: all
-all: clean _bootstrap bindata build ln-web
+all: clean bootstrap bindata build ln-web
 
 .PHONY: other
-other: _bootstrap bindata ln-web
+other: bootstrap bindata ln-web
 
 .PHONY: deploy
 deploy:
@@ -48,6 +48,9 @@ ln-web:
 clean:
 	@cd web && $(MAKE) clean
 	rm -rf appengine/web
+
+.PHONY: bootstrap
+bootstrap: ln-web _bootstrap
 
 .PHONY: _bootstrap
 _bootstrap:
