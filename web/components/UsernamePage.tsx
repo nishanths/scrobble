@@ -80,7 +80,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
   }
 
   private header() {
-    return <Header username={this.props.profileUsername} logoutURL={this.props.logoutURL} />
+    return <Header username={this.props.profileUsername} signedIn={!!this.props.logoutURL}/>
   }
 
   private showMore() {
