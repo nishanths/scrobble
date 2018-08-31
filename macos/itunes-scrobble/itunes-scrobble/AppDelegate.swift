@@ -18,6 +18,10 @@ import iTunesLibrary
 // the deprecated NSURLConnection.sendAsynchronousRequest.
 
 // State is the state of the application.
+//
+// TODO: there's plenty of concurrent accesses of these vars,
+// but for the most part the asynchronous functions performing the
+// concurrent run far apart in time from each other.
 struct State {
     // whether scrobbling is running or paused
     var running: Bool
@@ -368,7 +372,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         textField!.cell?.wraps = false
         textField!.cell?.isScrollable = false
         textField!.delegate = self
-        textField!.font = NSFont(name: "Menlo", size: NSFont.systemFontSize) // NSFont.monospacedDigitSystemFont(ofSize: NSFont.systemFontSize, weight: .regular)
+        textField!.font = NSFont(name: "Menlo", size: NSFont.systemFontSize)
         textField!.placeholderString = "D1A3903GB"
         alert!.accessoryView = textField
         alert!.window.initialFirstResponder = alert!.accessoryView
