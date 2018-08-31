@@ -23,11 +23,11 @@ export interface UArgs {
 }
 
 export interface Song {
-	albumTitle: string
-	artistName: string
-	title: string
-	totalTime: number
-	year: number
-	lastPlayed: number
-	artworkHash: string
+  albumTitle: string
+  artistName: string
+  title: string
+  totalTime: number
+  year: number
+  lastPlayed: number
+  artworkHash: string
 }
