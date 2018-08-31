@@ -76,6 +76,7 @@ $default-songcard-dimension: 180px;
     padding-right: 6px;
     cursor: default;
     color: $meta-color;
+    text-align: center;
 
     .title {
       font-size: 13px + $adjust-font-size;
