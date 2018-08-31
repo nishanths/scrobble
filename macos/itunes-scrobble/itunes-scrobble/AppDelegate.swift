@@ -180,6 +180,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
             if let ls = state.lastScrobbled {
                 statusItem.title = String(format: "Last scrobbled: %@", formatDate(ls))
                 statusItem.isHidden = false
+                if let lp = state.latestPlayed {
+                    statusItem.toolTip = String(format: "Latest known play time: %@", formatDate(lp))
+                } else {
+                    statusItem.toolTip = nil // clear
+                }
             } else {
                 statusItem.isHidden = true
             }
