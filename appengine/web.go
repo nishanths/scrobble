@@ -137,6 +137,7 @@ type UArgs struct {
 	LogoutURL       string  `json:"logoutURL"`
 	Account         Account `json:"account"`
 	Self            bool    `json:"self"`
+	Private         bool    `json:"private"`
 }
 
 func uHandler(w http.ResponseWriter, r *http.Request) {
@@ -154,7 +155,7 @@ func uHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	profileUsername := c[1]
-	_, _, ok := fetchAccountForUsername(ctx, profileUsername, w)
+	acc, _, ok := fetchAccountForUsername(ctx, profileUsername, w)
 	if !ok {
 		return
 	}
@@ -195,6 +196,7 @@ func uHandler(w http.ResponseWriter, r *http.Request) {
 		LogoutURL:       logoutURL,
 		Account:         account,
 		Self:            self,
+		Private:         acc.Private,
 	}); err != nil {
 		log.Errorf(ctx, "failed to execute template: %v", err.Error())
 	}

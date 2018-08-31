@@ -13,7 +13,6 @@ export interface BootstrapArgs {
 }
 
 export interface UArgs {
-  title: string
   host: string
   artworkBaseURL: string
   profileUsername: string
