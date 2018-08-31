@@ -50,7 +50,7 @@ var deleteFunc = delay.Func("delete", func(ctx context.Context, namespace string
 
 func deleteKeysChunk(ctx context.Context, keys []*datastore.Key) error {
 	if len(keys) > datastoreLimitPerOp {
-		return fmt.Errorf("length must be < %d, got %d", datastoreLimitPerOp, len(keys))
+		panic(fmt.Sprintf("length must be <= %d, got %d", datastoreLimitPerOp, len(keys)))
 	}
 	return datastore.DeleteMulti(ctx, keys)
 }
