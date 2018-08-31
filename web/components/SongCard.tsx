@@ -36,7 +36,7 @@ export class SongCard extends React.Component<{song: Song, artworkBaseURL: strin
           <div className="other">
             {s.artistName && <span className="artist">{s.artistName}</span>}
           </div>
-          {s.lastPlayed && <div className="date">{dateDisplayString(new Date(s.lastPlayed * 1000), this.props.now)}</div>}
+          {s.lastPlayed && <time className="date">{dateDisplayString(new Date(s.lastPlayed * 1000), this.props.now)}</time>}
         </div>
       </div>
     </div>
