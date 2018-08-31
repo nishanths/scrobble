@@ -52,8 +52,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
     private static let shortVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     
     // Keys for information saved to UserDefaults.
-    private static let (keyAPIKey, keyRunning, keyLastScrobbled, keyLatestPlayed) =
-        ("apiKey", "running", "lastScrobbled", "latestPlayed")
+    private static let (keyAPIKey, keyRunning) = ("apiKey", "running")
     
     // Scrobble timer frequnecies.
     // The timer fires frequently, but scrobbling happens less often.
@@ -83,12 +82,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         statusBarItem.menu = makeMenu()
         
         // restore persisted information
-        let ls = UserDefaults.standard.double(forKey: AppDelegate.keyLastScrobbled)
-        let lp = UserDefaults.standard.double(forKey: AppDelegate.keyLatestPlayed)
         state.running = UserDefaults.standard.bool(forKey: AppDelegate.keyRunning)
         state.apiKey = UserDefaults.standard.string(forKey: AppDelegate.keyAPIKey)
-        state.lastScrobbled = ls != 0 ? Date(timeIntervalSince1970: TimeInterval(ls)) : nil
-        state.latestPlayed = lp != 0 ? Date(timeIntervalSince1970: TimeInterval(lp)) : nil
         render()
         
         // initially fetch account info
@@ -240,8 +235,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                     self.state.lastScrobbled = Date(timeIntervalSinceNow: 0)
                     self.state.latestPlayed = latest
                     self.state.authError = false
-                    UserDefaults.standard.set(self.state.lastScrobbled?.timeIntervalSince1970, forKey: AppDelegate.keyLastScrobbled)
-                    UserDefaults.standard.set(self.state.latestPlayed?.timeIntervalSince1970, forKey: AppDelegate.keyLatestPlayed)
                     self.render()
                 }
                 self.handleArtwork(lib)
@@ -299,8 +292,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         state.authError = false
         UserDefaults.standard.set(state.running, forKey: AppDelegate.keyRunning)
         UserDefaults.standard.set(state.apiKey, forKey: AppDelegate.keyAPIKey)
-        UserDefaults.standard.set(state.lastScrobbled, forKey: AppDelegate.keyLastScrobbled)
-        UserDefaults.standard.set(state.latestPlayed, forKey: AppDelegate.keyLatestPlayed)
         render()
     }
     
@@ -412,8 +403,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                             self.state.account = account
                             UserDefaults.standard.set(self.state.running, forKey: AppDelegate.keyRunning)
                             UserDefaults.standard.set(self.state.apiKey, forKey: AppDelegate.keyAPIKey)
-                            UserDefaults.standard.set(self.state.lastScrobbled?.timeIntervalSince1970, forKey: AppDelegate.keyLastScrobbled)
-                            UserDefaults.standard.set(self.state.latestPlayed?.timeIntervalSince1970, forKey: AppDelegate.keyLatestPlayed)
                             self.render()
                             NSApplication.shared.sendAction(self.oldOkButtonAction!, to: self.oldOkButtonTarget, from: sender)
                         }
@@ -437,7 +426,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         clearAPIKey()
         enterAPIKeyAction(sender)
     }
-
+    
     // uppercase API key input
     override func controlTextDidChange(_ obj: Notification) {
         if let text = obj.userInfo!["NSFieldEditor"] as? NSText {
