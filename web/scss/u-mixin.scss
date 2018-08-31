@@ -39,6 +39,7 @@ $default-songcard-dimension: 180px;
   $transition-exit-duration: 200ms;
 
   .scaleArea {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
     &:hover {
       .pict {
         transform: scale(1.10);

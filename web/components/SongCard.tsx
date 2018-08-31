@@ -4,6 +4,12 @@ import { displayString as dateDisplayString } from "../src/time"
 
 export class SongCard extends React.Component<{song: Song, artworkBaseURL: string, now: Date}, {}> {
   private static readonly defaultArtworkPath = "/static/img/default-artwork.jpeg"
+  private scaleArea: HTMLDivElement|null = null
+
+  componentDidMount() {
+    // SO says onclick on an element enables :hover on iOS
+    this.scaleArea!.setAttribute("onclick", "");
+  }
 
   private artworkURL(): string {
     if (!this.props.song.artworkHash) {
@@ -29,7 +35,7 @@ export class SongCard extends React.Component<{song: Song, artworkBaseURL: strin
     let imgStyles = this.artworkURL() ? {backgroundImage: `url(${this.artworkURL()})`} : {backgroundColor: "#fff"};
 
     return <div className="SongCard">
-      <div className="scaleArea">
+      <div className="scaleArea" ref={r => {this.scaleArea = r}}>
         <div className="pict" style={imgStyles}></div>
         <div className="meta" title={this.tooltip()}>
           <div className="title">{s.title}</div>
