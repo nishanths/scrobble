@@ -56,12 +56,12 @@
   font-family: 'proxima-nova';
   font-weight: normal;
   font-style: normal;
-  src: url("/static/font/proxima-nova/2F00B2_0_0.woff2") format("woff2"), url("webfonts/2F00B2_0_0.woff") format("woff"), url("webfonts/2F00B2_0_0.ttf") format("truetype");
+  src: url("/static/font/proxima-nova/2F00B2_0_0.woff2") format("woff2"), url("/static/font/proxima-nova/2F00B2_0_0.woff") format("woff"), url("/static/font/proxima-nova/2F00B2_0_0.ttf") format("truetype");
 }
 
 @font-face {
   font-family: 'proxima-nova';
   font-weight: bold;
   font-style: normal;
-  src: url("/static/font/proxima-nova/2F00B2_1_0.woff2") format("woff2"), url("webfonts/2F00B2_1_0.woff") format("woff"), url("webfonts/2F00B2_1_0.ttf") format("truetype");
+  src: url("/static/font/proxima-nova/2F00B2_1_0.woff2") format("woff2"), url("/static/font/proxima-nova/2F00B2_1_0.woff") format("woff"), url("/static/font/proxima-nova/2F00B2_1_0.ttf") format("truetype");
 }

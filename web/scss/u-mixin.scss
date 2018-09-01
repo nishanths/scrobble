@@ -35,8 +35,8 @@ $default-songcard-dimension: 180px;
   border-right: $songcard-border-w solid transparent;
   border-bottom: $border-bottom solid transparent;
 
-  $transition-enter-duration: 250ms;
-  $transition-exit-duration: 200ms;
+  $transition-enter-duration: 200ms;
+  $transition-exit-duration: 150ms;
 
   .scaleArea {
     -webkit-tap-highlight-color: rgba(0,0,0,0);
