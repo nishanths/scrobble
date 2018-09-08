@@ -41,13 +41,13 @@ body {
     }
   }
 
-  .settings {
+  .nav {
     display: none;
     margin-left: auto;
     font-size: 13px;
     font-weight: 500;
     position: relative;
-    top: 6px;
+    top: 7px;
     a {
       text-decoration: none;
       color: inherit;
@@ -184,7 +184,7 @@ body {
     .username {
       max-width: 500px;
     }
-    .settings {
+    .nav {
       display: block;
     }
   }
