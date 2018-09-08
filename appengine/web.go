@@ -19,8 +19,14 @@ import (
 )
 
 var (
-	indexTmpl = template.Must(template.New("").Parse(string(MustAsset("appengine/template/index.html"))))
-	uTmpl     = template.Must(template.New("").Parse(string(MustAsset("appengine/template/u.html"))))
+	indexTmpl = template.Must(
+		template.Must(template.New("").Parse(string(MustAsset("appengine/template/fs-snippet.tmpl")))).
+			Parse(string(MustAsset("appengine/template/index.tmpl"))),
+	)
+	uTmpl = template.Must(
+		template.Must(template.New("").Parse(string(MustAsset("appengine/template/fs-snippet.tmpl")))).
+			Parse(string(MustAsset("appengine/template/u.tmpl"))),
+	)
 )
 
 var defaultTxOpts = &datastore.TransactionOptions{XG: true}

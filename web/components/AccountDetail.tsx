@@ -115,7 +115,7 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
           <tr><td>Username</td><td>{this.props.account.username}</td></tr>
           <tr>
             <td>API Key</td>
-            <td className="mono">{this.state.apiKey}</td>
+            <td className="mono apiKey">{this.state.apiKey}</td>
             <td><a href="" onClick={this.onRegenerateClick.bind(this)}>Regenerate</a></td>
             <td><span className={errClass(this.state.keyGenerateErr)}>{this.state.keyGenerateErr}</span></td>
           </tr>

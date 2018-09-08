@@ -74,7 +74,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                               scrobbling: false,
                               authError: false)
     
+    private var lib: ITLibrary? = nil
+    
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+        if let l = try? ITLibrary.init(apiVersion: "1.0") {
+            lib = l
+        } else {
+            os_log("failed to initialize ITLibrary")
+            return
+        }
+        
         // make status bar item and menu
         let button = statusBarItem.button!
         button.image = NSImage(named:NSImage.Name(AppDelegate.menuIconName))
@@ -201,18 +210,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
             // already scrobbling
             return
         }
-        
-        // NOTE: unverified, but it appears that init-ing the library each time
-        // is required to properly pick up "Last Played", et. al.
-        guard let lib = try? ITLibrary.init(apiVersion: "1.0") else {
-            os_log("failed to initialize ITLibrary")
-            return
-        }
-        
+    
         state.scrobbling = true
+        lib!.reloadData()
         render()
         
-        let (items, latest) = scrobblableItems(from: lib.allMediaItems)
+        let (items, latest) = scrobblableItems(from: lib!.allMediaItems)
         guard let data = try? JSONEncoder().encode(items) else { return }
         
         NSURLConnection.sendAsynchronousRequest(API.scrobbleRequest(state.apiKey!, data), queue: OperationQueue.main) {(rsp, data, err) in
@@ -237,7 +240,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                     self.state.authError = false
                     self.render()
                 }
-                self.handleArtwork(lib)
+                self.handleArtwork(self.lib!)
                 return
             }
         }

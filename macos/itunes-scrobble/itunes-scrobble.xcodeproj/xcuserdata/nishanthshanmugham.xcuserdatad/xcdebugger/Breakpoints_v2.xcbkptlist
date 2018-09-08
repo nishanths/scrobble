@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "itunes-scrobble/AppDelegate.swift"
-            timestampString = "558094911.612493"
+            timestampString = "558095795.387796"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "390"
-            endingLineNumber = "390"
+            startingLineNumber = "393"
+            endingLineNumber = "393"
             landmarkName = "okButtonAction(_:)"
             landmarkType = "7">
          </BreakpointContent>
