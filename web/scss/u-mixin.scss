@@ -44,7 +44,7 @@ $default-songcard-dimension: 180px;
       .pict {
         transform: scale(1.10);
         transition: $transition-enter-duration ease transform, $transition-enter-duration ease box-shadow;
-        box-shadow:0 1px 8px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+        box-shadow:0 1px 6px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
       }
       .meta {
         .title {
@@ -71,7 +71,7 @@ $default-songcard-dimension: 180px;
     border-radius: 4px;
     border: 1px solid #e5e5e5;
     transition: $transition-enter-duration ease transform, $transition-exit-duration ease box-shadow;
-    box-shadow:0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+    box-shadow:0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1) inset;
   }
 
   .meta {
