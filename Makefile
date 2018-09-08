@@ -43,11 +43,14 @@ ln-web:
 	mkdir -p appengine/web
 	ln -s $(PWD)/web/dist $(PWD)/appengine/web
 	ln -s $(PWD)/web/static $(PWD)/appengine/web
+	ln -s $(PWD)/web/node_modules/nprogress/nprogress.css $(PWD)/web/static/css/nprogress.css
+	ln -s $(PWD)/web/node_modules/nprogress/nprogress.js $(PWD)/web/static/js/nprogress.js
 
 .PHONY: clean
 clean:
 	@cd web && $(MAKE) clean
 	rm -rf appengine/web
+	rm -rf web/static/{css/nprogress.css,js/nprogress.js}
 
 .PHONY: bootstrap
 bootstrap: ln-web _bootstrap
