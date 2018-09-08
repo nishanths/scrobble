@@ -8,7 +8,7 @@ declare var NProgress: {
   start(): void
   done(): void
   configure(opts: {[k: string]: any}): void
-};
+}
 
 class Songs extends React.Component<{songs: Song[], artworkBaseURL: string}, {}> {
   private static key(s: Song): string {
@@ -49,8 +49,8 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
   }
 
   componentDidMount() {
-    NProgress.configure({ showSpinner: false, minimum: 0.1, speed: 500, trickleSpeed: 100 });
-    NProgress.start();
+    NProgress.configure({ showSpinner: false, minimum: 0.1, trickleSpeed: 25, speed: 500 })
+    NProgress.start()
     const leeway = 200
     window.addEventListener("scroll", () => {
       if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight - leeway)) {
@@ -110,7 +110,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
       return <div>{this.header()}</div>
     }
 
-    NProgress.done();
+    NProgress.done()
 
     if (this.state.private) {
       return <div>
