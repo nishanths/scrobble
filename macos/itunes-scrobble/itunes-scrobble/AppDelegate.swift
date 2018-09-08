@@ -268,15 +268,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                     items[hash] = p
                 }
                 
-                // send artwork that the server asks for
+                // send artwork that the server is missing
                 for (h, _) in incomingHashes {
                     guard self.state.running else { return }
                     guard let key = self.state.apiKey else { return }
                     guard let p = items[h] else { continue }
                     guard let d = p.artwork?.imageData else { continue }
                     guard let f = p.artwork?.imageDataFormat else { continue }
-                    NSURLConnection.sendAsynchronousRequest(API.artworkRequest(key, f, d), queue: OperationQueue.main) {(_, _, _) in
-                    }
+                    NSURLConnection.sendAsynchronousRequest(API.artworkRequest(key, f, d), queue: OperationQueue.main) {(_, _, _) in}
                 }
             }
         }
@@ -337,7 +336,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         case NSApplication.ModalResponse.alertFirstButtonReturn:
             clearAPIKey()
         case NSApplication.ModalResponse.alertSecondButtonReturn:
-        break // nothing to do
+            break // nothing to do
         default:
             print("unhandled button", result)
         }

@@ -20,7 +20,7 @@ other: bootstrap bindata ln-web
 
 .PHONY: deploy
 deploy:
-	gcloud --quiet --project $(PROJECT_ID) app deploy $(APP_YAML)
+	gcloud --quiet --project $(PROJECT_ID) app deploy -v 1 $(APP_YAML)
 
 .PHONY: bindata
 bindata:

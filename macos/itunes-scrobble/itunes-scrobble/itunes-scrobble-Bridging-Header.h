@@ -10,6 +10,6 @@
 #define itunes_scrobble_Bridging_Header_h
 
 #import <CommonCrypto/CommonCrypto.h>
-#include <os/log.h>
+#import <os/log.h>
 
 #endif /* itunes_scrobble_Bridging_Header_h */

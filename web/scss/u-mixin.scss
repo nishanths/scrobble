@@ -45,18 +45,20 @@ $default-songcard-dimension: 180px;
         transform: scale(1.10);
         transition: $transition-enter-duration ease transform;
       }
-      .title {
-        transform: scale(1.1) translateY($songcard-dim * .1 / 2);
-        transition: $transition-enter-duration ease transform;
-      }
-      .other {
-        transform: scale(1.1) translateY($songcard-dim * .1 / 2 + 1px);
-        transition: $transition-enter-duration ease transform;
-      }
-      .date {
-        transform: scale(1.1) translateY($songcard-dim * .1 / 2 + 2px);
-        transition: $transition-enter-duration ease transform, 500ms ease opacity;
-        opacity: 1;
+      .meta {
+        .title {
+          transform: scale(1.1) translateY($songcard-dim * .1 / 2);
+          transition: $transition-enter-duration ease transform;
+        }
+        .other {
+          transform: scale(1.1) translateY($songcard-dim * .1 / 2 + 1px);
+          transition: $transition-enter-duration ease transform;
+        }
+        .date {
+          transform: scale(1.1) translateY($songcard-dim * .1 / 2 + 2px);
+          transition: $transition-enter-duration ease transform, 500ms ease opacity;
+          opacity: 1;
+        }
       }
     }
   }
@@ -71,8 +73,8 @@ $default-songcard-dimension: 180px;
   }
 
   .meta {
-    padding-left: 2px;
-    padding-right: 6px;
+    padding-left: 3px;
+    padding-right: 3px;
     cursor: default;
     color: $meta-color;
     text-align: center;
