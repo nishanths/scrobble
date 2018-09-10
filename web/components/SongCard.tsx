@@ -30,12 +30,10 @@ export class SongCard extends React.Component<{song: Song, artworkBaseURL: strin
     return tooltip
   }
 
-  private internals() {
+  private card() {
     let s = this.props.song
-    let imgStyles = this.artworkURL() ? {backgroundImage: `url(${this.artworkURL()})`} : {backgroundColor: "#fff"};
-
     return <div className="scaleArea" ref={r => {this.scaleArea = r}}>
-      <div className="pict" style={imgStyles}></div>
+      {this.pict()}
       <div className="meta" title={this.tooltip()}>
         <div className="title">{s.title}</div>
         <div className="other">
@@ -46,11 +44,10 @@ export class SongCard extends React.Component<{song: Song, artworkBaseURL: strin
     </div>
   }
 
-  private card() {
-    if (this.props.song.trackViewURL) {
-      return <a href={this.props.song.trackViewURL} target="_blank">{this.internals()}</a>
-    }
-    return this.internals()
+  private pict() {
+    let imgStyles = this.artworkURL() ? {backgroundImage: `url(${this.artworkURL()})`} : {backgroundColor: "#fff"}
+    let e = <div className="pict" style={imgStyles}></div>
+    return this.props.song.trackViewURL ? <a href={this.props.song.trackViewURL} target="_blank">{e}</a> : e
   }
 
   render() {

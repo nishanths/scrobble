@@ -21,7 +21,7 @@ import (
 )
 
 var fillITunesFunc = delay.Func("fillITunes", func(ctx context.Context, namespace string, ident string) error {
-	time.Sleep(time.Duration(rand.Intn(120e3)) * time.Millisecond) // a barebones attempt at staggering
+	time.Sleep(time.Duration(rand.Intn(60e3)) * time.Millisecond) // a barebones attempt at staggering
 
 	err := datastore.RunInTransaction(ctx, func(ctx context.Context) error {
 		ns, err := appengine.Namespace(ctx, namespace)
@@ -40,7 +40,7 @@ var fillITunesFunc = delay.Func("fillITunes", func(ctx context.Context, namespac
 		if s.PreviewURL != "" && s.TrackViewURL != "" {
 			// already filled
 			// TODO: is there a way to indicate "abort" transaction instead of nil, since
-			// there have been no writes thus far.
+			// there have been no writes thus far?
 			return nil
 		}
 
@@ -70,7 +70,7 @@ var fillITunesFunc = delay.Func("fillITunes", func(ctx context.Context, namespac
 				}
 			}
 			if matchingIdx == -1 {
-				log.Infof(ctx, "no matching tracks found for %s (len=%d)", searchTerm, len(tracks))
+				log.Infof(ctx, "no matching tracks found for %q (len=%d)", searchTerm, len(tracks))
 				return nil
 			}
 
