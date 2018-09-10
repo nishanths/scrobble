@@ -30,21 +30,32 @@ export class SongCard extends React.Component<{song: Song, artworkBaseURL: strin
     return tooltip
   }
 
-  render() {
+  private internals() {
     let s = this.props.song
     let imgStyles = this.artworkURL() ? {backgroundImage: `url(${this.artworkURL()})`} : {backgroundColor: "#fff"};
 
-    return <div className="SongCard">
-      <div className="scaleArea" ref={r => {this.scaleArea = r}}>
-        <div className="pict" style={imgStyles}></div>
-        <div className="meta" title={this.tooltip()}>
-          <div className="title">{s.title}</div>
-          <div className="other">
-            {s.artistName && <span className="artist">{s.artistName}</span>}
-          </div>
-          {s.lastPlayed && <time className="date">{dateDisplayString(new Date(s.lastPlayed * 1000), this.props.now)}</time>}
+    return <div className="scaleArea" ref={r => {this.scaleArea = r}}>
+      <div className="pict" style={imgStyles}></div>
+      <div className="meta" title={this.tooltip()}>
+        <div className="title">{s.title}</div>
+        <div className="other">
+          {s.artistName && <span className="artist">{s.artistName}</span>}
         </div>
+        {s.lastPlayed && <time className="date">{dateDisplayString(new Date(s.lastPlayed * 1000), this.props.now)}</time>}
       </div>
+    </div>
+  }
+
+  private card() {
+    if (this.props.song.trackViewURL) {
+      return <a href={this.props.song.trackViewURL} target="_blank">{this.internals()}</a>
+    }
+    return this.internals()
+  }
+
+  render() {
+    return <div className="SongCard">
+      {this.card()}
     </div>
   }
 }

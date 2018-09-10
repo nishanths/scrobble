@@ -29,4 +29,5 @@ export interface Song {
   year: number
   lastPlayed: number
   artworkHash: string
+  trackViewURL: string
 }
