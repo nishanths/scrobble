@@ -18,6 +18,7 @@ import (
 	"google.golang.org/appengine/user"
 )
 
+// TODO: WTF is this monstrosity
 var (
 	indexTmpl = template.Must(
 		template.Must(template.New("").Parse(string(MustAsset("appengine/template/fs-snippet.tmpl")))).

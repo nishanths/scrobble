@@ -38,7 +38,16 @@ const (
 	KindAPIKey        = "APIKey"   // to guarantee uniqueness
 	KindSong          = "Song"
 	KindArtworkRecord = "ArtworkRecord"
+	KindITunesTrack   = "ITunesTrack"
 )
+
+func songident(album, artist, title string, year int) string {
+	return fmt.Sprintf("%s|%s|%s|%s",
+		base64encode([]byte(album)),
+		base64encode([]byte(artist)),
+		base64encode([]byte(title)),
+		base64encode([]byte((strconv.Itoa(year)))))
+}
 
 // Namespace: [default]
 // Key: email
@@ -67,15 +76,13 @@ type Song struct {
 	LastPlayed int64 `json:"lastPlayed"`
 	PlayCount  int   `json:"-"`
 
-	ArtworkHash string `datastore:",noindex" json:"artworkHash"`
+	ArtworkHash  string `datastore:",noindex" json:"artworkHash"`
+	PreviewURL   string `datastore:",noindex" json:"previewURL"`
+	TrackViewURL string `datastore:",noindex" json:"trackViewURL"`
 }
 
 func (s *Song) Ident() string {
-	return fmt.Sprintf("%s|%s|%s|%s",
-		base64encode([]byte(s.AlbumTitle)),
-		base64encode([]byte(s.ArtistName)),
-		base64encode([]byte(s.Title)),
-		base64encode([]byte(strconv.Itoa(s.Year))))
+	return songident(s.AlbumTitle, s.ArtistName, s.Title, s.Year)
 }
 
 const headerAPIKey = "X-Scrobble-API-Key"
@@ -267,6 +274,7 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Parse request
 	type MediaItem struct {
 		Added          float64 `json:"added"`
 		AlbumTitle     string  `json:"albumTitle"`
@@ -293,6 +301,7 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Convert to Songs.
 	songs := make([]Song, len(mis))
 	for i, m := range mis {
 		sal := m.SortAlbumTitle
@@ -322,34 +331,72 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	s := 0
-	e := min(s+datastoreLimitPerOp, len(songs))
-	chunk := songs[s:e]
+	sKeys := make([]*datastore.Key, len(songs))
+	var aKeys []*datastore.Key
+	for i, s := range songs {
+		// Create song key
+		sKeys[i] = datastore.NewKey(ns, KindSong, s.Ident(), 0, nil)
+		// Create artwork hash key
+		if h := s.ArtworkHash; h != "" {
+			aKeys = append(aKeys, datastore.NewKey(ns, KindArtworkRecord, h, 0, nil))
+		}
+	}
 
-	for len(chunk) > 0 {
-		keys := make([]*datastore.Key, len(chunk))
-		var aKeys []*datastore.Key
+	// Put songs.
+	{
+		s := 0
+		e := min(s+datastoreLimitPerOp, len(songs))
+		chunk := songs[s:e]
+		keysChunk := sKeys[s:e]
 
-		for i := range chunk {
-			keys[i] = datastore.NewKey(ns, KindSong, chunk[i].Ident(), 0, nil)
-			if h := chunk[i].ArtworkHash; h != "" {
-				aKeys = append(aKeys, datastore.NewKey(ns, KindArtworkRecord, h, 0, nil))
+		for len(chunk) > 0 {
+			if _, err := datastore.PutMulti(ns, keysChunk, chunk); err != nil {
+				log.Errorf(ns, "failed to put songs: %v", err.Error())
+				w.WriteHeader(http.StatusInternalServerError)
+				return
 			}
+
+			s = e
+			e = min(s+datastoreLimitPerOp, len(songs))
+			chunk = songs[s:e]
+			keysChunk = sKeys[s:e]
+		}
+	}
+
+	var g errgroup.Group
+
+	// Put artwork hash keys
+	g.Go(func() error {
+		s := 0
+		e := min(s+datastoreLimitPerOp, len(aKeys))
+		keysChunk := aKeys[s:e]
+
+		for len(keysChunk) > 0 {
+			if _, err := datastore.PutMulti(ns, keysChunk, make([]struct{}, len(keysChunk))); err != nil {
+				log.Errorf(ns, "failed to put artwork records: %v", err.Error()) // only log
+			}
+
+			s = e
+			e = min(s+datastoreLimitPerOp, len(aKeys))
+			keysChunk = aKeys[s:e]
 		}
 
-		if _, err := datastore.PutMulti(ns, keys, chunk); err != nil {
-			log.Errorf(ns, "failed to put songs: %v", err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+		return nil
+	})
 
-		if _, err := datastore.PutMulti(ns, aKeys, make([]struct{}, len(aKeys))); err != nil {
-			log.Errorf(ns, "failed to put artwork records: %v", err.Error()) // only log
-		}
+	// Create tasks to fill in iTunes-related fields
+	for _, s := range songs {
+		ident := s.Ident()
+		g.Go(func() error {
+			if err := fillITunesFunc.Call(ctx, namespaceID(accID), ident); err != nil {
+				log.Errorf(ctx, "failed to call fillITunesFunc for %s,%s", namespaceID(accID), ident) // only log
+			}
+			return nil
+		})
+	}
 
-		s = e
-		e = min(s+datastoreLimitPerOp, len(songs))
-		chunk = songs[s:e]
+	if err := g.Wait(); err != nil { // no such errors expected
+		log.Errorf(ns, "%v", err.Error())
 	}
 
 	w.WriteHeader(http.StatusOK)

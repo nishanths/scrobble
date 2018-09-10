@@ -15,6 +15,7 @@ import (
 // put/get/deleted in a single call. App Engine documentation?
 const datastoreLimitPerOp = 500
 
+// Deletes entities of the given kind in the namespace.
 var deleteFunc = delay.Func("delete", func(ctx context.Context, namespace string, kind string) error {
 	log.Infof(ctx, "deleting namespace=%s, kind=%s", namespace, kind)
 
