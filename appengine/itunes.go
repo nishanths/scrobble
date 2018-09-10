@@ -21,7 +21,7 @@ import (
 )
 
 var fillITunesFunc = delay.Func("fillITunes", func(ctx context.Context, namespace string, ident string) error {
-	time.Sleep(time.Duration(rand.Intn(60e3)) * time.Millisecond) // a barebones attempt at staggering
+	time.Sleep(time.Duration(rand.Intn(120e3)) * time.Millisecond) // a barebones attempt at staggering
 
 	err := datastore.RunInTransaction(ctx, func(ctx context.Context) error {
 		ns, err := appengine.Namespace(ctx, namespace)
@@ -53,9 +53,12 @@ var fillITunesFunc = delay.Func("fillITunes", func(ctx context.Context, namespac
 			tctx, cancel := context.WithTimeout(ns, 5*time.Second)
 			defer cancel()
 			searchTerm := strings.Join([]string{s.Title, s.ArtistName}, " ") // including the album name produces poorer results
-			tracks, err := iTunesSearchSong(tctx, searchTerm)
+			tracks, retry, err := iTunesSearchSong(tctx, searchTerm)
 			if err != nil {
-				log.Errorf(ctx, "failed to search iTunes for %q: %s", searchTerm, err)
+				log.Errorf(ctx, "failed to search iTunes for %q: %s (retry=%v)", searchTerm, err, retry)
+				if retry {
+					return err // returning a non-nil error causes the task to retry
+				}
 				return nil // don't bother
 			}
 
@@ -119,7 +122,7 @@ func (i *ITunesTrack) Ident() string {
 }
 
 // See https://affiliate.itunes.apple.com/resources/documentation/itunes-store-web-service-search-api/
-func iTunesSearchSong(ctx context.Context, searchTerm string) ([]ITunesTrack, error) {
+func iTunesSearchSong(ctx context.Context, searchTerm string) ([]ITunesTrack, bool, error) {
 	vals := make(url.Values)
 	vals.Set("term", searchTerm)
 	vals.Set("media", "music")
@@ -131,12 +134,14 @@ func iTunesSearchSong(ctx context.Context, searchTerm string) ([]ITunesTrack, er
 	u := fmt.Sprintf("https://itunes.apple.com/search?%s", vals.Encode())
 	rsp, err := urlfetch.Client(ctx).Get(u)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to make itunes request")
+		// assume all errors are transient, indicate to retry
+		return nil, true, errors.Wrapf(err, "failed to make itunes request")
 	}
 	defer drainAndClose(rsp.Body)
 
 	if rsp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("bad status code %d", rsp.StatusCode)
+		// indicate retry on 403s, which appears to the "too many requests" code
+		return nil, rsp.StatusCode == http.StatusForbidden, fmt.Errorf("bad status code %d", rsp.StatusCode)
 	}
 
 	type auxITunesTrack struct {
@@ -154,11 +159,11 @@ func iTunesSearchSong(ctx context.Context, searchTerm string) ([]ITunesTrack, er
 
 	var v iTunesSearchResponse
 	if err := json.NewDecoder(rsp.Body).Decode(&v); err != nil {
-		return nil, errors.Wrapf(err, "failed to json-decode itunes response")
+		return nil, false, errors.Wrapf(err, "failed to json-decode itunes response")
 	}
 
 	if v.ResultCount == 0 {
-		return nil, nil
+		return nil, false, nil
 	}
 
 	ret := make([]ITunesTrack, len(v.Results))
@@ -176,7 +181,7 @@ func iTunesSearchSong(ctx context.Context, searchTerm string) ([]ITunesTrack, er
 			}
 		}
 	}
-	return ret, nil
+	return ret, false, nil
 }
 
 func drainAndClose(r io.ReadCloser) {
