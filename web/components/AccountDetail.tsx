@@ -112,15 +112,15 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
     return <div className="account">
       <table>
         <tbody>
-          <tr><td>Username</td><td>{this.props.account.username}</td></tr>
+          <tr><td>Username:</td><td>{this.props.account.username}</td></tr>
           <tr>
-            <td>API Key</td>
+            <td>API Key:</td>
             <td className="mono apiKey">{this.state.apiKey}</td>
             <td><a href="" onClick={this.onRegenerateClick.bind(this)}>Regenerate</a></td>
             <td><span className={errClass(this.state.keyGenerateErr)}>{this.state.keyGenerateErr}</span></td>
           </tr>
           <tr>
-            <td>Private</td>
+            <td>Private:</td>
             <td>
               <input type="checkbox" defaultChecked={this.state.private} onClick={this.onPrivacyClick.bind(this)} ref={r => {this.privacyCheckbox = r}}/>
             </td>

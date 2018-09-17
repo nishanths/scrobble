@@ -215,7 +215,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         lib!.reloadData()
         render()
         
-        let (items, latest) = scrobblableItems(from: lib!.allMediaItems)
+        var (items, latest) = scrobblableItems(from: lib!.allMediaItems)
+        let loved = lovedItems(in: lib!)
+        for idx in 0..<items.count {
+            if loved.contains(items[idx]) {
+                items[idx].loved = true
+            }
+        }
+
         guard let data = try? JSONEncoder().encode(items) else { return }
         
         NSURLConnection.sendAsynchronousRequest(API.scrobbleRequest(state.apiKey!, data), queue: OperationQueue.main) {(rsp, data, err) in
@@ -464,6 +471,15 @@ func scrobblableItems(from m: Array<ITLibMediaItem>) -> (Array<API.MediaItem>, D
     return (items, latestPlayed)
 }
 
+func lovedItems(in lib: ITLibrary) -> Set<API.MediaItem> {
+    if let p = lib.allPlaylists.first(where: { $0.distinguishedKind == .kindLovedSongs }) {
+        return Set(p.items.map({ API.MediaItem(fromITLibMediaItem: $0) }))
+    }
+    if let p = lib.allPlaylists.first(where: { $0.name == "Loved" }) {
+        return Set(p.items.map({ API.MediaItem(fromITLibMediaItem: $0) }))
+    }
+    return Set()
+}
 
 func formatDate(_ t: Date) -> String {
     let y0 = Calendar.current.dateComponents(in: TimeZone.current, from: t).year

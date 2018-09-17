@@ -79,6 +79,8 @@ type Song struct {
 	ArtworkHash  string `datastore:",noindex" json:"artworkHash"`
 	PreviewURL   string `datastore:",noindex" json:"previewURL"`
 	TrackViewURL string `datastore:",noindex" json:"trackViewURL"`
+
+	Loved bool `json:"loved"`
 }
 
 func (s *Song) Ident() string {
@@ -292,7 +294,8 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		TotalTime      uint    `json:"totalTime"` // milliseconds
 		Year           uint    `json:"year"`
 		PersistentID   string  `json:"persistentID"`
-		ArtworkHash    string  `json:"artworkHash"` // md5(artworkData + '|' + artworkFormatString)
+		ArtworkHash    string  `json:"artworkHash"`
+		Loved          bool    `json:"loved"`
 	}
 	var mis []MediaItem
 	if err := json.NewDecoder(r.Body).Decode(&mis); err != nil {
@@ -328,6 +331,7 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 			LastPlayed:     int64(m.LastPlayed),
 			PlayCount:      int(m.PlayCount),
 			ArtworkHash:    m.ArtworkHash,
+			Loved:          m.Loved,
 		}
 	}
 

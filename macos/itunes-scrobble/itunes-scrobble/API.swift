@@ -60,7 +60,11 @@ class API {
         var username: String
     }
     
-    struct MediaItem: Encodable {
+    struct MediaItem: Encodable, Hashable {
+        var hashValue: Int {
+            return persistentID.hashValue
+        }
+        
         var added: Double?
         var albumTitle: String?
         var sortAlbumTitle: String?
@@ -78,6 +82,8 @@ class API {
         var year: UInt
         var persistentID: String
         var artworkHash: String?
+        
+        var loved = false
         
         init(fromITLibMediaItem i: ITLibMediaItem) {
             self.added = i.addedDate?.timeIntervalSince1970
