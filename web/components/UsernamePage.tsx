@@ -1,5 +1,5 @@
 import * as React from "react";
-import { UArgs, Song } from "../src/shared"
+import { UArgs, Song, trimPrefix, unreachable } from "../src/shared"
 import { Header } from "./Header"
 import { SongCard } from "./SongCard"
 import "../scss/u.scss"
@@ -30,6 +30,11 @@ interface UsernamePageState {
   songs: Song[]
   private: boolean
   endIdx: number
+  mode: Mode
+}
+
+enum Mode {
+  All, Loved
 }
 
 export class UsernamePage extends React.Component<UsernamePageProps, UsernamePageState> {
@@ -45,6 +50,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
       songs: [],
       private: true,
       endIdx: 0,
+      mode: new URLSearchParams(trimPrefix(window.location.search, "?")).get("loved") == "true" ? Mode.Loved : Mode.All
     }
   }
 
@@ -76,11 +82,11 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
         }
       }).then(r => {
         if (!success) { return }
-        let s = r as Song[];
+        let songs = r as Song[];
         this.setState({
           fetched: true,
-          songs: s,
-          endIdx: UsernamePage.determineNextEndIdx(this.state.endIdx, s.length),
+          songs: songs,
+          endIdx: UsernamePage.determineNextEndIdx(this.state.endIdx, songs.length),
         })
       }, err => {
         console.error(err)
@@ -126,10 +132,20 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
       </div>
     }
 
+    let renderSongs = (): Song[] => {
+      switch (this.state.mode) {
+        case Mode.All:
+          return this.state.songs
+        case Mode.Loved:
+          return this.state.songs.filter(s => s.loved)
+      }
+      unreachable()
+    }
+
     return <div>
       {this.header()}
       <div className="songs">
-        <Songs songs={this.state.songs.slice(0, this.state.endIdx)} artworkBaseURL={this.props.artworkBaseURL}/>
+        <Songs songs={renderSongs().slice(0, this.state.endIdx)} artworkBaseURL={this.props.artworkBaseURL}/>
       </div>
     </div>
   }
