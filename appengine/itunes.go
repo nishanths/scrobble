@@ -21,8 +21,6 @@ import (
 )
 
 var fillITunesFunc = delay.Func("fillITunes", func(ctx context.Context, namespace string, ident string) error {
-	time.Sleep(time.Duration(rand.Intn(60e3)) * time.Millisecond) // a barebones attempt at staggering
-
 	err := datastore.RunInTransaction(ctx, func(ctx context.Context) error {
 		ns, err := appengine.Namespace(ctx, namespace)
 		if err != nil {
@@ -49,6 +47,8 @@ var fillITunesFunc = delay.Func("fillITunes", func(ctx context.Context, namespac
 		if err := datastore.Get(ctx, trackKey, &track); err != nil && err != datastore.ErrNoSuchEntity {
 			return errors.Wrapf(err, "failed to get track %s", trackKey)
 		} else if err == datastore.ErrNoSuchEntity {
+			time.Sleep(time.Duration(rand.Intn(60e3)) * time.Millisecond) // a barebones attempt at staggering
+
 			// Need to fetch data from iTunes API
 			tctx, cancel := context.WithTimeout(ns, 5*time.Second)
 			defer cancel()
