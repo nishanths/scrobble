@@ -2,7 +2,7 @@ import * as React from "react";
 import { Song } from "../src/shared"
 import { displayString as dateDisplayString } from "../src/time"
 
-export class SongCard extends React.Component<{song: Song, artworkBaseURL: string, now: Date}, {}> {
+export class SongCard extends React.Component<{song: Song, artworkBaseURL: string, now: Date, modeToggled: () => void}, {}> {
   private static readonly defaultArtworkPath = "/static/img/default-artwork.jpeg"
   private scaleArea: HTMLDivElement|null = null
 
@@ -35,7 +35,10 @@ export class SongCard extends React.Component<{song: Song, artworkBaseURL: strin
     return <div className="scaleArea" ref={r => {this.scaleArea = r}}>
       {this.pict()}
       <div className="meta" title={this.tooltip()}>
-        <div className="title">{s.title}</div>
+        <div className="title">
+          <span className="titleContent">{s.title}</span>
+          {s.loved && <span className="love"></span>}
+        </div>
         <div className="other">
           {s.artistName && <span className="artist">{s.artistName}</span>}
         </div>

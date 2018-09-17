@@ -10,7 +10,7 @@ declare var NProgress: {
   configure(opts: {[k: string]: any}): void
 }
 
-class Songs extends React.Component<{songs: Song[], artworkBaseURL: string}, {}> {
+class Songs extends React.Component<{songs: Song[], artworkBaseURL: string, modeToggled: () => void}, {}> {
   private static key(s: Song): string {
     return [s.title, s.albumTitle, s.artistName, s.year].join("|")
   }
@@ -18,7 +18,7 @@ class Songs extends React.Component<{songs: Song[], artworkBaseURL: string}, {}>
   render() {
     let now = new Date()
     return this.props.songs.map(s => {
-      return <SongCard key={Songs.key(s)} song={s} artworkBaseURL={this.props.artworkBaseURL} now={now}/>
+      return <SongCard key={Songs.key(s)} song={s} artworkBaseURL={this.props.artworkBaseURL} now={now} modeToggled={this.props.modeToggled}/>
     })
   }
 }
@@ -50,7 +50,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
       songs: [],
       private: true,
       endIdx: 0,
-      mode: new URLSearchParams(trimPrefix(window.location.search, "?")).get("loved") == "true" ? Mode.Loved : Mode.All
+      mode: UsernamePage.decodeMode()
     }
   }
 
@@ -64,6 +64,46 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
       }
     })
     this.fetchSongs()
+  }
+
+  private static decodeMode(): Mode {
+    switch (new URLSearchParams(trimPrefix(window.location.search, "?")).get("mode")) {
+      case "loved":
+        return Mode.Loved
+      default:
+        return Mode.All
+    }
+  }
+
+  private static encodeMode(m: Mode) {
+    let action = (m: Mode, params: URLSearchParams): () => void => {
+      switch (m) {
+        case Mode.All:
+          return () => { params.delete("mode") }
+        case Mode.Loved:
+          return () => { params.set("mode", "loved") }
+      }
+      unreachable()
+    }
+
+    let params = new URLSearchParams(trimPrefix(window.location.search, "?"))
+    action(m, params)()
+    window.history.replaceState({}, window.document.title,
+      params.toString() ? `${window.location.pathname}?${params.toString()}` : `${window.location.pathname}`)
+  }
+
+  private onModeToggled() {
+    this.setState(s => {
+      return {mode: UsernamePage.nextMode(s.mode)}
+    })
+    UsernamePage.encodeMode(this.state.mode)
+  }
+
+  private static nextMode(m: Mode): Mode {
+    switch (m) {
+      case Mode.All: return Mode.Loved
+      case Mode.Loved: return Mode.All
+    }
   }
 
   private fetchSongs() {
@@ -145,7 +185,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
     return <div>
       {this.header()}
       <div className="songs">
-        <Songs songs={renderSongs().slice(0, this.state.endIdx)} artworkBaseURL={this.props.artworkBaseURL}/>
+        <Songs songs={renderSongs().slice(0, this.state.endIdx)} artworkBaseURL={this.props.artworkBaseURL} modeToggled={this.onModeToggled.bind(this)}/>
       </div>
     </div>
   }
