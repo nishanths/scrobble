@@ -62,7 +62,7 @@ $default-songcard-dimension: 180px;
         }
         .date {
           transform: scale(1.1) translateY($songcard-dim * .1 / 2 + 2px);
-          transition: $transition-enter-duration ease transform, 500ms ease opacity;
+          transition: $transition-enter-duration ease transform, $transition-enter-duration+100ms ease opacity;
           opacity: 1;
         }
       }

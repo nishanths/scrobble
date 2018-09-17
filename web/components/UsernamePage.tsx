@@ -96,7 +96,6 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
     this.setState(s => {
       return {mode: UsernamePage.nextMode(s.mode)}
     })
-    UsernamePage.encodeMode(this.state.mode)
   }
 
   private static nextMode(m: Mode): Mode {
@@ -152,6 +151,8 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
   }
 
   render() {
+    UsernamePage.encodeMode(this.state.mode)
+
     if (!this.state.fetched) {
       return <div>{this.header()}</div>
     }
