@@ -37,7 +37,7 @@ export class SongCard extends React.Component<{song: Song, artworkBaseURL: strin
       <div className="meta" title={this.tooltip()}>
         <div className="title">
           <span className="titleContent">{s.title}</span>
-          {s.loved && <span className="love"></span>}
+          {s.loved && <span className="love" onClick={this.props.modeToggled.bind(this)}></span>}
         </div>
         <div className="other">
           {s.artistName && <span className="artist">{s.artistName}</span>}
