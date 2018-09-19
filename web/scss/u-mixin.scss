@@ -6,7 +6,7 @@ $songcard-border-w: 18px;
 $default-songcard-dimension: 180px;
 $ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
 $ease-in-back: cubic-bezier(0.6, -0.28, 0.735, 0.045);
-$ease-out-back: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+$ease-out-back: cubic-bezier(0.16, 0.93, 0.12, 1.49); // modified
 $transition-enter-func: $ease-out-back;
 $transition-exit-func: $ease-out-back;
 
@@ -40,7 +40,7 @@ $transition-exit-func: $ease-out-back;
   border-right: $songcard-border-w solid transparent;
   border-bottom: $border-bottom solid transparent;
 
-  $transition-enter-duration: 150ms;
+  $transition-enter-duration: 200ms;
   $transition-exit-duration: 350ms;
 
   a {
@@ -129,7 +129,7 @@ $transition-exit-func: $ease-out-back;
       display: block;
       font-size: 11px + $adjust-font-size;
       line-height: 1.3;
-      transition: $transition-exit-duration ease all;
+      transition: 200ms ease all;
       opacity: 0;
     }
   }
