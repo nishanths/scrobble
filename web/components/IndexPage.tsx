@@ -67,7 +67,7 @@ export class IndexPage extends React.Component<IndexPageProps, {account: Account
   }
 
   private profile() {
-    return this.state.account && <p><a href={"https://" + this.props.host + "/u/" + this.state.account.username}>Your scrobbles</a></p>
+    return this.state.account && <p><a href={"/u/" + this.state.account.username}>Your scrobbles</a></p>
   }
 
   private download() {

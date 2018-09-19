@@ -4,6 +4,11 @@ $body-margin-w: 8px;
 $app-padding-w: 18px;
 $songcard-border-w: 18px;
 $default-songcard-dimension: 180px;
+$ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+$ease-in-back: cubic-bezier(0.6, -0.28, 0.735, 0.045);
+$ease-out-back: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+$transition-enter-func: $ease-out-back;
+$transition-exit-func: $ease-out-back;
 
 @mixin ellipsis() {
   white-space: nowrap;
@@ -36,7 +41,7 @@ $default-songcard-dimension: 180px;
   border-bottom: $border-bottom solid transparent;
 
   $transition-enter-duration: 150ms;
-  $transition-exit-duration: 100ms;
+  $transition-exit-duration: 350ms;
 
   a {
     text-decoration: none;
@@ -48,21 +53,20 @@ $default-songcard-dimension: 180px;
     &:hover {
       .pict {
         transform: scale(1.10);
-        transition: $transition-enter-duration ease transform, $transition-enter-duration ease box-shadow;
-        box-shadow:0 1px 6px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+        transition: $transition-enter-duration $transition-enter-func transform, $transition-enter-duration $transition-enter-func box-shadow;
       }
       .meta {
         .title {
           transform: scale(1.1) translateY($songcard-dim * .1 / 2);
-          transition: $transition-enter-duration ease transform;
+          transition: 100ms ease transform;
         }
         .other {
           transform: scale(1.1) translateY($songcard-dim * .1 / 2 + 1px);
-          transition: $transition-enter-duration ease transform;
+          transition: 100ms ease transform;
         }
         .date {
           transform: scale(1.1) translateY($songcard-dim * .1 / 2 + 2px);
-          transition: $transition-enter-duration ease transform, $transition-enter-duration+100ms ease opacity;
+          transition: 100ms ease transform, $transition-enter-duration ease opacity;
           opacity: 1;
         }
       }
@@ -75,7 +79,7 @@ $default-songcard-dimension: 180px;
     background-size: contain;
     border-radius: 4px;
     border: 1px solid #e5e5e5;
-    transition: $transition-enter-duration ease transform, $transition-exit-duration ease box-shadow;
+    transition: $transition-enter-duration $transition-exit-func transform, $transition-exit-duration $transition-exit-func box-shadow;
     box-shadow:0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1) inset;
   }
 
@@ -110,7 +114,7 @@ $default-songcard-dimension: 180px;
       position: absolute;
       right: 0;
       box-shadow: -4px 0px 0px 0px white;
-      border: 2px solid white;
+      border: 3px solid white;
       cursor: pointer;
     }
 
