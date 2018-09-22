@@ -49,8 +49,7 @@ body {
     font-size: 13px;
     font-weight: 500;
     position: relative;
-    top: 9px;
-    text-transform: lowercase;
+    top: 8px;
     a {
       text-decoration: none;
       color: inherit;
@@ -59,7 +58,7 @@ body {
 }
 
 .control {
-  margin: 60px auto 50px;
+  margin: 60px auto 55px;
   max-width: $segmented-control-w;
 }
 
