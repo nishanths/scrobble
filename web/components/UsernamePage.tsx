@@ -11,7 +11,7 @@ declare var NProgress: {
   configure(opts: {[k: string]: any}): void
 }
 
-class Songs extends React.Component<{songs: Song[], artworkBaseURL: string, modeToggled: () => void}, {}> {
+class Songs extends React.Component<{songs: Song[], artworkBaseURL: string}, {}> {
   private static key(s: Song): string {
     return [s.title, s.albumTitle, s.artistName, s.year].join("|")
   }
@@ -19,7 +19,7 @@ class Songs extends React.Component<{songs: Song[], artworkBaseURL: string, mode
   render() {
     let now = new Date()
     return this.props.songs.map(s => {
-      return <SongCard key={Songs.key(s)} song={s} artworkBaseURL={this.props.artworkBaseURL} now={now} modeToggled={this.props.modeToggled}/>
+      return <SongCard key={Songs.key(s)} song={s} artworkBaseURL={this.props.artworkBaseURL} now={now}/>
     })
   }
 }
@@ -51,7 +51,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
       songs: [],
       private: true,
       endIdx: 0,
-      mode: UsernamePage.decodeMode()
+      mode: Mode.All,
     }
   }
 
@@ -67,33 +67,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
     this.fetchSongs()
   }
 
-  private static decodeMode(): Mode {
-    switch (new URLSearchParams(trimPrefix(window.location.search, "?")).get("mode")) {
-      case "loved":
-        return Mode.Loved
-      default:
-        return Mode.All
-    }
-  }
-
-  private static encodeMode(m: Mode) {
-    let action = (m: Mode, params: URLSearchParams): () => void => {
-      switch (m) {
-        case Mode.All:
-          return () => { params.delete("mode") }
-        case Mode.Loved:
-          return () => { params.set("mode", "loved") }
-      }
-      unreachable()
-    }
-
-    let params = new URLSearchParams(trimPrefix(window.location.search, "?"))
-    action(m, params)()
-    window.history.replaceState({}, window.document.title,
-      params.toString() ? `${window.location.pathname}?${params.toString()}` : `${window.location.pathname}`)
-  }
-
-  private onModeToggled() {
+  private onControlToggled() {
     this.setState(s => {
       return {mode: UsernamePage.nextMode(s.mode)}
     })
@@ -101,7 +75,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
 
   private static nextMode(m: Mode): Mode {
     switch (m) {
-      case Mode.All: return Mode.Loved
+      case Mode.All:   return Mode.Loved
       case Mode.Loved: return Mode.All
     }
   }
@@ -139,7 +113,8 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
 
   private showMore() {
     this.setState(s => {
-      return {endIdx: UsernamePage.determineNextEndIdx(s.endIdx, s.songs.length)}
+      let newEndIdx = UsernamePage.determineNextEndIdx(s.endIdx, this.songsForCurrentMode().length)
+      return newEndIdx > s.endIdx ? {endIdx: newEndIdx} : {endIdx: s.endIdx}
     })
   }
 
@@ -151,9 +126,17 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
     return nSongs - b < UsernamePage.moreIncrement ? nSongs : b;
   }
 
-  render() {
-    UsernamePage.encodeMode(this.state.mode)
+  private songsForCurrentMode = (): Song[] => {
+    switch (this.state.mode) {
+      case Mode.All:
+        return this.state.songs
+      case Mode.Loved:
+        return this.state.songs.filter(s => s.loved)
+    }
+    unreachable()
+  }
 
+  render() {
     if (!this.state.fetched) {
       return <div>{this.header()}</div>
     }
@@ -174,21 +157,11 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
       </div>
     }
 
-    let renderSongs = (): Song[] => {
-      switch (this.state.mode) {
-        case Mode.All:
-          return this.state.songs
-        case Mode.Loved:
-          return this.state.songs.filter(s => s.loved)
-      }
-      unreachable()
-    }
-
     return <div>
       {this.header()}
-      <div className="control"><SegmentedControl></SegmentedControl></div>
+      <div className="control"><SegmentedControl afterChange={this.onControlToggled.bind(this)}/></div>
       <div className="songs">
-        <Songs songs={renderSongs().slice(0, this.state.endIdx)} artworkBaseURL={this.props.artworkBaseURL} modeToggled={this.onModeToggled.bind(this)}/>
+        <Songs songs={this.songsForCurrentMode().slice(0, this.state.endIdx)} artworkBaseURL={this.props.artworkBaseURL}/>
       </div>
     </div>
   }
