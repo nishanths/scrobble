@@ -114,7 +114,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
   private showMore() {
     this.setState(s => {
       let newEndIdx = UsernamePage.determineNextEndIdx(s.endIdx, this.songsForCurrentMode().length)
-      return newEndIdx > s.endIdx ? {endIdx: newEndIdx} : {endIdx: s.endIdx}
+      return {endIdx: Math.max(newEndIdx, s.endIdx)}
     })
   }
 

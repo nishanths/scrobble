@@ -56,13 +56,13 @@ func devUHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func devScrobbledHandler(w http.ResponseWriter, r *http.Request) {
+	var devScrobbledResponse = func() string {
+		b, err := ioutil.ReadFile(filepath.Join(".devdata", "scrobbled.json"))
+		if err != nil {
+			panic(err)
+		}
+		return string(b)
+	}()
+
 	io.WriteString(w, devScrobbledResponse)
 }
-
-var devScrobbledResponse = func() string {
-	b, err := ioutil.ReadFile(filepath.Join(".devdata", "scrobbled.json"))
-	if err != nil {
-		panic(err)
-	}
-	return string(b)
-}()
