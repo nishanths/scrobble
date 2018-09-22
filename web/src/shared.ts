@@ -1,3 +1,5 @@
+import * as base64js from "base64-js";
+
 export interface Account {
   username: string
   apiKey: string
@@ -45,5 +47,15 @@ export function trimPrefix(s: string, prefix: string): string {
 }
 
 export function unreachable(): never {
-    throw new Error("unreachable");
+  throw new Error("unreachable");
+}
+
+export function base64Encode(s: string) {
+  let bytes = new TextEncoder().encode(s);
+  return base64js.fromByteArray(bytes);
+}
+
+export function base64Decode(s: string) {
+  let bytes = base64js.toByteArray(s);
+  return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
 }

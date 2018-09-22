@@ -1,7 +1,9 @@
 // TODO: this file is ugly
 
 @import "shared.scss";
+@import "vars.scss";
 @import "u-mixin.scss";
+@import "segmentedcontrol.scss";
 
 $dim: 260px;
 $bb: 105px;
@@ -47,12 +49,18 @@ body {
     font-size: 13px;
     font-weight: 500;
     position: relative;
-    top: 8px;
+    top: 9px;
+    text-transform: lowercase;
     a {
       text-decoration: none;
       color: inherit;
     }
   }
+}
+
+.control {
+  margin: 60px auto 50px;
+  max-width: $segmented-control-w;
 }
 
 .info {
@@ -66,7 +74,6 @@ body {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  margin-top: 60px;
 }
 
 .SongCard {

@@ -2,6 +2,7 @@ import * as React from "react";
 import { UArgs, Song, trimPrefix, unreachable } from "../src/shared"
 import { Header } from "./Header"
 import { SongCard } from "./SongCard"
+import { SegmentedControl } from "./SegmentedControl"
 import "../scss/u.scss"
 
 declare var NProgress: {
@@ -185,6 +186,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
 
     return <div>
       {this.header()}
+      <div className="control"><SegmentedControl></SegmentedControl></div>
       <div className="songs">
         <Songs songs={renderSongs().slice(0, this.state.endIdx)} artworkBaseURL={this.props.artworkBaseURL} modeToggled={this.onModeToggled.bind(this)}/>
       </div>

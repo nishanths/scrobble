@@ -1,0 +1,13 @@
+$muted-color: #333;
+$love-color: rgb(252, 49, 89);
+$meta-color: rgb(130, 130, 130);
+$body-margin-w: 8px;
+$app-padding-w: 18px;
+$songcard-border-w: 18px;
+$default-songcard-dimension: 180px;
+$ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+$ease-in-back: cubic-bezier(0.6, -0.28, 0.735, 0.045);
+$ease-out-back: cubic-bezier(0.17, 0.89, 0.12, 1.49); // modified
+$transition-enter-func: $ease-out-back;
+$transition-exit-func: $ease-out-back;
+$segmented-control-w: 170px;

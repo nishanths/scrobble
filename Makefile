@@ -2,6 +2,7 @@ PWD               := $(shell pwd)
 PROJECT_ID        := selective-scrobble
 DEV_APPSERVER     := dev_appserver.py
 APP_YAML          := appengine/app.yaml
+DEV_APP_YAML      := appengine/dev_app.yaml
 
 # NOTE: To deploy, typically you want `make all` followed by `make deploy`.
 #
@@ -64,4 +65,4 @@ build: go web
 
 .PHONY: dev
 dev:
-	$(DEV_APPSERVER) $(APP_YAML)
+	$(DEV_APPSERVER) $(DEV_APP_YAML)

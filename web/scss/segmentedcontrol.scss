@@ -1,0 +1,54 @@
+@import "vars.scss";
+
+.SegmentedControl {
+  $border-radius: 15px;
+
+  display: flex;
+  justify-content: space-evenly;
+  border-radius: $border-radius;
+  height: 23px;
+  align-items: center;
+  width: $segmented-control-w;
+
+  .c {
+    width: 50%;
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 10px;
+    height: 23px;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+    color: $meta-color;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid #ccc;
+  }
+
+  .c0 {
+    border-radius: $border-radius 0px 0 $border-radius;
+    border-right: 0;
+  }
+
+  .c1 {
+    border-radius: 0 $border-radius $border-radius 0;
+    border-left: 0;
+  }
+
+  .c.sel {
+    background: $love-color;
+    color: #f7f7f7;
+    border: 1px solid rgb(239, 46, 84);
+    box-shadow: 0px 3px 10px #ec2e53 inset;
+  }
+}
+
+
+
+
+
+
+
+
+
