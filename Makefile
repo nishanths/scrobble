@@ -44,6 +44,7 @@ ln-web:
 	mkdir -p appengine/web
 	ln -s $(PWD)/web/dist $(PWD)/appengine/web
 	ln -s $(PWD)/web/static $(PWD)/appengine/web
+	sed -i '' 's/#29d/rgb\(21,126,251\)/g' $(PWD)/web/node_modules/nprogress/nprogress.css
 	ln -s $(PWD)/web/node_modules/nprogress/nprogress.css $(PWD)/web/static/css/nprogress.css
 	ln -s $(PWD)/web/node_modules/nprogress/nprogress.js $(PWD)/web/static/js/nprogress.js
 
