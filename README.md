@@ -1,9 +1,10 @@
 # scrobble
 
-Music scrobbler for iTunes
+[`scrobble.allele.cc`](https://scrobble.allele.cc) hosts a music scrobbling
+service for iTunes.
 
-![](https://imgur.com/OCZb996.png)
+![](https://i.imgur.com/vUx2DCe.jpg)
 
 ## Icons
 
-- Flower by nitut786 from the Noun Project
+The Mac application icon is Flower by nitut786 from the Noun Project.
