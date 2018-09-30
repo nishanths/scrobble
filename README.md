@@ -3,7 +3,7 @@
 [`scrobble.allele.cc`](https://scrobble.allele.cc) hosts a music scrobbling
 service for iTunes.
 
-![](https://i.imgur.com/vUx2DCe.jpg)
+![](https://i.imgur.com/oO6k4R4.jpg)
 
 ## Icons
 

@@ -5,7 +5,7 @@
 @import "u-mixin.scss";
 @import "segmentedcontrol.scss";
 
-$dim: 260px;
+$dim: 250px;
 $bb: 105px;
 $fa: 2px;
 
@@ -72,7 +72,7 @@ body {
 .songs {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .SongCard {
@@ -85,7 +85,7 @@ body {
 
 @media screen and (min-width: 360px) {
   $cards: 2;
-  $dim: 115px;
+  $dim: 139px;
   $bb: 80px;
   $fa: 0;
 
@@ -95,10 +95,61 @@ body {
   .header {
     max-width: header-width($cards, $dim)
   }
+  .SongCard {
+    @include songCardProps($dim, $bb, $fa);
+  }
+
   .username {
     max-width: 380px;
   }
+}
 
+@media screen and (min-width: 380px) {
+  $cards: 2;
+  $dim: 144px;
+  $bb: 80px;
+  $fa: 0;
+
+  #app {
+    max-width: app-width($cards, $dim)
+  }
+  .header {
+    max-width: header-width($cards, $dim)
+  }
+  .SongCard {
+    @include songCardProps($dim, $bb, $fa);
+  }
+}
+
+@media screen and (min-width: 400px) {
+  $cards: 2;
+  $dim: 154px;
+  $bb: 80px;
+  $fa: 0;
+
+  #app {
+    max-width: app-width($cards, $dim)
+  }
+  .header {
+    max-width: header-width($cards, $dim)
+  }
+  .SongCard {
+    @include songCardProps($dim, $bb, $fa);
+  }
+}
+
+@media screen and (min-width: 420px) {
+  $cards: 2;
+  $dim: 160px;
+  $bb: 80px;
+  $fa: 0;
+
+  #app {
+    max-width: app-width($cards, $dim)
+  }
+  .header {
+    max-width: header-width($cards, $dim)
+  }
   .SongCard {
     @include songCardProps($dim, $bb, $fa);
   }
@@ -106,7 +157,24 @@ body {
 
 @media screen and (min-width: 450px) {
   $cards: 2;
-  $dim: 140px;
+  $dim: 164px;
+  $bb: 90px;
+  $fa: 0;
+
+  #app {
+    max-width: app-width($cards, $dim)
+  }
+  .header {
+    max-width: header-width($cards, $dim)
+  }
+  .SongCard {
+    @include songCardProps($dim, $bb, $fa);
+  }
+}
+
+@media screen and (min-width: 475px) {
+  $cards: 2;
+  $dim: 170px;
   $bb: 90px;
   $fa: 0;
 
@@ -182,10 +250,10 @@ body {
   .header {
     max-width: header-width($cards, $dim)
   }
-
-  .songs {
-    justify-content: flex-start;
+  .SongCard {
+    @include songCardProps($dim, $bb, $fa);
   }
+
   .header {
     .username {
       max-width: 500px;
@@ -206,6 +274,9 @@ body {
   .header {
     max-width: header-width($cards, $dim)
   }
+  .SongCard {
+    @include songCardProps($dim, $bb, $fa);
+  }
 }
 
 @media screen and (min-width: 1350px) {
@@ -217,5 +288,8 @@ body {
   }
   .header {
     max-width: header-width($cards, $dim)
+  }
+  .SongCard {
+    @include songCardProps($dim, $bb, $fa);
   }
 }
