@@ -87,6 +87,10 @@ func (s *Song) Ident() string {
 	return songident(s.AlbumTitle, s.ArtistName, s.Title, s.Year)
 }
 
+func (s *Song) iTunesFilled() bool {
+	return s.PreviewURL != "" && s.TrackViewURL != ""
+}
+
 const headerAPIKey = "X-Scrobble-API-Key"
 
 func accountHandler(w http.ResponseWriter, r *http.Request) {

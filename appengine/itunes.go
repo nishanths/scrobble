@@ -22,25 +22,40 @@ import (
 )
 
 var fillITunesFunc = delay.Func("fillITunes", func(ctx context.Context, namespace string, ident string) error {
-	err := datastore.RunInTransaction(ctx, func(ctx context.Context) error {
+	ns, err := appengine.Namespace(ctx, namespace)
+	if err != nil {
+		return errors.Wrapf(err, "failed to make namespace for %q", namespace)
+	}
+	var s Song
+	songKey := datastore.NewKey(ns, KindSong, ident, 0, nil)
+	if err := datastore.Get(ns, songKey, &s); err != nil {
+		if err == datastore.ErrNoSuchEntity {
+			return nil // deleted sometime in between?
+		}
+		return errors.Wrapf(err, "failed to get song %s", songKey)
+	}
+	if s.iTunesFilled() {
+		return nil // nothing to do
+	}
+
+	// a barebones attempt at staggering
+	time.Sleep(time.Duration(rand.Intn(120e3)) * time.Millisecond)
+
+	err = datastore.RunInTransaction(ctx, func(ctx context.Context) error {
 		ns, err := appengine.Namespace(ctx, namespace)
 		if err != nil {
 			return errors.Wrapf(err, "failed to make namespace for %q", namespace)
 		}
-
 		var s Song
 		songKey := datastore.NewKey(ns, KindSong, ident, 0, nil)
 		if err := datastore.Get(ns, songKey, &s); err != nil {
 			if err == datastore.ErrNoSuchEntity {
-				return nil // song was deleted sometime in between?
+				return nil // deleted sometime in between?
 			}
 			return errors.Wrapf(err, "failed to get song %s", songKey)
 		}
-		if s.PreviewURL != "" && s.TrackViewURL != "" {
-			// already filled
-			// TODO: is there a way to indicate "abort" transaction instead of nil, since
-			// there have been no writes thus far?
-			return nil
+		if s.iTunesFilled() {
+			return nil // nothing to do
 		}
 
 		var track ITunesTrack
@@ -48,8 +63,6 @@ var fillITunesFunc = delay.Func("fillITunes", func(ctx context.Context, namespac
 		if err := datastore.Get(ctx, trackKey, &track); err != nil && err != datastore.ErrNoSuchEntity {
 			return errors.Wrapf(err, "failed to get track %s", trackKey)
 		} else if err == datastore.ErrNoSuchEntity {
-			time.Sleep(time.Duration(rand.Intn(60e3)) * time.Millisecond) // a barebones attempt at staggering
-
 			// Need to fetch data from iTunes API
 			tctx, cancel := context.WithTimeout(ns, 5*time.Second)
 			defer cancel()
