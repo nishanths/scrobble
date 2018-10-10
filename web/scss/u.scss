@@ -10,7 +10,7 @@ $bb: 105px;
 $fa: 2px;
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, proxima-nova, sans-serif;
+  font-family: proxima-nova, sans-serif;
   margin: $body-margin-w;
 }
 
@@ -46,8 +46,8 @@ body {
   .nav {
     display: none;
     margin-left: auto;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 14px;
+    font-weight: 600;
     position: relative;
     top: 8px;
     a {
@@ -243,6 +243,8 @@ body {
 @media screen and (min-width: 700px) {
   $cards: 3;
   $dim: 180px;
+  $bb: 90px;
+  $fa: 1px;
 
   #app {
     max-width: app-width($cards, $dim)
@@ -267,6 +269,9 @@ body {
 @media screen and (min-width: 915px) {
   $cards: 4;
   $dim: 180px;
+  $bb: 90px;
+  $fa: 1px;
+  $songcard-border-w: 19px; // HACK
 
   #app {
     max-width: app-width($cards, $dim)
@@ -279,9 +284,12 @@ body {
   }
 }
 
-@media screen and (min-width: 1350px) {
+@media screen and (min-width: 1380px) {
   $cards: 5;
   $dim: 180px;
+  $bb: 90px;
+  $fa: 2px;
+  $songcard-border-w: 20px; // HACK
 
   #app {
     max-width: app-width($cards, $dim)
