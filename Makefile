@@ -14,10 +14,7 @@ default:
 	@echo "the default target does nothing!"
 
 .PHONY: all
-all: clean bootstrap bindata build ln-web
-
-.PHONY: other
-other: bootstrap bindata ln-web
+all: clean bootstrap bindata go web
 
 .PHONY: deploy
 deploy:
@@ -27,8 +24,8 @@ deploy:
 bindata:
 	go-bindata -pkg=main -o=appengine/gen-template.go appengine/template
 
-.PHONY: deps
-deps:
+.PHONY: dev-deps
+dev-deps:
 	go get github.com/jteeuwen/go-bindata/...
 
 .PHONY: go
@@ -60,9 +57,6 @@ bootstrap: ln-web _bootstrap
 .PHONY: _bootstrap
 _bootstrap:
 	mkdir -p web/dist
-
-.PHONY: build
-build: go web
 
 .PHONY: dev
 dev:
