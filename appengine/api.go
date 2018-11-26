@@ -280,7 +280,7 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Parse request
+	// Parse request.
 	type MediaItem struct {
 		Added          float64 `json:"added"`
 		AlbumTitle     string  `json:"albumTitle"`
@@ -342,11 +342,37 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 	sKeys := make([]*datastore.Key, len(songs))
 	var aKeys []*datastore.Key
 	for i, s := range songs {
-		// Create song key
+		// Create song key.
 		sKeys[i] = datastore.NewKey(ns, KindSong, s.Ident(), 0, nil)
-		// Create artwork hash key
+		// Create artwork hash key.
 		if h := s.ArtworkHash; h != "" {
 			aKeys = append(aKeys, datastore.NewKey(ns, KindArtworkRecord, h, 0, nil))
+		}
+	}
+
+	// The overall goal is to put the incoming songs and remove any
+	// old ones (leftover) that are not present in the set of
+	// incoming songs.
+	var oldIDs map[string]struct{}
+	incomingIDs := setFromSlice(sKeys)
+	toRemoveIDs := make(map[string]struct{})
+
+	// Get old song IDs.
+	{
+		keys, err := datastore.NewQuery(KindSong).KeysOnly().GetAll(ctx, nil)
+		if err != nil {
+			log.Errorf(ns, "failed to query songs: %v", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		oldIDs = setFromSlice(keys)
+	}
+
+	// Compute the IDs to remove.
+	// (We do the actual removal below later.)
+	for k := range oldIDs {
+		if _, exists := incomingIDs[k]; !exists {
+			toRemoveIDs[k] = struct{}{}
 		}
 	}
 
@@ -373,7 +399,7 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 
 	var g errgroup.Group
 
-	// Put artwork hash keys
+	// Put artwork hash keys.
 	g.Go(func() error {
 		s := 0
 		e := min(s+datastoreLimitPerOp, len(aKeys))
@@ -392,7 +418,7 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		return nil
 	})
 
-	// Create tasks to fill in iTunes-related fields
+	// Create tasks to fill in iTunes-related fields.
 	for _, s := range songs {
 		ident := s.Ident()
 		g.Go(func() error {
@@ -403,11 +429,47 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	if err := g.Wait(); err != nil { // no such errors expected
+	g.Go(func() error {
+		toRemoveKeys := sliceFromSet(ns, toRemoveIDs)
+
+		s := 0
+		e := min(s+datastoreLimitPerOp, len(toRemoveKeys))
+		keysChunk := toRemoveKeys[s:e]
+
+		for len(keysChunk) > 0 {
+			if err := datastore.DeleteMulti(ns, keysChunk); err != nil {
+				log.Errorf(ns, "failed to delete leftover song keys: %v", err.Error()) // only log
+			}
+
+			s = e
+			e = min(s+datastoreLimitPerOp, len(toRemoveKeys))
+			keysChunk = toRemoveKeys[s:e]
+		}
+
+		return nil
+	})
+
+	if err := g.Wait(); err != nil { // no such errors are expected (all groups return nil error)
 		log.Errorf(ns, "%v", err.Error())
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func setFromSlice(ss []*datastore.Key) map[string]struct{} {
+	ret := make(map[string]struct{}, len(ss))
+	for _, s := range ss {
+		ret[s.StringID()] = struct{}{}
+	}
+	return ret
+}
+
+func sliceFromSet(ns context.Context, set map[string]struct{}) []*datastore.Key {
+	ret := make([]*datastore.Key, 0, len(set))
+	for stringID := range set {
+		ret = append(ret, datastore.NewKey(ns, KindSong, stringID, 0, nil))
+	}
+	return ret
 }
 
 func artworkHandler(w http.ResponseWriter, r *http.Request) {
