@@ -1,6 +1,7 @@
 PWD               := $(shell pwd)
 PROJECT_ID        := selective-scrobble
 DEV_APPSERVER     := dev_appserver.py
+INDEX_YAML        := appengine/index.yaml
 APP_YAML          := appengine/app.yaml
 DEV_APP_YAML      := appengine/dev_app.yaml
 
@@ -15,6 +16,10 @@ default:
 
 .PHONY: all
 all: clean bootstrap bindata go web
+
+.PHONY: indexes
+indexes:
+	gcloud --quiet --project $(PROJECT_ID) datastore indexes create $(INDEX_YAML)
 
 .PHONY: deploy
 deploy:

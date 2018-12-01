@@ -228,6 +228,11 @@ func scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 	q := datastore.NewQuery(KindSong).
 		Order("-LastPlayed")
 
+	lovedOnly := r.FormValue("loved") == "true"
+	if lovedOnly {
+		q = q.Filter("Loved=", true)
+	}
+
 	songs := make([]Song, 0) // to marshal as empty JSON array instead of null when there are 0 songs
 	_, err := q.GetAll(ns, &songs)
 	if err != nil {

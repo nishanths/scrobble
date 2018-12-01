@@ -1,0 +1,7 @@
+indexes:
+
+- kind: Song
+  properties:
+  - name: Loved
+  - name: LastPlayed
+    direction: desc
