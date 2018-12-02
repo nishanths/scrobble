@@ -77,11 +77,16 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
 
   private static urlFromMode(m: Mode, wnd: Window) {
     let p = new URLSearchParams(wnd.location.search)
-    switch (m) {
-      case Mode.All:   p.delete("loved"); break;
-      case Mode.Loved: p.set("loved", "true"); break;
+
+    let u = (): string => {
+      return p.toString() != "" ? `${wnd.location.pathname}?${p.toString()}` : `${wnd.location.pathname}`
     }
-    return p.toString() != "" ? `${wnd.location.pathname}?${p.toString()}` : `${wnd.location.pathname}`
+
+    switch (m) {
+      case Mode.All:   p.delete("loved"); return u();
+      case Mode.Loved: p.set("loved", "true"); return u();
+    }
+    unreachable()
   }
 
   private onControlToggled() {
@@ -97,6 +102,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
       case Mode.All:   return Mode.Loved
       case Mode.Loved: return Mode.All
     }
+    unreachable()
   }
 
   private fetchSongs() {
