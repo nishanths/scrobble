@@ -86,20 +86,12 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
     unreachable()
   }
 
-  private onControlToggled() {
+  private onControlToggled(v: string) {
     this.setState(s => {
-      let m = UsernamePage.nextMode(s.mode)
+      let m = UsernamePage.modeFromControlValue(v)
       window.history.pushState(null, "", UsernamePage.urlFromMode(m, this.props.profileUsername)) // TODO: gross side-effect in this function?
       return { mode: m }
     })
-  }
-
-  private static nextMode(m: Mode): Mode {
-    switch (m) {
-      case Mode.All:   return Mode.Loved
-      case Mode.Loved: return Mode.All
-    }
-    unreachable()
   }
 
   private fetchSongs() {
@@ -158,6 +150,24 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
     unreachable()
   }
 
+  private static controlValueForMode(m: Mode): string {
+    switch (m) {
+      case Mode.All:
+        return "All"
+      case Mode.Loved:
+        return "Loved"
+    }
+    unreachable()
+  }
+
+  private static modeFromControlValue(v: string): Mode {
+    switch (v) {
+      case "All":   return Mode.All
+      case "Loved": return Mode.Loved
+      default:      return Mode.All // fallback
+    }
+  }
+
   render() {
     if (!this.state.fetched) {
       return <div>{this.header()}</div>
@@ -181,7 +191,13 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
 
     return <div>
       {this.header()}
-      <div className="control"><SegmentedControl afterChange={this.onControlToggled.bind(this)}/></div>
+      <div className="control">
+        <SegmentedControl
+          afterChange={this.onControlToggled.bind(this)}
+          values={["All", "Loved"]}
+          initial={UsernamePage.controlValueForMode(this.state.mode)}
+        />
+      </div>
       <div className="songs">
         <Songs songs={this.songsForCurrentMode().slice(0, this.state.endIdx)} artworkBaseURL={this.props.artworkBaseURL}/>
       </div>

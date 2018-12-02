@@ -1,16 +1,17 @@
 import * as React from "react";
 
 interface SegmentedControlProps {
-  afterChange: (idx: number) => void
+  afterChange: (value: string) => void
+  initial: string
+  values: string[]
 }
 
-// TODO: this only supports two item controls, and it does not
-// support configuring labels, etc.
-export class SegmentedControl extends React.Component<SegmentedControlProps, {selectedIdx: number}> {
+// TODO: this only properly supports two item controls in terms of styling.
+export class SegmentedControl extends React.Component<SegmentedControlProps, {selected: string}> {
   constructor(props: SegmentedControlProps) {
     super(props)
     this.state = {
-      selectedIdx: 0
+      selected: this.props.initial
     }
   }
 
@@ -18,20 +19,24 @@ export class SegmentedControl extends React.Component<SegmentedControlProps, {se
     return selected ? `c c${idx} selected` : `c c${idx}`
   }
 
-  private onControlClicked(idx: number) {
-    let current = this.state.selectedIdx
-    this.setState({selectedIdx: idx})
-    if (idx != current) {
-      this.props.afterChange(idx)
+  private onControlClicked(v: string) {
+    let current = this.state.selected
+    this.setState({selected: v})
+    if (v != current) {
+      this.props.afterChange(v)
     }
   }
 
-  render() {
-    let c0 = this.state.selectedIdx == 0
+  private items(): JSX.Element[] {
+    return this.props.values.map((v, i) => {
+      let selected = this.state.selected == v;
+      return <div key={v} className={SegmentedControl.className(selected, i)} onClick={ () => this.onControlClicked(v) }>{v}</div>
+    })
+  }
 
+  render() {
     return <div className="SegmentedControl">
-      <div className={SegmentedControl.className(c0, 0)} onClick={ () => this.onControlClicked(0) }>All</div>
-      <div className={SegmentedControl.className(!c0, 1)} onClick={ () => this.onControlClicked(1) }>Loved</div>
+      {this.items()}
     </div>
   }
 }
