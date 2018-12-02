@@ -156,7 +156,7 @@ func uHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c := pathComponents(r.URL.Path)
-	if len(c) != 2 { // 'u', username
+	if len(c) != 2 && len(c) != 3 { // /u/username[/loved]
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
