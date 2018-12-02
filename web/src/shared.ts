@@ -59,3 +59,7 @@ export function base64Decode(s: string) {
   let bytes = base64js.toByteArray(s);
   return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
 }
+
+export function pathComponents(p: string): string[] {
+  return p.split("/").filter(s => s != "")
+}

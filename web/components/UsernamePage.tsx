@@ -1,5 +1,5 @@
 import * as React from "react";
-import { UArgs, Song, trimPrefix, unreachable } from "../src/shared"
+import { UArgs, Song, trimPrefix, unreachable, pathComponents } from "../src/shared"
 import { Header } from "./Header"
 import { SongCard } from "./SongCard"
 import { SegmentedControl } from "./SegmentedControl"
@@ -71,20 +71,17 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
   }
 
   private static modeFromURL(wnd: Window): Mode {
-    let p = new URLSearchParams(wnd.location.search)
-    return p.get("loved") == "true" ? Mode.Loved : Mode.All
+    let components = pathComponents(wnd.location.pathname)
+    if (components.length != 3) {
+      return Mode.All // fallback
+    }
+    return components[2] == "loved" ? Mode.Loved : Mode.All
   }
 
-  private static urlFromMode(m: Mode, wnd: Window) {
-    let p = new URLSearchParams(wnd.location.search)
-
-    let u = (): string => {
-      return p.toString() != "" ? `${wnd.location.pathname}?${p.toString()}` : `${wnd.location.pathname}`
-    }
-
+  private static urlFromMode(m: Mode, username: string): string {
     switch (m) {
-      case Mode.All:   p.delete("loved"); return u();
-      case Mode.Loved: p.set("loved", "true"); return u();
+      case Mode.All:   return "/u/" + username
+      case Mode.Loved: return "/u/" + username + "/loved"
     }
     unreachable()
   }
@@ -92,7 +89,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
   private onControlToggled() {
     this.setState(s => {
       let m = UsernamePage.nextMode(s.mode)
-      window.history.pushState(null, "", UsernamePage.urlFromMode(m, window)) // TODO: gross side-effect in this function?
+      window.history.pushState(null, "", UsernamePage.urlFromMode(m, this.props.account.username)) // TODO: gross side-effect in this function?
       return { mode: m }
     })
   }
