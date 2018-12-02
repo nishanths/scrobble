@@ -58,18 +58,37 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
   componentDidMount() {
     NProgress.configure({ showSpinner: false, minimum: 0.1, trickleSpeed: 25, speed: 500 })
     NProgress.start()
+
     const leeway = 200
     window.addEventListener("scroll", () => {
       if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight - leeway)) {
         this.showMore()
       }
     })
+
+    this.setState({ mode: UsernamePage.modeFromURL(window) })
     this.fetchSongs()
+  }
+
+  private static modeFromURL(wnd: Window): Mode {
+    let p = new URLSearchParams(wnd.location.search)
+    return p.get("loved") == "true" ? Mode.Loved : Mode.All
+  }
+
+  private static urlFromMode(m: Mode, wnd: Window) {
+    let p = new URLSearchParams(wnd.location.search)
+    switch (m) {
+      case Mode.All:   p.delete("loved"); break;
+      case Mode.Loved: p.set("loved", "true"); break;
+    }
+    return p.toString() != "" ? `${wnd.location.pathname}?${p.toString()}` : `${wnd.location.pathname}`
   }
 
   private onControlToggled() {
     this.setState(s => {
-      return {mode: UsernamePage.nextMode(s.mode)}
+      let m = UsernamePage.nextMode(s.mode)
+      window.history.pushState(null, "", UsernamePage.urlFromMode(m, window)) // TODO: gross side-effect in this function?
+      return { mode: m }
     })
   }
 
@@ -81,7 +100,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
   }
 
   private fetchSongs() {
-    let success = false // TODO: learn to use `fetch`
+    let success = false // TODO: learn fetch, "like a dog."
 
     fetch("/api/v1/scrobbled?username=" + this.props.profileUsername)
       .then(r => {
