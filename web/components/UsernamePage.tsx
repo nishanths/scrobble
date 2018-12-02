@@ -89,7 +89,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
   private onControlToggled() {
     this.setState(s => {
       let m = UsernamePage.nextMode(s.mode)
-      window.history.pushState(null, "", UsernamePage.urlFromMode(m, this.props.account.username)) // TODO: gross side-effect in this function?
+      window.history.pushState(null, "", UsernamePage.urlFromMode(m, this.props.profileUsername)) // TODO: gross side-effect in this function?
       return { mode: m }
     })
   }
