@@ -2,6 +2,7 @@ module github.com/nishanths/scrobble/appengine
 
 require (
 	cloud.google.com/go v0.33.1
+	github.com/google/uuid v1.1.0
 	github.com/googleapis/gax-go v2.0.2+incompatible // indirect
 	github.com/pkg/errors v0.8.0
 	go.opencensus.io v0.18.0 // indirect

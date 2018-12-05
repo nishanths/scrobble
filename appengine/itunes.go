@@ -21,24 +21,27 @@ import (
 	"google.golang.org/appengine/urlfetch"
 )
 
-var fillITunesFunc = delay.Func("fillITunes", func(ctx context.Context, namespace string, ident string) error {
+// NOSUBMIT: this needs to account for new key structure
+
+var fillITunesFunc = delay.Func("fillITunes", func(ctx context.Context, namespace string, songParentIdent, songIdent string) error {
 	done := false
+
+	ns, err := appengine.Namespace(ctx, namespace)
+	if err != nil {
+		return errors.Wrapf(err, "failed to make namespace for %q", namespace)
+	}
+
+	sKey := songKey(ns, songIdent, songParentKey(ns, songParentIdent))
 
 	// Only fill from existing data.
 	if err := datastore.RunInTransaction(ctx, func(ctx context.Context) error {
-		ns, err := appengine.Namespace(ctx, namespace)
-		if err != nil {
-			return errors.Wrapf(err, "failed to make namespace for %q", namespace)
-		}
-
 		var s Song
-		songKey := datastore.NewKey(ns, KindSong, ident, 0, nil)
-		if err := datastore.Get(ns, songKey, &s); err != nil {
+		if err := datastore.Get(ns, sKey, &s); err != nil {
 			if err == datastore.ErrNoSuchEntity {
 				done = true
 				return nil // deleted sometime in between?
 			}
-			return errors.Wrapf(err, "failed to get song %s", songKey)
+			return errors.Wrapf(err, "failed to get song %s", sKey)
 		}
 		if s.iTunesFilled() {
 			done = true
@@ -46,15 +49,15 @@ var fillITunesFunc = delay.Func("fillITunes", func(ctx context.Context, namespac
 		}
 
 		var track ITunesTrack
-		trackKey := datastore.NewKey(ctx, KindITunesTrack, ident, 0, nil)
+		trackKey := datastore.NewKey(ctx, KindITunesTrack, songIdent, 0, nil)
 		if err := datastore.Get(ctx, trackKey, &track); err != nil && err != datastore.ErrNoSuchEntity {
 			return errors.Wrapf(err, "failed to get track %s", trackKey)
 		} else if err == nil {
 			// update the song and we are done
 			s.PreviewURL = track.PreviewURL
 			s.TrackViewURL = track.TrackViewURL
-			if _, err := datastore.Put(ns, songKey, &s); err != nil {
-				return errors.Wrapf(err, "failed to put song %s", songKey)
+			if _, err := datastore.Put(ns, sKey, &s); err != nil {
+				return errors.Wrapf(err, "failed to put song %s", sKey)
 			}
 			done = true
 			return nil
@@ -76,18 +79,12 @@ var fillITunesFunc = delay.Func("fillITunes", func(ctx context.Context, namespac
 
 	// Try both.
 	if err := datastore.RunInTransaction(ctx, func(ctx context.Context) error {
-		ns, err := appengine.Namespace(ctx, namespace)
-		if err != nil {
-			return errors.Wrapf(err, "failed to make namespace for %q", namespace)
-		}
-
 		var s Song
-		songKey := datastore.NewKey(ns, KindSong, ident, 0, nil)
-		if err := datastore.Get(ns, songKey, &s); err != nil {
+		if err := datastore.Get(ns, sKey, &s); err != nil {
 			if err == datastore.ErrNoSuchEntity {
 				return nil // deleted sometime in between?
 			}
-			return errors.Wrapf(err, "failed to get song %s", songKey)
+			return errors.Wrapf(err, "failed to get song %s", sKey)
 		}
 		if s.iTunesFilled() {
 			return nil
@@ -108,7 +105,7 @@ var fillITunesFunc = delay.Func("fillITunes", func(ctx context.Context, namespac
 
 		matchingIdx := -1
 		for idx := range tracks {
-			if !tracks[idx].ReleaseDate.IsZero() && tracks[idx].Ident() == ident && tracks[idx].HasRequiredURLs() {
+			if !tracks[idx].ReleaseDate.IsZero() && tracks[idx].Ident() == songIdent && tracks[idx].HasRequiredURLs() {
 				matchingIdx = idx
 				break
 			}
@@ -119,7 +116,7 @@ var fillITunesFunc = delay.Func("fillITunes", func(ctx context.Context, namespac
 			return nil
 		}
 
-		trackKey := datastore.NewKey(ctx, KindITunesTrack, ident, 0, nil)
+		trackKey := datastore.NewKey(ctx, KindITunesTrack, songIdent, 0, nil)
 		if _, err := datastore.Put(ctx, trackKey, &tracks[matchingIdx]); err != nil {
 			return errors.Wrapf(err, "failed to put track %s", trackKey)
 		}
@@ -127,8 +124,8 @@ var fillITunesFunc = delay.Func("fillITunes", func(ctx context.Context, namespac
 		s.PreviewURL = tracks[matchingIdx].PreviewURL
 		s.TrackViewURL = tracks[matchingIdx].TrackViewURL
 
-		if _, err := datastore.Put(ns, songKey, &s); err != nil {
-			return errors.Wrapf(err, "failed to put song %s", songKey)
+		if _, err := datastore.Put(ns, sKey, &s); err != nil {
+			return errors.Wrapf(err, "failed to put song %s", sKey)
 		}
 		return nil
 	}, defaultTxOpts); err != nil {
@@ -153,6 +150,7 @@ func (i *ITunesTrack) HasRequiredURLs() bool {
 		i.TrackViewURL != "" && i.TrackViewURL != "—"
 }
 
+// NOTE: track ident == song ident, by definition
 func (i *ITunesTrack) Ident() string {
 	if i.ReleaseDate.IsZero() {
 		panic("zero ReleaseDate")
