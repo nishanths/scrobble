@@ -73,7 +73,7 @@ type Song struct {
 	SortTitle      string `json:"-"`
 
 	// play info
-	LastPlayed int64 `json:"lastPlayed"`
+	LastPlayed int64 `json:"lastPlayed"` // unix seconds
 	PlayCount  int   `json:"-"`
 
 	ArtworkHash  string `datastore:",noindex" json:"artworkHash"`
@@ -81,6 +81,8 @@ type Song struct {
 	TrackViewURL string `datastore:",noindex" json:"trackViewURL"`
 
 	Loved bool `json:"loved"`
+
+	ReleaseDate int64 `datastore:",noindex"` // unix seconds
 }
 
 func (s *Song) Ident() string {
@@ -341,6 +343,7 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 			PlayCount:      int(m.PlayCount),
 			ArtworkHash:    m.ArtworkHash,
 			Loved:          m.Loved,
+			ReleaseDate:    int64(m.ReleaseDate),
 		}
 	}
 
