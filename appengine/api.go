@@ -46,7 +46,7 @@ const (
 )
 
 func songparentident(t time.Time, u uuid.UUID) string {
-	return fmt.Sprintf("%d|%d", t.Unix(), u.String())
+	return fmt.Sprintf("%d|%s", t.Unix(), u.String())
 }
 
 func songident(album, artist, title string, year int) string {
@@ -484,11 +484,10 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	// Create tasks to fill in iTunes-related fields.
-	for _, s := range songs {
-		ident := s.Ident()
+	for _, k := range sKeys {
 		g.Go(func() error {
-			if err := fillITunesFunc.Call(ctx, namespaceID(accID), ident); err != nil {
-				log.Errorf(ctx, "failed to call fillITunesFunc for %s,%s", namespaceID(accID), ident) // only log
+			if err := fillITunesFunc.Call(ctx, namespaceID(accID), k.Parent().StringID(), k.StringID()); err != nil {
+				log.Errorf(ctx, "failed to call fillITunesFunc for %s,%s", namespaceID(accID), k) // only log
 			}
 			return nil
 		})
