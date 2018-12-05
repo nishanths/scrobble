@@ -322,7 +322,7 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		sar := m.SortArtistName
 		if sar == "" {
-			sal = m.ArtistName
+			sar = m.ArtistName
 		}
 		st := m.SortTitle
 		if st == "" {
