@@ -5,9 +5,9 @@ indexes:
   - name: Loved
   - name: LastPlayed
     direction: desc
-    
+
 - kind: SongParent
   properties:
   - name: Completed
-  - name: Inserted
+  - name: Created
     direction: desc

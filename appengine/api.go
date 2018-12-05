@@ -68,7 +68,7 @@ type Account struct {
 // Namespace: account
 // Key: <unix seconds>|<uuid>
 type SongParent struct {
-	Inserted int64 // unix seconds
+	Created  int64 // unix seconds
 	Complete bool  // whether the songs have all been inserted
 }
 
@@ -267,7 +267,7 @@ func scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get the latest completed parent.
 	q := datastore.NewQuery(KindSongParent).
-		Order("-Inserted").Filter("Completed=", true).
+		Order("-Created").Filter("Completed=", true).
 		Limit(1).KeysOnly()
 
 	parentKeys, err := q.GetAll(ns, nil)
@@ -373,7 +373,7 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 	newParentKey := songParentKey(ns, newParentIdent)
 
 	if _, err := datastore.Put(ns, newParentKey, &SongParent{
-		Inserted: now.Unix(),
+		Created:  now.Unix(),
 		Complete: false,
 	}); err != nil {
 		log.Errorf(ns, "%v", err.Error())
@@ -484,10 +484,11 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	// Create tasks to fill in iTunes-related fields.
-	for _, k := range sKeys {
+	for _, s := range songs {
+		songIdent := s.Ident()
 		g.Go(func() error {
-			if err := fillITunesFunc.Call(ctx, namespaceID(accID), k.Parent().StringID(), k.StringID()); err != nil {
-				log.Errorf(ctx, "failed to call fillITunesFunc for %s,%s", namespaceID(accID), k) // only log
+			if err := fillITunesFields.Call(ctx, namespaceID(accID), newParentIdent, songIdent); err != nil {
+				log.Errorf(ctx, "failed to call fillITunesFields for %s,%s", namespaceID(accID), newParentIdent, songIdent) // only log
 			}
 			return nil
 		})

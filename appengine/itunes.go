@@ -21,9 +21,7 @@ import (
 	"google.golang.org/appengine/urlfetch"
 )
 
-// NOSUBMIT: this needs to account for new key structure
-
-var fillITunesFunc = delay.Func("fillITunes", func(ctx context.Context, namespace string, songParentIdent, songIdent string) error {
+var fillITunesFields = delay.Func("fillITunesFields", func(ctx context.Context, namespace string, songParentIdent string, songIdent string) error {
 	done := false
 
 	ns, err := appengine.Namespace(ctx, namespace)
@@ -116,6 +114,7 @@ var fillITunesFunc = delay.Func("fillITunes", func(ctx context.Context, namespac
 			return nil
 		}
 
+		// store track for use in future calls
 		trackKey := datastore.NewKey(ctx, KindITunesTrack, songIdent, 0, nil)
 		if _, err := datastore.Put(ctx, trackKey, &tracks[matchingIdx]); err != nil {
 			return errors.Wrapf(err, "failed to put track %s", trackKey)
@@ -123,7 +122,6 @@ var fillITunesFunc = delay.Func("fillITunes", func(ctx context.Context, namespac
 
 		s.PreviewURL = tracks[matchingIdx].PreviewURL
 		s.TrackViewURL = tracks[matchingIdx].TrackViewURL
-
 		if _, err := datastore.Put(ns, sKey, &s); err != nil {
 			return errors.Wrapf(err, "failed to put song %s", sKey)
 		}
