@@ -3,6 +3,12 @@ indexes:
 - kind: Song
   ancestor: yes
   properties:
+  - name: LastPlayed
+    direction: desc
+
+- kind: Song
+  ancestor: yes
+  properties:
   - name: Loved
   - name: LastPlayed
     direction: desc
