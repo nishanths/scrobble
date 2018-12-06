@@ -1,13 +1,8 @@
 indexes:
 
 - kind: Song
+  ancestor: yes
   properties:
   - name: Loved
   - name: LastPlayed
-    direction: desc
-
-- kind: SongParent
-  properties:
-  - name: Completed
-  - name: Created
     direction: desc
