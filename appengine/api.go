@@ -453,11 +453,11 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 	//
 	// TODO: make this deterministic instead of using a delay?
 	g.Go(func() error {
-		task, err := markParentComplete.Task(ctx, namespaceID(accID), newParentIdent)
+		task, err := markParentComplete.Task(namespaceID(accID), newParentIdent)
 		if err != nil {
 			return errors.Wrapf(err, "failed to make task")
 		}
-		task.Delay = 3 * time.Minute
+		task.Delay = 2 * time.Minute
 		if _, err := taskqueue.Add(ns, task, ""); err != nil {
 			return errors.Wrapf(err, "failed to add task")
 		}
