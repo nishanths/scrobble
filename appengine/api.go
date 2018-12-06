@@ -465,6 +465,12 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
+	if err := g.Wait(); err != nil {
+		log.Errorf(ns, "%v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	// We create the parent link, now that the songs have all been put.
 	// But we want the iTunes related fields to also be filled in (which happens
 	// asynchronously with staggered internal delaying), so wait for a bit
@@ -482,12 +488,6 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return nil
 	}(); err != nil {
-		log.Errorf(ns, "%v", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	if err := g.Wait(); err != nil {
 		log.Errorf(ns, "%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
