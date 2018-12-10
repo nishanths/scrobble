@@ -139,10 +139,10 @@ func trimSongParents(ns context.Context) error {
 		return nil
 	}
 
-	if err := f(true, 10, 6); err != nil {
+	if err := f(true, 100, 50); err != nil {
 		return err
 	}
-	if err := f(false, 5, 2); err != nil {
+	if err := f(false, 50, 25); err != nil {
 		return err
 	}
 	return nil
