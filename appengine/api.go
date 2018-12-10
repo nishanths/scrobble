@@ -68,6 +68,7 @@ type Account struct {
 // Namespace: account
 // Key: <unix seconds>|<uuid>
 type SongParent struct {
+	Complete bool
 	Created  int64 // unix seconds
 }
 
@@ -266,7 +267,8 @@ func scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get the latest parent.
 	q := datastore.NewQuery(KindSongParent).
-		Order("-Created").Limit(1).KeysOnly()
+		Order("-Created").Filter("Complete=", true).
+		Limit(1).KeysOnly()
 
 	parentKeys, err := q.GetAll(ns, nil)
 	if err != nil {
@@ -337,10 +339,6 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	now := time.Now()
-	newParentIdent := songparentident(now, uuid.New())
-	newParentKey := songParentKey(ns, newParentIdent)
-
 	// Parse request.
 	type MediaItem struct {
 		Added          float64 `json:"added"`
@@ -399,6 +397,20 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 			ArtworkHash:    m.ArtworkHash,
 			Loved:          m.Loved,
 		}
+	}
+
+	now := time.Now()
+	newParentIdent := songparentident(now, uuid.New())
+	newParentKey := songParentKey(ns, newParentIdent)
+
+	// Create new incomplete SongParent.
+	if _, err := datastore.Put(ns, newParentKey, &SongParent{
+		Complete: false,
+		Created:  now.Unix(),
+	}); err != nil {
+		log.Errorf(ns, "%v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	sKeys := make([]*datastore.Key, len(songs))
@@ -471,14 +483,14 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// We create the parent link, now that the songs have all been put.
+	// We can mark the parent as complete, now that the songs have all been put.
 	// But we want the iTunes related fields to also be filled in (which happens
 	// asynchronously with staggered internal delaying), so wait for a bit
-	// before creating the parent link a few minutes.
+	// before marking the parent as complete.
 	//
 	// TODO: make this deterministic instead of using a delay?
 	if err := func() error {
-		task, err := createSongParent.Task(namespaceID(accID), newParentIdent, now)
+		task, err := markParentComplete.Task(namespaceID(accID), newParentIdent, now)
 		if err != nil {
 			return errors.Wrapf(err, "failed to make task")
 		}
@@ -648,9 +660,9 @@ func artworkMissingHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Creates a SongParent link, and deletes really old SongParents and their
+// Marks a SongParent as complete, and deletes really old SongParents and their
 // child Songs.
-var createSongParent = delay.Func("createSongParent", func(ctx context.Context, namespace string, songParentIdent string, now time.Time) error {
+var markParentComplete = delay.Func("markParentComplete", func(ctx context.Context, namespace string, songParentIdent string) error {
 	ns, err := appengine.Namespace(ctx, namespace)
 	if err != nil {
 		log.Errorf(ctx, "failed to make namespace: %v", err.Error())
@@ -658,7 +670,18 @@ var createSongParent = delay.Func("createSongParent", func(ctx context.Context, 
 	}
 
 	// Create parent link.
-	if _, err := datastore.Put(ns, songParentKey(ns, songParentIdent), &SongParent{Created: now.Unix()}); err != nil {
+	newParentKey := songParentKey(ns, songParentIdent)
+	if err := datastore.RunInTransaction(ns, func(tx context.Context) error {
+		var sp SongParent
+		if err := datastore.Get(ns, newParentKey, &sp); err != nil {
+			return errors.Wrapf(err, "failed to get %s", newParentKey)
+		}
+		sp.Complete = true
+		if _, err := datastore.Put(ns, newParentKey, &sp); err != nil {
+			return errors.Wrapf(err, "failed to put %s", newParentKey)
+		}
+		return nil
+	}, defaultTxOpts); err != nil {
 		log.Errorf(ns, "%v", err.Error())
 		return err
 	}

@@ -1,14 +1,29 @@
 indexes:
 
+# GET scrobbled
 - kind: Song
   ancestor: yes
   properties:
   - name: LastPlayed
     direction: desc
 
+# GET scrobbled
 - kind: Song
   ancestor: yes
   properties:
   - name: Loved
   - name: LastPlayed
+    direction: desc
+
+# GET scrobbled
+- kind: SongParent
+  properties:
+  - name: Complete
+  - name: Created
+
+# trimming function
+- kind: SongParent
+  properties:
+  - name: Complete
+  - name: Created
     direction: desc
