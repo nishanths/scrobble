@@ -1,0 +1,7 @@
+-- fix automatic scrolling when switching modes
+-- segmented control for switching modes
+- permanent links to songs
+- explore lastSkipped field
+- switch to go111 runtime for app engine?
+- macos project doesn't compile in 10.14
+- large preview of album artwork with zoom.js
