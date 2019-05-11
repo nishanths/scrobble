@@ -8,7 +8,8 @@ export class SongCard extends React.Component<{song: Song, artworkBaseURL: strin
 
   componentDidMount() {
     // SO says onclick on an element enables :hover on iOS
-    this.trackLinkAreaElem!.setAttribute("onclick", "");
+    this.trackLinkAreaElem &&
+      this.trackLinkAreaElem.setAttribute("onclick", "");
   }
 
   private artworkURL(): string {
