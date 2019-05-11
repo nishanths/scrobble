@@ -41,14 +41,13 @@
   }
 
   .scaleArea {
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
     &:hover {
       .pict {
         transform: scale(1.10);
         transition: $transition-enter-duration $transition-enter-func transform, $transition-enter-duration $transition-enter-func box-shadow;
         box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2), 0 0 40px rgba(0, 0, 0, 0.2) inset;
-        .expandArea {
-          .expand {
+        .trackLinkArea {
+          .trackLink {
             transition: $transition-enter-duration $transition-enter-func opacity;
             opacity: 1;
           }
@@ -73,6 +72,7 @@
   }
 
   .pict {
+    cursor: zoom-in; // corresponds to detail view click handler
     width: $songcard-dim;
     height: $songcard-dim;
     background-size: contain;
@@ -81,7 +81,8 @@
     transition: $transition-exit-duration $transition-exit-func transform, $transition-exit-duration $transition-exit-func box-shadow;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1) inset;
 
-    .expandArea {
+    .trackLinkArea {
+      -webkit-tap-highlight-color: rgba(0,0,0,0);
       height: $icon-dim * 3.2;
       width: $icon-dim * 3.2;
       margin-left: auto;
@@ -89,11 +90,7 @@
       position: relative;
       // background-color: red; // uncomment for debugging
 
-      &:hover {
-        cursor: zoom-in;
-      }
-
-      .expand {
+      .trackLink {
         position: absolute;
         height: $icon-dim * 1.2;
         width: $icon-dim * 1.2;
