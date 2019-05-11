@@ -31,26 +31,43 @@ export class SongCard extends React.Component<{song: Song, artworkBaseURL: strin
   }
 
   private card() {
-    let s = this.props.song
     return <div className="scaleArea" ref={r => {this.scaleArea = r}}>
       {this.pict()}
-      <div className="meta" title={this.tooltip()}>
-        <div className="title">
-          <span className="titleContent">{s.title}</span>
-          {s.loved && <span className="love"></span>}
-        </div>
-        <div className="other">
-          {s.artistName && <span className="artist">{s.artistName}</span>}
-        </div>
-        {s.lastPlayed && <time className="date">{dateDisplayString(new Date(s.lastPlayed * 1000), this.props.now)}</time>}
+      {this.info()}
+    </div>
+  }
+
+  private info() {
+    const s = this.props.song
+    return <div className="meta" title={this.tooltip()}>
+      <div className="title">
+        <span className="titleContent">{s.title}</span>
+        {s.loved && <span className="love"></span>}
       </div>
+      <div className="other">
+        {s.artistName && <span className="artist">{s.artistName}</span>}
+      </div>
+      {s.lastPlayed && <time className="date">{dateDisplayString(new Date(s.lastPlayed * 1000), this.props.now)}</time>}
     </div>
   }
 
   private pict() {
-    let imgStyles = this.artworkURL() ? {backgroundImage: `url(${this.artworkURL()})`} : {backgroundColor: "#fff"}
-    let e = <div className="pict" style={imgStyles}></div>
-    return this.props.song.trackViewURL ? <a href={this.props.song.trackViewURL} target="_blank">{e}</a> : e
+    let imgStyles = this.artworkURL() ?
+      {backgroundImage: `url(${this.artworkURL()})`} :
+      {backgroundColor: "#fff"}
+
+    let e = <div className="pict" style={imgStyles}>
+      {this.expand()}
+    </div>
+
+    return this.props.song.trackViewURL ?
+      <a href={this.props.song.trackViewURL} target="_blank">{e}</a> : e
+  }
+
+  private expand() {
+    return <div className="expandArea">
+      <div className="expand"></div>
+    </div>
   }
 
   render() {
