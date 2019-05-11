@@ -52,12 +52,18 @@ export function unreachable(): never {
   throw new Error("unreachable");
 }
 
-export function base64Encode(s: string) {
+// base64Encode encodes the string using base64 standard encoding, i.e.,
+// the encoding corresponding to base64.StdEncoding in Go.
+//
+// Verified using https://runkit.com/nishanths/5cd735892538b9001a7e08d5
+// and https://gobyexample.com/base64-encoding.
+export function base64Encode(s: string): string {
   let bytes = new TextEncoder().encode(s);
   return base64js.fromByteArray(bytes);
 }
 
-export function base64Decode(s: string) {
+// base64Decode is the inverse of base64Encode.
+export function base64Decode(s: string): string {
   let bytes = base64js.toByteArray(s);
   return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
 }
