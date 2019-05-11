@@ -250,6 +250,14 @@ func scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	lovedOnly := r.FormValue("loved") == "true"
+	songIdent := r.FormValue("song")
+
+	if songIdent != "" && lovedOnly {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	acc, accID, ok := fetchAccountForUsername(ctx, username, w)
 	if !ok {
 		return
@@ -282,27 +290,43 @@ func scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get the songs.
-	q = datastore.NewQuery(KindSong).
-		Order("-LastPlayed").
-		Ancestor(parentKeys[0])
+	if songIdent != "" {
+		// Get song by ident.
+		key := songKey(ns, songIdent, parentKeys[0])
+		var s Song
+		if err := datastore.Get(ns, key, &s); err != nil {
+			log.Errorf(ns, "failed to fetch song %s: %v", key, err.Error())
+			if err == datastore.ErrNoSuchEntity {
+				w.WriteHeader(http.StatusNotFound)
+			} else {
+				w.WriteHeader(http.StatusInternalServerError)
+			}
+			return
+		}
+		writeSuccessRsp([]Song{s})
+	} else {
+		// Get all songs.
+		q = datastore.NewQuery(KindSong).
+			Order("-LastPlayed").
+			Ancestor(parentKeys[0])
 
-	lovedOnly := r.FormValue("loved") == "true"
-	if lovedOnly {
-		q = q.Filter("Loved=", true)
-	}
+		if lovedOnly {
+			q = q.Filter("Loved=", true)
+		}
 
-	songs := make([]Song, 0) // to marshal as empty JSON array instead of null when there are 0 songs
-	if _, err := q.GetAll(ns, &songs); err != nil {
-		log.Errorf(ns, "failed to fetch songs: %v", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		songs := make([]Song, 0) // use "make" to marshal as empty JSON array instead of null when there are 0 songs
+		if _, err := q.GetAll(ns, &songs); err != nil {
+			log.Errorf(ns, "failed to fetch songs: %v", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		writeSuccessRsp(songs)
 	}
-	writeSuccessRsp(songs)
 }
 
 func canViewScrobbled(ctx context.Context, forAccountID string, u *user.User, h http.Header) bool {
 	if u != nil && u.Email == forAccountID {
+		// a logged in user can view their own account's scrobbles
 		return true
 	}
 
