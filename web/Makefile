@@ -1,6 +1,7 @@
 WEBPACK := node_modules/.bin/webpack-cli
 
-default: dev
+default:
+	@echo "the default target does nothing!"
 
 .PHONY: dev
 dev:

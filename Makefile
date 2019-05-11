@@ -7,7 +7,9 @@ DEV_APP_YAML      := appengine/dev_app.yaml
 
 # NOTE: To deploy, typically you want `make all` followed by `make deploy`.
 #
-# For local development, run `make dev` and the web directory's `make dist`.
+# For local development, run `make dev` and the web directory's `make dev`.
+# You may optionally require `make bootstrap`.
+#
 # Only certain paths may be supported with fake data in local dev
 # (see appengine/server.go).
 
