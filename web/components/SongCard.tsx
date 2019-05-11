@@ -57,15 +57,21 @@ export class SongCard extends React.Component<{song: Song, artworkBaseURL: strin
       {backgroundColor: "#fff"}
 
     let e = <div className="pict" style={imgStyles}>
-      {this.expand()}
+      {this.expandArea()}
     </div>
 
     return this.props.song.trackViewURL ?
       <a href={this.props.song.trackViewURL} target="_blank">{e}</a> : e
   }
 
-  private expand() {
-    return <div className="expandArea">
+  private expandArea() {
+    return <div className="expandArea" onClick={(e) => {
+      // prevent a[href] from opening.
+      // TODO: consider using click handlers for a[href], which should help
+      // avoid this hack.
+      e.stopPropagation()
+      console.log("clicked expand")
+    }}>
       <div className="expand"></div>
     </div>
   }
