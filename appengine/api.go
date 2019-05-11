@@ -367,9 +367,11 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	now := time.Now()
+
 	// Convert to Songs.
-	songs := make([]Song, len(mis))
-	for i, m := range mis {
+	var songs []Song
+	for _, m := range mis {
 		sal := m.SortAlbumTitle
 		if sal == "" {
 			sal = m.AlbumTitle
@@ -382,7 +384,15 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		if st == "" {
 			st = m.Title
 		}
-		songs[i] = Song{
+
+		// There is a bug (somewhere) that leads to some songs having last
+		// played times far into the future, for instance, in the year 2040.
+		// So ignore such songs.
+		if time.Unix(int64(m.LastPlayed), 0).Sub(now) > 365*24*time.Hour {
+			continue
+		}
+
+		songs = append(songs, Song{
 			AlbumTitle:     m.AlbumTitle,
 			ArtistName:     m.ArtistName,
 			Title:          m.Title,
@@ -396,10 +406,9 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 			PlayCount:      int(m.PlayCount),
 			ArtworkHash:    m.ArtworkHash,
 			Loved:          m.Loved,
-		}
+		})
 	}
 
-	now := time.Now()
 	newParentIdent := songparentident(now, uuid.New())
 	newParentKey := songParentKey(ns, newParentIdent)
 
