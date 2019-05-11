@@ -33,6 +33,8 @@ export interface Song {
   artworkHash: string
   trackViewURL: string
   loved: boolean
+
+  ident: string
 }
 
 export function hasPrefix(s: string, prefix: string): boolean {
