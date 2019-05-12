@@ -12,14 +12,10 @@ declare var NProgress: {
 }
 
 class Songs extends React.Component<{songs: Song[], artworkBaseURL: string}, {}> {
-  private static key(s: Song): string {
-    return [s.title, s.albumTitle, s.artistName, s.year].join("|")
-  }
-
   render() {
     let now = new Date()
     return this.props.songs.map(s => {
-      return <SongCard key={Songs.key(s)} song={s} artworkBaseURL={this.props.artworkBaseURL} now={now}/>
+      return <SongCard key={s.ident} song={s} artworkBaseURL={this.props.artworkBaseURL} now={now}/>
     })
   }
 }
@@ -39,10 +35,54 @@ enum Mode {
 }
 
 export class UsernamePage extends React.Component<UsernamePageProps, UsernamePageState> {
+  private static modeFromURL(wnd: Window): Mode {
+    let components = pathComponents(wnd.location.pathname)
+    if (components.length < 3 || // /u/username,
+        components[2] != "loved" // /u/username/song, /u/username/<gibberish>
+    ) {
+      return Mode.All
+    }
+    return Mode.Loved // /u/username/loved, /u/username/loved/song, /u/username/loved/<gibberish>
+  }
+
+  private static urlFromMode(m: Mode, username: string): string {
+    switch (m) {
+      case Mode.All:   return "/u/" + username
+      case Mode.Loved: return "/u/" + username + "/loved"
+    }
+    unreachable()
+  }
+
+  private static controlValueForMode(m: Mode): string {
+    switch (m) {
+      case Mode.All:
+        return "All"
+      case Mode.Loved:
+        return "Loved"
+    }
+    unreachable()
+  }
+
+  private static modeFromControlValue(v: string): Mode {
+    switch (v) {
+      case "All":   return Mode.All
+      case "Loved": return Mode.Loved
+      default:      return Mode.All // fallback
+    }
+  }
+
   // Divisble by 2, 3, and 4. This is appropriate because these are the number
   // of cards typically displayed per row. Using such a number ensures that
   // the last row isn't an incomplete row.
   private static readonly moreIncrement = 48
+
+  private static determineNextEndIdx(idx: number, nSongs: number): number {
+    // increment, but make sure we don't go over the number of songs itself
+    let b = Math.min(idx + UsernamePage.moreIncrement, nSongs)
+    // if there aren't sufficient songs left for the next time, just include
+    // them now
+    return nSongs - b < UsernamePage.moreIncrement ? nSongs : b;
+  }
 
   constructor(props: UsernamePageProps) {
     super(props)
@@ -59,7 +99,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
     NProgress.configure({ showSpinner: false, minimum: 0.1, trickleSpeed: 25, speed: 500 })
     NProgress.start()
 
-    const leeway = 200
+    const leeway = 250
     window.addEventListener("scroll", () => {
       if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight - leeway)) {
         this.showMore()
@@ -70,32 +110,15 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
     this.fetchSongs()
   }
 
-  private static modeFromURL(wnd: Window): Mode {
-    let components = pathComponents(wnd.location.pathname)
-    if (components.length != 3) {
-      return Mode.All // fallback
-    }
-    return components[2] == "loved" ? Mode.Loved : Mode.All
-  }
-
-  private static urlFromMode(m: Mode, username: string): string {
-    switch (m) {
-      case Mode.All:   return "/u/" + username
-      case Mode.Loved: return "/u/" + username + "/loved"
-    }
-    unreachable()
-  }
-
   private onControlToggled(v: string) {
-    this.setState(s => {
-      let m = UsernamePage.modeFromControlValue(v)
-      window.history.pushState(null, "", UsernamePage.urlFromMode(m, this.props.profileUsername)) // TODO: gross side-effect in this function?
-      return { mode: m }
+    const mode = UsernamePage.modeFromControlValue(v)
+    this.setState({ mode }, () => {
+      window.history.pushState(null, "", UsernamePage.urlFromMode(this.state.mode, this.props.profileUsername)) // TODO: gross side-effect in this function?
     })
   }
 
   private fetchSongs() {
-    let success = false // TODO: learn fetch, "like a dog."
+    let success = false // TODO: learn `fetch`
 
     fetch("/api/v1/scrobbled?username=" + this.props.profileUsername)
       .then(r => {
@@ -132,14 +155,6 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
     })
   }
 
-  private static determineNextEndIdx(idx: number, nSongs: number): number {
-    // increment, but make sure we don't go over the number of songs itself
-    let b = Math.min(idx + UsernamePage.moreIncrement, nSongs)
-    // if there aren't sufficient songs left for the next time, just include
-    // them now
-    return nSongs - b < UsernamePage.moreIncrement ? nSongs : b;
-  }
-
   private songsForCurrentMode = (): Song[] => {
     switch (this.state.mode) {
       case Mode.All:
@@ -148,24 +163,6 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
         return this.state.songs.filter(s => s.loved)
     }
     unreachable()
-  }
-
-  private static controlValueForMode(m: Mode): string {
-    switch (m) {
-      case Mode.All:
-        return "All"
-      case Mode.Loved:
-        return "Loved"
-    }
-    unreachable()
-  }
-
-  private static modeFromControlValue(v: string): Mode {
-    switch (v) {
-      case "All":   return Mode.All
-      case "Loved": return Mode.Loved
-      default:      return Mode.All // fallback
-    }
   }
 
   render() {
