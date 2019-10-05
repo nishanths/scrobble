@@ -463,6 +463,14 @@ func scrobblableItems(from m: Array<ITLibMediaItem>) -> (Array<API.MediaItem>, D
         if (p.mediaKind != .kindSong) {
             continue
         }
+        // There is a bug (somewhere) that leads to some songs having last
+        // played times far into the future, for instance, in the year 2040.
+        // So ignore such songs.
+        //
+        // See related: 27833a2309d3a94a9ddbe37791174d7e00c7737d
+        if p.lastPlayedDate!.timeIntervalSinceNow > 365 * 24 * 60 * 60 {
+            continue
+        }
         items.append(API.MediaItem(fromITLibMediaItem: p))
         if latestPlayed == nil || p.lastPlayedDate! > latestPlayed! {
             latestPlayed = p.lastPlayedDate!
