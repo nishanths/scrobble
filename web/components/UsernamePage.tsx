@@ -1,9 +1,11 @@
 import * as React from "react";
+import { useSelector } from "react-redux"
 import { UArgs, Song } from "../shared/types"
 import { trimPrefix, assertExhaustive, pathComponents } from "../shared/util"
 import { Header } from "./Header"
 import { Songs } from "./Songs"
 import { SegmentedControl } from "./SegmentedControl"
+import { State } from "../redux/reducers/username"
 import "../scss/u.scss"
 
 declare var NProgress: {

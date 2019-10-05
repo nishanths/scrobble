@@ -20,7 +20,7 @@ export const SongCard: React.StatelessComponent<SongCardProps> = ({
   useEffect(() => {
     if (initialMount.current === false) { return }
     initialMount.current = false;
-    trackLinkAreaElem!.setAttribute("onclick", "") // Stack Overflow says onclick enables :hover on iOS
+    if (trackLinkAreaElem != null) { trackLinkAreaElem.setAttribute("onclick", "") } // Stack Overflow says onclick enables :hover on iOS
   })
 
   const artworkURL = song.artworkHash ? artworkBaseURL + "/" + song.artworkHash : "";
