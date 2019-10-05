@@ -44,12 +44,18 @@ struct State {
     // TODO: this is gross
 }
 
+struct Constants {
+    static let BaseUrl = "selective-scrobble.appspot.com"
+    static let HelpLink = "https://scrobble.allele.cc"
+}
+
+func profileLink(_ username: String) -> String {
+    return String(format: "https://scrobble.allele.cc/u/", username)
+}
+
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlertDelegate {
     private static let menuIconName = "itunes-scrobble-18x18" // size from https://stackoverflow.com/a/33708433
-    static let baseUrl = "selective-scrobble.appspot.com"
-    private static let helpLink = "https://scrobble.allele.cc"
-    private static let profileBaseUrl = "https://scrobble.allele.cc/u/"
     private static let shortVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     
     // Keys for information saved to UserDefaults.
@@ -64,7 +70,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
     private let statusBarItem = NSStatusBar.system.statusItem(withLength:NSStatusItem.squareLength)
     private let pauseItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
     private let statusItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
+    private let secondaryStatusItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
     private let multiItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
+    private let profileLinkItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
     
     private var prevState: State? = nil
     private var state = State(running: false,
@@ -130,7 +138,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         m.addItem(pauseItem)
         m.addItem(NSMenuItem.separator())
         m.addItem(multiItem)
+        m.addItem(profileLinkItem)
+        m.addItem(NSMenuItem.separator())
         m.addItem(statusItem)
+        m.addItem(secondaryStatusItem)
         m.addItem(NSMenuItem.separator())
         m.addItem(v)
         m.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: ""))
@@ -144,16 +155,21 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
     private func render() {
         defer { prevState = state }
         
+        profileLinkItem.title = "Browse your scrobbles..."
+        profileLinkItem.action = #selector(openProfile(_:))
+        
         // TODO: clean this up, gosh it's gnarly
         if state.apiKey == nil {
             assert(!state.running)
             multiItem.title = "Start scrobbling..."
             multiItem.action =  #selector(enterAPIKeyAction(_:))
+            profileLinkItem.isHidden = true
             pauseItem.isHidden = true
         } else {
             if let a = state.account {
                 multiItem.title = String(format: "Signed in as %@...", a.username)
                 multiItem.action = #selector(scrobblingAsAction(_:))
+                profileLinkItem.isHidden = false
             } else {
                 if state.authError {
                     // If it's an auth error, clicking clear should prompt
@@ -164,6 +180,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                     multiItem.title = String(format: "Remove API Key & Sign Out")
                     multiItem.action = #selector(clearAPIKeyAction(_:))
                 }
+                profileLinkItem.isHidden = false
             }
             if (state.running) {
                 pauseItem.title = "Pause scrobbling"
@@ -184,15 +201,22 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
             statusItem.isHidden = false
         } else {
             if let ls = state.lastScrobbled {
-                statusItem.title = String(format: "Last scrobbled: %@", formatDate(ls))
+                statusItem.title = String(format: "Last scrobbled:   %@", formatDate(ls)) // extra spaces for text alignment with secondary status item
                 statusItem.isHidden = false
-                if let lp = state.latestPlayed {
-                    statusItem.toolTip = String(format: "Latest known play time: %@", formatDate(lp))
-                } else {
-                    statusItem.toolTip = nil // clear
-                }
             } else {
                 statusItem.isHidden = true
+            }
+        }
+        
+        // Secondary status item
+        if state.authError || state.scrobbling {
+            secondaryStatusItem.isHidden = true
+        } else {
+            if let lp = state.latestPlayed {
+                secondaryStatusItem.title = String(format: "Latest play time: %@", formatDate(lp))
+                secondaryStatusItem.isHidden = false
+            } else {
+                secondaryStatusItem.isHidden = true
             }
         }
         
@@ -339,19 +363,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         let a = NSAlert()
         a.alertStyle = .informational
         a.messageText = String(format: "Scrobbling as %@", state.account!.username)
-        a.informativeText = String(format: "%@%@", AppDelegate.profileBaseUrl, state.account!.username)
+        a.informativeText = String(format: "%@", profileLink(state.account!.username))
         a.showsSuppressionButton = false
         a.showsHelp = true
         a.delegate = self
-        a.addButton(withTitle: "Remove API Key & Sign Out")
         a.addButton(withTitle: "Close")
+        a.addButton(withTitle: "Remove API Key & Sign Out")
         
         let result = a.runModal()
         switch result {
         case NSApplication.ModalResponse.alertFirstButtonReturn:
-            clearAPIKey()
-        case NSApplication.ModalResponse.alertSecondButtonReturn:
             break // nothing to do
+        case NSApplication.ModalResponse.alertSecondButtonReturn:
+            clearAPIKey()
         default:
             print("unhandled button", result)
         }
@@ -391,10 +415,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
     }
     
     func alertShowHelp(_ alert: NSAlert) -> Bool {
-        if let u = URL(string: AppDelegate.helpLink) {
+        if let u = URL(string: Constants.HelpLink) {
             NSWorkspace.shared.open(u)
         }
         return true
+    }
+    
+    @objc private func openProfile(_ sender: Any?) {
+        if let u = URL(string: profileLink(state.account!.username)) {
+            NSWorkspace.shared.open(u)
+        }
     }
     
     @objc private func okButtonAction(_ sender: Any?) {

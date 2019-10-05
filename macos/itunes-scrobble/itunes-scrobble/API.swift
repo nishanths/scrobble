@@ -13,7 +13,7 @@ class API {
     static let headerAPIKey = "X-Scrobble-API-Key"
     
     static func scrobbleRequest(_ apiKey: String, _ body: Data) -> URLRequest {
-        let url = URL(string: String(format: "https://%@/api/v1/scrobble", AppDelegate.baseUrl))!
+        let url = URL(string: String(format: "https://%@/api/v1/scrobble", Constants.BaseUrl))!
         var r = URLRequest(url: url)
         r.httpMethod = "POST"
         r.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -23,7 +23,7 @@ class API {
     }
     
     static func accountRequest(_ apiKey: String) -> URLRequest {
-        let url = URL(string: String(format: "https://%@/api/v1/account", AppDelegate.baseUrl))!
+        let url = URL(string: String(format: "https://%@/api/v1/account", Constants.BaseUrl))!
         var r = URLRequest(url: url)
         r.httpMethod = "GET"
         setStandardHeaders(&r, apiKey)
@@ -33,7 +33,7 @@ class API {
     static func artworkRequest(_ apiKey: String, _ artworkFormat: ITLibArtworkFormat, _ artwork: Data) -> URLRequest {
         var c = URLComponents()
         c.scheme = "https"
-        c.host = AppDelegate.baseUrl
+        c.host = Constants.BaseUrl
         c.path = "/api/v1/artwork"
         c.queryItems = [URLQueryItem(name: "format", value: artworkFormatString(artworkFormat))]
         
@@ -45,7 +45,7 @@ class API {
     }
     
     static func missingArtworkRequest(_ apiKey: String) -> URLRequest {
-        let url = URL(string: String(format: "https://%@/api/v1/artwork/missing", AppDelegate.baseUrl))
+        let url = URL(string: String(format: "https://%@/api/v1/artwork/missing", Constants.BaseUrl))
         var r = URLRequest(url: url!)
         r.httpMethod = "GET"
         setStandardHeaders(&r, apiKey)
