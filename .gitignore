@@ -3,3 +3,6 @@ web/node_modules
 
 # symlinks
 appengine/web
+
+# directory for local archive exporting
+macos/archive
