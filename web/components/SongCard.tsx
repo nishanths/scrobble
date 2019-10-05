@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useEffect, useRef } from "react";
-import { Song } from "../src/shared"
-import { displayString as dateDisplayString } from "../src/time"
+import { Song } from "../shared/types"
+import { dateDisplay } from "../shared/time"
 
 interface SongCardProps {
   song: Song;
@@ -58,7 +58,7 @@ export const SongCard: React.StatelessComponent<SongCardProps> = ({
       <div className="other">
         {s.artistName && <span className="artist">{s.artistName}</span>}
       </div>
-      {s.lastPlayed && <time className="date">{dateDisplayString(new Date(s.lastPlayed * 1000), now())}</time>}
+      {s.lastPlayed && <time className="date">{dateDisplay(new Date(s.lastPlayed * 1000), now())}</time>}
     </div>
   })()
 

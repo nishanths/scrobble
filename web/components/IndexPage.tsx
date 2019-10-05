@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BootstrapArgs, Account } from "../src/shared";
+import { BootstrapArgs, Account } from "../shared/types";
 import { SetUsername, SetUsernameProps } from "./SetUsername";
 import { AccountDetail, AccountDetailProps } from "./AccountDetail";
 import "../scss/index.scss";

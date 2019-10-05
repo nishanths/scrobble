@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { IndexPage } from "../components/IndexPage";
-import { BootstrapArgs } from "./shared";
+import { BootstrapArgs } from "../shared/types";
 
 declare var bootstrap: BootstrapArgs;
 

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Account } from "../src/shared"
+import { Account } from "../shared/types"
 import "../scss/username.scss";
 
 export interface SetUsernameProps {

@@ -5,8 +5,8 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
   entry: {
-    index: "./src/index.main.tsx",
-    u: "./src/u.main.tsx",
+    index: "./entrypoints/index.main.tsx",
+    u: "./entrypoints/u.main.tsx",
   },
   output: {
     filename: "[name].js",

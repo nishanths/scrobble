@@ -1,5 +1,6 @@
 import * as React from "react";
-import { UArgs, Song, trimPrefix, assertExhaustive, pathComponents } from "../src/shared"
+import { UArgs, Song } from "../shared/types"
+import { trimPrefix, assertExhaustive, pathComponents } from "../shared/util"
 import { Header } from "./Header"
 import { Songs } from "./Songs"
 import { SegmentedControl } from "./SegmentedControl"
