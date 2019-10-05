@@ -1,5 +1,5 @@
 import * as React from "react";
-import { UArgs, Song, trimPrefix, unreachable, pathComponents } from "../src/shared"
+import { UArgs, Song, trimPrefix, assertExhaustive, pathComponents } from "../src/shared"
 import { Header } from "./Header"
 import { SongCard } from "./SongCard"
 import { SegmentedControl } from "./SegmentedControl"
@@ -50,7 +50,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
       case Mode.All:   return "/u/" + username
       case Mode.Loved: return "/u/" + username + "/loved"
     }
-    unreachable()
+    assertExhaustive(m)
   }
 
   private static controlValueForMode(m: Mode): string {
@@ -60,7 +60,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
       case Mode.Loved:
         return "Loved"
     }
-    unreachable()
+    assertExhaustive(m)
   }
 
   private static modeFromControlValue(v: string): Mode {
@@ -162,7 +162,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
       case Mode.Loved:
         return this.state.songs.filter(s => s.loved)
     }
-    unreachable()
+    assertExhaustive(this.state.mode)
   }
 
   render() {

@@ -48,8 +48,8 @@ export function trimPrefix(s: string, prefix: string): string {
   return s
 }
 
-export function unreachable(): never {
-  throw new Error("unreachable");
+export function assertExhaustive(value: never, message: string = "unexpected value"): never {
+  throw new Error(message + " " + value);
 }
 
 // base64Encode encodes the string using base64 standard encoding, i.e.,
