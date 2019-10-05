@@ -49,6 +49,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
     private static let menuIconName = "itunes-scrobble-18x18" // size from https://stackoverflow.com/a/33708433
     static let baseUrl = "selective-scrobble.appspot.com"
     private static let helpLink = "https://scrobble.allele.cc"
+    private static let profileBaseUrl = "https://scrobble.allele.cc/u/"
     private static let shortVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     
     // Keys for information saved to UserDefaults.
@@ -97,7 +98,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         
         // initially fetch account info
         guard let key = state.apiKey else { return }
-        URLSession.shared.dataTask(with: API.accountRequest(key)) {(data, rsp, err) in
+        let task = URLSession.shared.dataTask(with: API.accountRequest(key)) {(data, rsp, err) in
             guard err == nil else { return }
             guard let rr = rsp as! HTTPURLResponse? else { return }
             if (rr.statusCode == 200) {
@@ -114,6 +115,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                 return
             }
         }
+        task.resume()
     }
     
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -159,7 +161,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                     multiItem.title = String(format: "Re-enter API Key")
                     multiItem.action = #selector(clearThenEnterAPIKeyAction(_:))
                 } else {
-                    multiItem.title = String(format: "Clear API Key")
+                    multiItem.title = String(format: "Remove API Key & Sign Out")
                     multiItem.action = #selector(clearAPIKeyAction(_:))
                 }
             }
@@ -225,7 +227,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
 
         guard let data = try? JSONEncoder().encode(items) else { return }
         
-        URLSession.shared.dataTask(with: API.scrobbleRequest(state.apiKey!, data)) {(data, rsp, err) in
+        let task = URLSession.shared.dataTask(with: API.scrobbleRequest(state.apiKey!, data)) {(data, rsp, err) in
             defer {
                 self.state.scrobbling = false
                 self.render()
@@ -251,11 +253,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                 return
             }
         }
+        task.resume()
     }
     
     private func handleArtwork(_ lib: ITLibrary) {
         guard let key = state.apiKey else { return }
-        URLSession.shared.dataTask(with: API.missingArtworkRequest(key)) {(data, rsp, err) in
+        let task = URLSession.shared.dataTask(with: API.missingArtworkRequest(key)) {(data, rsp, err) in
             if err != nil {
                 return
             }
@@ -289,6 +292,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                 }
             }
         }
+        task.resume()
     }
     
     private func clearAPIKey() {
@@ -334,12 +338,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         assert(state.apiKey != nil && state.account != nil)
         let a = NSAlert()
         a.alertStyle = .informational
-        a.messageText = String(format: "Scrobbling as %@.", state.account!.username)
+        a.messageText = String(format: "Scrobbling as %@", state.account!.username)
+        a.informativeText = String(format: "%@%@", AppDelegate.profileBaseUrl, state.account!.username)
         a.showsSuppressionButton = false
         a.showsHelp = true
         a.delegate = self
-        a.addButton(withTitle: "Clear API Key")
-        a.addButton(withTitle: "Cancel")
+        a.addButton(withTitle: "Remove API Key & Sign Out")
+        a.addButton(withTitle: "Close")
         
         let result = a.runModal()
         switch result {
@@ -360,7 +365,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
     @objc private func enterAPIKeyAction(_ sender: Any?) {
         alert = NSAlert()
         alert!.alertStyle = .informational
-        alert!.messageText = "Enter API Key."
+        alert!.messageText = "Enter API Key"
         alert!.showsSuppressionButton = false
         alert!.showsHelp = true
         alert!.delegate = self
@@ -398,7 +403,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
             return
         }
         
-        URLSession.shared.dataTask(with: API.accountRequest(key)) {(data, rsp, err) in
+        let task = URLSession.shared.dataTask(with: API.accountRequest(key)) {(data, rsp, err) in
             if err == nil {
                 if let rr = rsp as! HTTPURLResponse? {
                     if rr.statusCode == 200 {
@@ -429,6 +434,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                 self.alert!.informativeText = String(format: "Something went wrong. Try again?")
             }
         }
+        task.resume()
     }
     
     @objc private func clearThenEnterAPIKeyAction(_ sender: Any?) {
