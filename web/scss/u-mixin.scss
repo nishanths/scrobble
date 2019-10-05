@@ -49,7 +49,7 @@
         .trackLinkArea {
           .trackLink {
             transition: $transition-enter-duration $transition-enter-func opacity;
-            opacity: 0; // NOTE: set to 1 to add track link circles
+            opacity: 1; // NOTE: set to 1 to add track link circles
           }
         }
       }
