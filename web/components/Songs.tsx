@@ -5,7 +5,7 @@ import { Song } from "../src/shared"
 interface SongsProps {
 	songs: Song[];
 	artworkBaseURL: string;
-	now: Date;
+	now: () => Date;
 }
 
 export const Songs: React.StatelessComponent<SongsProps> = ({ songs, artworkBaseURL, now }) => {

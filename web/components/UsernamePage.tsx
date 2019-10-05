@@ -187,7 +187,11 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
         />
       </div>
       <div className="songs">
-        <Songs songs={this.songsForCurrentMode().slice(0, this.state.endIdx)} artworkBaseURL={this.props.artworkBaseURL} now={new Date()}/>
+        <Songs
+          songs={this.songsForCurrentMode().slice(0, this.state.endIdx)}
+          artworkBaseURL={this.props.artworkBaseURL}
+          now={() => new Date()}
+        />
       </div>
     </div>
   }

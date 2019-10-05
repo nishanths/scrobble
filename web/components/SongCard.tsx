@@ -1,26 +1,38 @@
 import * as React from "react";
+import { useEffect, useRef } from "react";
 import { Song } from "../src/shared"
 import { displayString as dateDisplayString } from "../src/time"
 
-export class SongCard extends React.Component<{song: Song, artworkBaseURL: string, now: Date}, {}> {
-  private static readonly defaultArtworkPath = "/static/img/default-artwork.jpeg"
-  private trackLinkAreaElem: HTMLDivElement|null = null
+interface SongCardProps {
+  song: Song;
+  artworkBaseURL: string;
+  now: () => Date;
+}
 
-  componentDidMount() {
-    // SO says onclick on an element enables :hover on iOS
-    this.trackLinkAreaElem &&
-      this.trackLinkAreaElem.setAttribute("onclick", "");
-  }
+export const SongCard: React.StatelessComponent<SongCardProps> = ({
+  song,
+  artworkBaseURL,
+  now
+}) => {
+  const initialMount = useRef(true);
+  let trackLinkAreaElem: HTMLDivElement|null = null
 
-  private artworkURL(): string {
-    if (!this.props.song.artworkHash) {
-      return ""
-    }
-    return this.props.artworkBaseURL + "/" + this.props.song.artworkHash
-  }
+  useEffect(() => {
+    if (initialMount.current === false) { return }
+    initialMount.current = false;
+    trackLinkAreaElem!.setAttribute("onclick", "") // Stack Overflow says onclick enables :hover on iOS
+  })
 
-  private tooltip(): string {
-    let s = this.props.song;
+  const artworkURL = song.artworkHash ? artworkBaseURL + "/" + song.artworkHash : "";
+
+  const trackLinkArea = <a href={song.trackViewURL} title={song.trackViewURL} target="_blank">
+    <div className="trackLinkArea" ref={r => {trackLinkAreaElem = r}}>
+      <div className="trackLink"></div>
+    </div>
+  </a>
+
+  const tooltip = (() => {
+    const s = song
     let tooltip = s.title
     if (s.artistName || s.albumTitle) {
       tooltip += "\n"
@@ -29,18 +41,16 @@ export class SongCard extends React.Component<{song: Song, artworkBaseURL: strin
       if (s.albumTitle) { tooltip += s.albumTitle }
     }
     return tooltip
-  }
+  })()
 
-  private card() {
-    return <div className="scaleArea">
-      {this.pict()}
-      {this.meta()}
-    </div>
-  }
+  const pict = (() => {
+    const imgStyles = artworkURL ? {backgroundImage: `url(${artworkURL})`} : {backgroundColor: "#fff"}
+    return <div className="pict" style={imgStyles}>{song.trackViewURL && trackLinkArea}</div>
+  })()
 
-  private meta() {
-    const s = this.props.song
-    return <div className="meta" title={this.tooltip()}>
+  const meta = (() => {
+    const s = song
+    return <div className="meta" title={tooltip}>
       <div className="title">
         <span className="titleContent">{s.title}</span>
         {s.loved && <span className="love"></span>}
@@ -48,34 +58,14 @@ export class SongCard extends React.Component<{song: Song, artworkBaseURL: strin
       <div className="other">
         {s.artistName && <span className="artist">{s.artistName}</span>}
       </div>
-      {s.lastPlayed && <time className="date">{dateDisplayString(new Date(s.lastPlayed * 1000), this.props.now)}</time>}
+      {s.lastPlayed && <time className="date">{dateDisplayString(new Date(s.lastPlayed * 1000), now())}</time>}
     </div>
-  }
+  })()
 
-  private pict() {
-    let imgStyles = this.artworkURL() ?
-      {backgroundImage: `url(${this.artworkURL()})`} :
-      {backgroundColor: "#fff"}
+  const card = <div className="scaleArea">
+    {pict}
+    {meta}
+  </div>
 
-    return <div className="pict" style={imgStyles} onClick={() => {
-      console.log("clicked pict")
-    }}>
-      {this.props.song.trackViewURL && this.trackLinkArea()}
-    </div>
-  }
-
-  private trackLinkArea() {
-    return <a href={this.props.song.trackViewURL} title={this.props.song.trackViewURL} target="_blank">
-      <div className="trackLinkArea" ref={r => {this.trackLinkAreaElem = r}}>
-        <div className="trackLink"></div>
-      </div>
-    </a>
-  }
-
-  render() {
-    return <div className="SongCard">
-      {this.card()}
-    </div>
-  }
+  return <div className="SongCard">{card}</div>
 }
-
