@@ -43,7 +43,7 @@ export class IndexPage extends React.Component<IndexPageProps, {account: Account
       )
   }
 
-  private onDeleteAccountClick(e: MouseEvent) {
+  private onDeleteAccountClick(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
     e.preventDefault()
     let ok = confirm(deleteMessage)
     if (!ok) {

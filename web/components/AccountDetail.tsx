@@ -93,13 +93,13 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
       )
   }
 
-  private onRegenerateClick(e: MouseEvent) {
+  private onRegenerateClick(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
     e.preventDefault()
     if (this.generating) { return }
     this.newAPIKey()
   }
 
-  private onPrivacyClick(e: Event) {
+  private onPrivacyClick(e: React.MouseEvent<HTMLInputElement, MouseEvent>) {
     let v = this.privacyCheckbox!.checked
     this.setState({private: v})
     this.setPrivacy(v)
