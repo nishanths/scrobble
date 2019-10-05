@@ -95,12 +95,12 @@ class API {
             self.hasArtwork = i.hasArtworkAvailable
             self.kind = i.kind
             self.lastPlayed = i.lastPlayedDate?.timeIntervalSince1970
-            self.playCount = uint(i.playCount)
+            self.playCount = UInt(i.playCount)
             self.releaseDate = i.releaseDate?.timeIntervalSince1970
             self.sortTitle = i.sortTitle
             self.title = i.title
-            self.totalTime = uint(i.totalTime)
-            self.year = uint(i.year)
+            self.totalTime = UInt(i.totalTime)
+            self.year = UInt(i.year)
             self.persistentID = i.persistentID.stringValue
             
             // artwork hash
