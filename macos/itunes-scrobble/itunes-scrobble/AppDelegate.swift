@@ -50,7 +50,7 @@ struct Constants {
 }
 
 func profileLink(_ username: String) -> String {
-    return String(format: "https://scrobble.allele.cc/u/", username)
+    return String(format: "https://scrobble.allele.cc/u/%@", username)
 }
 
 @NSApplicationMain
