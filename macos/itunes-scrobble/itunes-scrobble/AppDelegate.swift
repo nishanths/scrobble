@@ -253,16 +253,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         
         let task = URLSession.shared.dataTask(with: API.scrobbleRequest(state.apiKey!, data)) {(data, rsp, err) in
             defer {
-                self.state.scrobbling = false
-                self.render()
+                DispatchQueue.main.async {
+                    self.state.scrobbling = false
+                    self.render()
+                }
             }
             
             guard err == nil else { return }
             guard let r = rsp as! HTTPURLResponse? else { return }
             
             if r.statusCode == 404 {
-                self.state.authError = true
-                self.render()
+                DispatchQueue.main.async {
+                    self.state.authError = true
+                    self.render()
+                }
                 return
             }
             
