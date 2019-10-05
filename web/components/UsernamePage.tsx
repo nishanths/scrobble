@@ -183,7 +183,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
         <SegmentedControl
           afterChange={this.onControlToggled.bind(this)}
           values={["All", "Loved"]}
-          initial={UsernamePage.controlValueForMode(this.state.mode)}
+          initialValue={UsernamePage.controlValueForMode(this.state.mode)}
         />
       </div>
       <div className="songs">

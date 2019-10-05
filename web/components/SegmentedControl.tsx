@@ -1,42 +1,39 @@
 import * as React from "react";
+import { useState } from "react";
 
 interface SegmentedControlProps {
   afterChange: (value: string) => void
-  initial: string
+  initialValue: string
   values: string[]
 }
 
 // TODO: this only properly supports two item controls in terms of styling.
-export class SegmentedControl extends React.Component<SegmentedControlProps, {selected: string}> {
-  constructor(props: SegmentedControlProps) {
-    super(props)
-    this.state = {
-      selected: this.props.initial
+export const SegmentedControl: React.FC<SegmentedControlProps> = ({
+  afterChange,
+  initialValue,
+  values,
+}) => {
+  const [selected, setSelected] = useState(initialValue);
+  const className = (selected: boolean, idx: number) => selected ? `c c${idx} selected` : `c c${idx}`
+  const onControlClick = (v: string) => {
+    const old = selected
+    setSelected(v)
+    if (v != old) {
+      afterChange(v)
     }
   }
 
-  private static className(selected: boolean, idx: number): string {
-    return selected ? `c c${idx} selected` : `c c${idx}`
-  }
+  return <div className="SegmentedControl">
+    {values.map((v, i) => {
+      return <Item key={v} className={className(selected === v, i)} onClick={() => onControlClick(v)} content={v}/>
+    })}
+  </div>
+}
 
-  private onControlClicked(v: string) {
-    let current = this.state.selected
-    this.setState({selected: v})
-    if (v != current) {
-      this.props.afterChange(v)
-    }
-  }
-
-  private items(): JSX.Element[] {
-    return this.props.values.map((v, i) => {
-      let selected = this.state.selected == v;
-      return <div key={v} className={SegmentedControl.className(selected, i)} onClick={ () => this.onControlClicked(v) }>{v}</div>
-    })
-  }
-
-  render() {
-    return <div className="SegmentedControl">
-      {this.items()}
-    </div>
-  }
+const Item: React.StatelessComponent<{content: string, className: string, onClick: () => void}> = ({
+  content,
+  className,
+  onClick,
+}) => {
+  return <div className={className} onClick={ () => { onClick() }}>{content}</div>
 }
