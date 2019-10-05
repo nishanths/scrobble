@@ -1,7 +1,7 @@
 import * as React from "react";
 import { UArgs, Song, trimPrefix, assertExhaustive, pathComponents } from "../src/shared"
 import { Header } from "./Header"
-import { SongCard } from "./SongCard"
+import { Songs } from "./Songs"
 import { SegmentedControl } from "./SegmentedControl"
 import "../scss/u.scss"
 
@@ -9,15 +9,6 @@ declare var NProgress: {
   start(): void
   done(): void
   configure(opts: {[k: string]: any}): void
-}
-
-class Songs extends React.Component<{songs: Song[], artworkBaseURL: string}, {}> {
-  render() {
-    let now = new Date()
-    return this.props.songs.map(s => {
-      return <SongCard key={s.ident} song={s} artworkBaseURL={this.props.artworkBaseURL} now={now}/>
-    })
-  }
 }
 
 type UsernamePageProps = UArgs
@@ -196,7 +187,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
         />
       </div>
       <div className="songs">
-        <Songs songs={this.songsForCurrentMode().slice(0, this.state.endIdx)} artworkBaseURL={this.props.artworkBaseURL}/>
+        <Songs songs={this.songsForCurrentMode().slice(0, this.state.endIdx)} artworkBaseURL={this.props.artworkBaseURL} now={new Date()}/>
       </div>
     </div>
   }
