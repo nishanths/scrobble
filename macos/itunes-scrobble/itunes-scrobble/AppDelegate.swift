@@ -97,7 +97,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         
         // initially fetch account info
         guard let key = state.apiKey else { return }
-        NSURLConnection.sendAsynchronousRequest(API.accountRequest(key), queue: OperationQueue.main) {(rsp, data, err) in
+        URLSession.shared.dataTask(with: API.accountRequest(key)) {(data, rsp, err) in
             guard err == nil else { return }
             guard let rr = rsp as! HTTPURLResponse? else { return }
             if (rr.statusCode == 200) {
@@ -225,7 +225,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
 
         guard let data = try? JSONEncoder().encode(items) else { return }
         
-        NSURLConnection.sendAsynchronousRequest(API.scrobbleRequest(state.apiKey!, data), queue: OperationQueue.main) {(rsp, data, err) in
+        URLSession.shared.dataTask(with: API.scrobbleRequest(state.apiKey!, data)) {(data, rsp, err) in
             defer {
                 self.state.scrobbling = false
                 self.render()
@@ -255,7 +255,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
     
     private func handleArtwork(_ lib: ITLibrary) {
         guard let key = state.apiKey else { return }
-        NSURLConnection.sendAsynchronousRequest(API.missingArtworkRequest(key), queue: OperationQueue.main) {(rsp, data, err) in
+        URLSession.shared.dataTask(with: API.missingArtworkRequest(key)) {(data, rsp, err) in
             if err != nil {
                 return
             }
@@ -285,7 +285,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                     guard let p = items[h] else { continue }
                     guard let d = p.artwork?.imageData else { continue }
                     guard let f = p.artwork?.imageDataFormat else { continue }
-                    NSURLConnection.sendAsynchronousRequest(API.artworkRequest(key, f, d), queue: OperationQueue.main) {(_, _, _) in}
+                    URLSession.shared.dataTask(with: API.artworkRequest(key, f, d)) {(_, _, _) in}
                 }
             }
         }
@@ -398,7 +398,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
             return
         }
         
-        NSURLConnection.sendAsynchronousRequest(API.accountRequest(key), queue: OperationQueue.main) {(rsp, data, err) in
+        URLSession.shared.dataTask(with: API.accountRequest(key)) {(data, rsp, err) in
             if err == nil {
                 if let rr = rsp as! HTTPURLResponse? {
                     if rr.statusCode == 200 {
