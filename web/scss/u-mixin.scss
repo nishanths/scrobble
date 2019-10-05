@@ -72,7 +72,7 @@
   }
 
   .pict {
-    cursor: zoom-in; // corresponds to detail view click handler
+    cursor: default; // corresponds to detail view click handler
     width: $songcard-dim;
     height: $songcard-dim;
     background-size: contain;
