@@ -24,6 +24,34 @@ enum Mode {
   All, Loved
 }
 
+const controlValues = ["All", "Loved"] as const
+
+const controlValueForMode = (m: Mode): typeof controlValues[number] => {
+  switch (m) {
+    case Mode.All: return "All"
+    case Mode.Loved: return "Loved"
+    default: throw assertExhaustive(m)
+  }
+}
+
+const modeFromControlValue = (v: typeof controlValues[number]): Mode => {
+  switch (v) {
+    case "All": return Mode.All
+    case "Loved": return Mode.Loved
+    default: throw assertExhaustive(v)
+  }
+}
+
+const songsForMode = (m: Mode, s: Song[]): Song[] => {
+  switch (m) {
+    case Mode.All:
+      return s
+    case Mode.Loved:
+      return s.filter(song => song.loved)
+  }
+  assertExhaustive(m)
+}
+
 // U is the root component for the username page, e.g.,
 // https://scrobble.allele.cc/u/whatever.
 export const U: React.FC<UProps> = ({
@@ -64,18 +92,6 @@ export const U: React.FC<UProps> = ({
     setEndIdx(scrobbles.error === false ? nextEndIdx(0, scrobbles.songs.length) : 0)
   }, [scrobbles])
 
-  const songsForCurrentMode = () => {
-    const songs = scrobblesRef.current.songs
-    const mode = modeRef.current
-    switch (mode) {
-      case Mode.All:
-        return songs
-      case Mode.Loved:
-        return songs.filter(s => s.loved)
-    }
-    assertExhaustive(mode)
-  }
-
   useEffect(() => {
     NProgress.configure({ showSpinner: false, minimum: 0.1, trickleSpeed: 25, speed: 500 })
   }, [])
@@ -88,7 +104,7 @@ export const U: React.FC<UProps> = ({
     const f = () => {
       const leeway = 250
       if ((wnd.innerHeight + wnd.pageYOffset) >= (wnd.document.body.offsetHeight - leeway)) {
-        const newEnd = nextEndIdx(endIdxRef.current, songsForCurrentMode().length)
+        const newEnd = nextEndIdx(endIdxRef.current, songsForMode(modeRef.current, scrobblesRef.current.songs).length)
         setEndIdx(Math.max(newEnd, endIdxRef.current))
       }
     }
@@ -130,14 +146,14 @@ export const U: React.FC<UProps> = ({
     {header}
     <div className="control">
       <SegmentedControl
-        afterChange={() => { }} // TODO
-        values={["All", "Loved"]}
-        initialValue={"All"} // TODO
+        afterChange={(v) => { setMode(modeFromControlValue(v)) }}
+        values={controlValues}
+        initialValue={controlValueForMode(mode)}
       />
     </div>
     <div className="songs">
       <Songs
-        songs={songsForCurrentMode().slice(0, endIdx)}
+        songs={songsForMode(mode, scrobbles.songs).slice(0, endIdx)}
         artworkBaseURL={artworkBaseURL}
         now={() => new Date()}
       />

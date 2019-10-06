@@ -1,18 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, ReactNode } from "react";
 import "../scss/segmented-control.scss";
 
-interface SegmentedControlProps {
-  afterChange: (value: string) => void
-  initialValue: string
-  values: string[]
+interface SegmentedControlProps<V extends readonly string[]> {
+  afterChange: (value: V[number]) => void
+  initialValue: V[number]
+  values: V
 }
 
 // TODO: this only properly supports two item controls in terms of styling.
-export const SegmentedControl: React.FC<SegmentedControlProps> = ({
-  afterChange,
-  initialValue,
-  values,
-}) => {
+// TODO: support for React.FC with generic props?
+
+export const SegmentedControl = <V extends readonly string[]>(props: (SegmentedControlProps<V> & { children?: ReactNode })) => {
+  const { afterChange, initialValue, values } = props;
   const [selected, setSelected] = useState(initialValue);
   const className = (selected: boolean, idx: number) => selected ? `c c${idx} selected` : `c c${idx}`
   const onControlClick = (v: string) => {
