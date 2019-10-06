@@ -1,10 +1,10 @@
 import React from "react";
 import thunk from 'redux-thunk'
 import * as ReactDOM from "react-dom";
-import { Router } from "react-router"
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom"
 import { createStore, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
-import { U } from "../components/Ux"
+import { U, Mode } from "../components/Ux"
 import { UArgs } from "../shared/types";
 import reducer from "../redux/reducers/u"
 
@@ -14,8 +14,12 @@ const store = createStore(reducer, { uargs }, applyMiddleware(thunk));
 
 ReactDOM.render(
   <Provider store={store}>
-    <Router history={}>
-      <U {...uargs} wnd={window} />
+    <Router>
+      <Switch>
+	      <Route exact path="/u/:username" render={p => <U {...uargs} wnd={window} mode={Mode.All} {...p} />} />
+	      <Route exact path="/u/:username/all" render={p => <U {...uargs} wnd={window} mode={Mode.All} {...p} />} />
+	      <Route exact path="/u/:username/loved" render={p => <U {...uargs} wnd={window} mode={Mode.Loved} {...p} />} />
+      </Switch>
     </Router>
   </Provider>,
   document.querySelector("#app")

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux";
+import { RouteComponentProps, Redirect } from "react-router-dom";
 import { UArgs, Song } from "../shared/types"
 import { trimPrefix, assertExhaustive, pathComponents } from "../shared/util"
 import { Header } from "./Header"
@@ -16,7 +17,7 @@ declare var NProgress: {
   configure(opts: { [k: string]: any }): void
 }
 
-enum Mode {
+export enum Mode {
   All, Loved
 }
 
@@ -50,34 +51,59 @@ const songsForMode = (m: Mode, s: Song[]): Song[] => {
   assertExhaustive(m)
 }
 
+const pathForMode = (m: Mode): string => {
+  switch (m) {
+    case Mode.All: return ""
+    case Mode.Loved: return "loved"
+  }
+  assertExhaustive(m)
+}
+
+const modeFromPath = (p: string): Mode => {
+  switch (p) {
+    case "":
+    case "all":
+      return Mode.All
+    case "loved":
+      return Mode.Loved
+    default:
+      return Mode.All
+  }
+}
+
 type UProps = UArgs & {
   wnd: Window
-}
+  mode: Mode
+} & RouteComponentProps;
 
 // U is the root component for the username page, e.g.,
 // https://scrobble.allele.cc/u/whatever.
 export const U: React.FC<UProps> = ({
-  wnd,
   host,
   artworkBaseURL,
   profileUsername,
   logoutURL,
   account,
   self,
+  wnd,
+  mode,
+  history,
 }) => {
   // Divisble by 2, 3, and 4. This is appropriate because these are the number
   // of cards typically displayed per row. Using such a number ensures that
   // the last row isn't an incomplete row.
   const MoreIncrement = 36;
-  const dispatch = useDispatch()
   const header = <Header username={profileUsername} signedIn={!!logoutURL} />;
-
+  const dispatch = useDispatch()
   const [endIdx, endIdxRef, setEndIdx] = useStateRef(0)
-  const [mode, modeRef, setMode] = useStateRef(Mode.All) // TODO: from URL
 
   const scrobbles = useSelector((s: State) => s.scrobbles)
   const scrobblesRef = useRef(scrobbles)
   useEffect(() => { scrobblesRef.current = scrobbles }, [scrobbles])
+
+  const onControlChange = (newMode: Mode): void => {
+    history.push("/u/" + profileUsername + "/" + pathForMode(newMode))
+  }
 
   const nextEndIdx = (currentEndIdx: number, totalSongs: number): number => {
     // increment, but don't go over the number of songs itself
@@ -87,7 +113,6 @@ export const U: React.FC<UProps> = ({
   }
 
   const initEnd = useRef(false)
-
   useEffect(() => {
     if (initEnd.current === true) { return }
     initEnd.current = false
@@ -106,7 +131,7 @@ export const U: React.FC<UProps> = ({
     const f = () => {
       const leeway = 250
       if ((wnd.innerHeight + wnd.pageYOffset) >= (wnd.document.body.offsetHeight - leeway)) {
-        const newEnd = nextEndIdx(endIdxRef.current, songsForMode(modeRef.current, scrobblesRef.current.songs).length)
+        const newEnd = nextEndIdx(endIdxRef.current, songsForMode(mode, scrobblesRef.current.songs).length)
         setEndIdx(Math.max(newEnd, endIdxRef.current))
       }
     }
@@ -115,6 +140,10 @@ export const U: React.FC<UProps> = ({
   }, [])
 
   // ... render ...
+
+  if (scrobbles.done === false) {
+    return <>{header}</>
+  }
 
   if (scrobbles.error === true) {
     return <>
@@ -148,7 +177,7 @@ export const U: React.FC<UProps> = ({
     {header}
     <div className="control">
       <SegmentedControl
-        afterChange={(v) => { setMode(modeFromControlValue(v)) }} // TODO: update URL
+        afterChange={(v) => { onControlChange(modeFromControlValue(v)) }}
         values={controlValues}
         initialValue={controlValueForMode(mode)}
       />
@@ -162,22 +191,3 @@ export const U: React.FC<UProps> = ({
     </div>
   </>
 }
-
-
-// private static modeFromURL(wnd: Window): Mode {
-//     let components = pathComponents(wnd.location.pathname)
-//     if (components.length < 3 || // /u/username,
-//       components[2] != "loved" // /u/username/song, /u/username/<gibberish>
-//     ) {
-//       return Mode.All
-//     }
-//     return Mode.Loved // /u/username/loved, /u/username/loved/song, /u/username/loved/<gibberish>
-//   }
-
-//   private static urlFromMode(m: Mode, username: string): string {
-//     switch (m) {
-//       case Mode.All: return "/u/" + username
-//       case Mode.Loved: return "/u/" + username + "/loved"
-//     }
-//     assertExhaustive(m)
-//   }

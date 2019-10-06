@@ -5,4 +5,5 @@ export type ScrobblesState = {
   songs: Song[]
   private: boolean
   error: boolean
+  done: boolean
 }
