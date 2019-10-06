@@ -1,39 +1,42 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Account } from "../shared/types"
 import "../scss/username.scss";
 
-export interface SetUsernameProps {
+interface SetUsernameProps {
   accountChange: (a: Account) => void
-  host: string
 }
 
-export class SetUsername extends React.Component<SetUsernameProps, { username: string, error: string }> {
-  private input: HTMLInputElement | null = null;
-  private static readonly usernameRe = /^[a-z0-9]*$/
+export const SetUsername: React.FC<SetUsernameProps> = ({
+  accountChange,
+}) => {
+  const initialMount = useRef(true)
+  const [username, setUsername] = useState("")
+  const [error, setError] = useState("")
+  let input: HTMLInputElement | null = null
 
-  constructor(props: SetUsernameProps) {
-    super(props)
-    this.state = {
-      username: "",
-      error: "",
-    }
+  useEffect(() => {
+    if (initialMount.current === false) { return }
+    initialMount.current = false
+    if (input !== null) { input.focus() }
+  })
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    initializeAccount(username)
   }
 
-  componentDidMount() {
-    this.input!.focus();
-  }
-
-  private initializeAccount(u: string) {
-    let { reason, ok } = SetUsername.validate(u)
+  const initializeAccount = (u: string): void => {
+    let { reason, ok } = validateUsername(u)
     if (!ok) {
-      this.setState({ error: reason })
+      setError(reason)
       return
     }
 
-    this.setState({ error: "" })
+    setError("")
     const genericError = "Something went wrong. Try again?"
-    let success = false;
 
+    // TODO: clean up the control flow
+    let success = false;
     fetch(`/initializeAccount?username=${u}`, { method: "POST" })
       .then(res => {
         if (res.status == 200) {
@@ -41,60 +44,51 @@ export class SetUsername extends React.Component<SetUsernameProps, { username: s
           return res.json()
         }
         if (res.status == 406) {
-          this.setState({ error: "The username is already taken" })
+          setError("The username is already taken")
           return res.text()
         }
-        this.setState({ error: genericError })
+        setError(genericError)
         return res.blob()
       })
       .then(r => {
         if (!success) { return }
-        this.props.accountChange(r as Account)
+        accountChange(r as Account)
       }, err => {
         console.error(err)
-        this.setState({ error: genericError })
+        setError(genericError)
       })
   }
 
-  private static validate(u: string): { reason: string, ok: boolean } {
-    if (!(u.length > 2)) {
-      return { reason: "Username must be at least 2 characters", ok: false }
-    }
-    if (!(u.length < 24)) {
-      return { reason: "Username must not be more than 24 characters", ok: false }
-    }
-    if (!SetUsername.usernameRe.test(u)) {
-      return { reason: "Username must contain only a-z and 0-9", ok: false }
-    }
-    if (u.indexOf("scrobble") != -1) {
-      return { reason: "Username cannot contain 'scrobble'", ok: false };
-    }
-    if (u == "username") {
-      return { reason: "Username cannot be 'username'", ok: false };
-    }
-    return { reason: "", ok: true }
-  }
+  return <>
+    <form onSubmit={(e) => { handleSubmit(e) }}>
+      <label>
+        Set your username:
+        <input type="text" value={username} onChange={() => { setUsername(input!.value) }}
+          ref={r => { input = r }}></input>
+      </label>
+      <input type="submit" value="OK" />
+      {error !== "" && <span className="error">{error}</span>}
+    </form>
+  </>
+}
 
-  private onChange() {
-    this.setState({ username: this.input!.value })
-  }
+const usernameRe = /^[a-z0-9]*$/
 
-  private handleSubmit(e: any) {
-    e.preventDefault()
-    this.initializeAccount(this.state.username)
+const validateUsername = (u: string): ({ reason: "", ok: true } | { reason: string, ok: false }) => {
+  if (!(u.length > 2)) {
+    return { reason: "Username must be at least 2 characters", ok: false }
   }
-
-  render() {
-    return <div>
-      <form onSubmit={this.handleSubmit.bind(this)}>
-        <label>
-          Set your username:
-          <input type="text" value={this.state.username} onChange={this.onChange.bind(this)}
-            ref={r => { this.input = r }}></input>
-        </label>
-        <input type="submit" value="OK" />
-        {this.state.error && <span className="error">{this.state.error}</span>}
-      </form>
-    </div>
+  if (!(u.length < 24)) {
+    return { reason: "Username must not be more than 24 characters", ok: false }
   }
+  if (!usernameRe.test(u)) {
+    return { reason: "Username must contain only a-z and 0-9", ok: false }
+  }
+  if (u.indexOf("scrobble") != -1) {
+    return { reason: "Username cannot contain 'scrobble'", ok: false }
+  }
+  if (u === "username") {
+    return { reason: "Username cannot be 'username'", ok: false }
+  }
+  return { reason: "", ok: true }
 }

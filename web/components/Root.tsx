@@ -1,7 +1,7 @@
 import React from "react";
 import { BootstrapArgs, Account } from "../shared/types";
-import { SetUsername, SetUsernameProps } from "./SetUsername";
-import { AccountDetail, AccountDetailProps } from "./AccountDetail";
+import { SetUsername } from "./SetUsername";
+import { AccountDetail } from "./AccountDetail";
 import "../scss/root.scss";
 
 const deleteMessage = `Deleting your account will remove your account and the list of scrobbled songs. Artwork you may have uploaded might not be removed, and your username can be reused.
@@ -80,7 +80,7 @@ export class Root extends React.Component<RootProps, { account: Account, deleteF
     return <div>
       <h1>{this.props.host}</h1>
       {this.props.email && !this.state.account.username &&
-        <SetUsername host={this.props.host} accountChange={this.updateAccount.bind(this)} />}
+        <SetUsername accountChange={this.updateAccount.bind(this)} />}
       {this.props.email && this.state.account.username &&
         <AccountDetail account={this.state.account} host={this.props.host} />}
       {this.signIn()}

@@ -2,7 +2,9 @@ import React from "react";
 import { Account } from "../shared/types"
 import "../scss/account"
 
-export interface AccountDetailProps {
+// TODO: refactor using hooks
+
+interface AccountDetailProps {
   account: Account
   host: string
 }

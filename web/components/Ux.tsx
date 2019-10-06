@@ -71,7 +71,7 @@ export const U: React.FC<UProps> = ({
     {header}
     <div className="control">
       <SegmentedControl
-        afterChange={() => {}} // TODO
+        afterChange={() => { }} // TODO
         values={["All", "Loved"]}
         initialValue={"All"} // TODO
       />
