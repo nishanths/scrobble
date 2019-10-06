@@ -1,4 +1,4 @@
-export function displayString(d: Date, now: Date): string {
+export function dateDisplay(d: Date, now: Date): string {
   let copy = new Date(now.getTime())
 
   // is it today?

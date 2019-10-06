@@ -1,19 +1,19 @@
-import * as React from "react";
-import { BootstrapArgs, Account } from "../src/shared";
-import { SetUsername, SetUsernameProps } from "./SetUsername";
-import { AccountDetail, AccountDetailProps } from "./AccountDetail";
-import "../scss/index.scss";
+import React from "react";
+import { BootstrapArgs, Account } from "../shared/types";
+import { SetUsername } from "./SetUsername";
+import { AccountDetail } from "./AccountDetail";
+import "../scss/root.scss";
 
 const deleteMessage = `Deleting your account will remove your account and the list of scrobbled songs. Artwork you may have uploaded might not be removed, and your username can be reused.
 
 Delete account?`
 
-type IndexPageProps = BootstrapArgs
+type RootProps = BootstrapArgs
 
-export class IndexPage extends React.Component<IndexPageProps, {account: Account, deleteFail: boolean}> {
+export class Root extends React.Component<RootProps, { account: Account, deleteFail: boolean }> {
   private static readonly downloadURL = "https://github.com/nishanths/scrobble/releases/latest"
 
-  constructor(props: IndexPageProps) {
+  constructor(props: RootProps) {
     super(props)
     this.state = {
       account: this.props.account,
@@ -22,11 +22,11 @@ export class IndexPage extends React.Component<IndexPageProps, {account: Account
   }
 
   updateAccount(a: Account) {
-    this.setState({account: a})
+    this.setState({ account: a })
   }
 
   private doDelete() {
-    fetch(`/api/v1/account/delete`, {method: "POST"})
+    fetch(`/api/v1/account/delete`, { method: "POST" })
       .then(
         r => {
           if (r.status == 200) {
@@ -34,16 +34,16 @@ export class IndexPage extends React.Component<IndexPageProps, {account: Account
             return
           }
           console.log("failed to delete: status=%d", r.status)
-          this.setState({deleteFail: true})
+          this.setState({ deleteFail: true })
         },
         err => {
           console.error(err)
-          this.setState({deleteFail: true})
+          this.setState({ deleteFail: true })
         }
       )
   }
 
-  private onDeleteAccountClick(e: MouseEvent) {
+  private onDeleteAccountClick(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
     e.preventDefault()
     let ok = confirm(deleteMessage)
     if (!ok) {
@@ -71,7 +71,7 @@ export class IndexPage extends React.Component<IndexPageProps, {account: Account
   }
 
   private download() {
-    return <p><a href={IndexPage.downloadURL}>Download</a> menu bar scrobble client for iTunes (macOS 10.14+)</p>
+    return <p><a href={Root.downloadURL}>Download</a> menu bar scrobble client for iTunes (macOS 10.14+)</p>
   }
 
   render() {
@@ -80,9 +80,9 @@ export class IndexPage extends React.Component<IndexPageProps, {account: Account
     return <div>
       <h1>{this.props.host}</h1>
       {this.props.email && !this.state.account.username &&
-        <SetUsername host={this.props.host} accountChange={this.updateAccount.bind(this)}/>}
+        <SetUsername accountChange={this.updateAccount.bind(this)} />}
       {this.props.email && this.state.account.username &&
-        <AccountDetail account={this.state.account} host={this.props.host}/>}
+        <AccountDetail account={this.state.account} host={this.props.host} />}
       {this.signIn()}
       {this.state.account.username ? this.profile() : this.visit()}
 

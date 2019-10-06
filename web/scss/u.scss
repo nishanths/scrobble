@@ -3,14 +3,13 @@
 @import "common.scss";
 @import "vars.scss";
 @import "u-mixin.scss";
-@import "segmentedcontrol.scss";
 
 $dim: 250px;
 $bb: 105px;
 $fa: 2px;
 
 body {
-  font-family: proxima-nova, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, proxima-nova, sans-serif;
   margin: $body-margin-w;
 }
 

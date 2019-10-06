@@ -10,7 +10,7 @@ import (
 	"google.golang.org/appengine/log"
 )
 
-const devSignedInUsername = "devuser2"
+const devSignedInUsername = "devuser"
 
 var devFakeAccount = Account{
 	Username: devSignedInUsername,
@@ -21,7 +21,7 @@ var devFakeAccount = Account{
 func devRootHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 
-	a := IndexArgs{
+	a := RootArgs{
 		Title: "Dev Scrobble",
 		Bootstrap: BootstrapArgs{
 			Host:      r.Host,
@@ -31,13 +31,13 @@ func devRootHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	if err := indexTmpl.Execute(w, a); err != nil {
+	if err := rootTmpl.Execute(w, a); err != nil {
 		log.Errorf(ctx, "failed to execute template: %v", err.Error())
 	}
 }
 
 func devUHandler(w http.ResponseWriter, r *http.Request) {
-	const profileUsername = "devuser"
+	const profileUsername = devSignedInUsername
 	const bucketName = "selective-scrobble.appspot.com"
 
 	ctx := appengine.NewContext(r)

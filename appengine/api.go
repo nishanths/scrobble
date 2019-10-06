@@ -118,6 +118,11 @@ func songKey(ns context.Context, ident string, parent *datastore.Key) *datastore
 	return datastore.NewKey(ns, KindSong, ident, 0, parent)
 }
 
+type SongResponse struct {
+	Song
+	Ident string `json:"ident"`
+}
+
 const headerAPIKey = "X-Scrobble-API-Key"
 
 func accountHandler(w http.ResponseWriter, r *http.Request) {
@@ -232,7 +237,7 @@ func scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate, private")
 
-	writeSuccessRsp := func(s []Song) {
+	writeSuccessRsp := func(s []SongResponse) {
 		w.Header().Set("Content-Type", "application/json")
 		if err := json.NewEncoder(w).Encode(s); err != nil {
 			log.Errorf(ctx, "failed to write response: %v", err.Error())
@@ -246,6 +251,14 @@ func scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 
 	username := r.FormValue("username")
 	if username == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	lovedOnly := r.FormValue("loved") == "true"
+	songIdent := r.FormValue("song")
+
+	if songIdent != "" && lovedOnly {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -278,31 +291,52 @@ func scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	if len(parentKeys) == 0 {
 		// no songs, respond with empty JSON array
-		writeSuccessRsp(make([]Song, 0))
+		writeSuccessRsp(make([]SongResponse, 0))
 		return
 	}
 
-	// Get the songs.
-	q = datastore.NewQuery(KindSong).
-		Order("-LastPlayed").
-		Ancestor(parentKeys[0])
+	if songIdent != "" {
+		// Get song by ident.
+		key := songKey(ns, songIdent, parentKeys[0])
+		var s SongResponse
+		if err := datastore.Get(ns, key, &s); err != nil {
+			log.Errorf(ns, "failed to fetch song %s: %v", key, err.Error())
+			if err == datastore.ErrNoSuchEntity {
+				w.WriteHeader(http.StatusNotFound)
+			} else {
+				w.WriteHeader(http.StatusInternalServerError)
+			}
+			return
+		}
+		s.Ident = key.StringID()
+		writeSuccessRsp([]SongResponse{s})
+	} else {
+		// Get all songs.
+		q = datastore.NewQuery(KindSong).
+			Order("-LastPlayed").
+			Ancestor(parentKeys[0])
 
-	lovedOnly := r.FormValue("loved") == "true"
-	if lovedOnly {
-		q = q.Filter("Loved=", true)
-	}
+		if lovedOnly {
+			q = q.Filter("Loved=", true)
+		}
 
-	songs := make([]Song, 0) // to marshal as empty JSON array instead of null when there are 0 songs
-	if _, err := q.GetAll(ns, &songs); err != nil {
-		log.Errorf(ns, "failed to fetch songs: %v", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		songs := make([]SongResponse, 0) // use "make" to marshal as empty JSON array instead of null when there are 0 songs
+		keys, err := q.GetAll(ns, &songs)
+		if err != nil {
+			log.Errorf(ns, "failed to fetch songs: %v", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		for i := range songs {
+			songs[i].Ident = keys[i].StringID()
+		}
+		writeSuccessRsp(songs)
 	}
-	writeSuccessRsp(songs)
 }
 
 func canViewScrobbled(ctx context.Context, forAccountID string, u *user.User, h http.Header) bool {
 	if u != nil && u.Email == forAccountID {
+		// a logged in user can view their own account's scrobbles
 		return true
 	}
 

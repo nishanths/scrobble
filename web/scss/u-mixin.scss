@@ -33,18 +33,25 @@
   $transition-enter-duration: 180ms;
   $transition-exit-duration: 300ms;
 
+  $icon-dim: 9px;
+
   a {
     text-decoration: none;
     color: transparent;
   }
 
   .scaleArea {
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
     &:hover {
       .pict {
         transform: scale(1.10);
         transition: $transition-enter-duration $transition-enter-func transform, $transition-enter-duration $transition-enter-func box-shadow;
-        box-shadow:0 1px 4px rgba(0, 0, 0, 0.2), 0 0 40px rgba(0, 0, 0, 0.2) inset;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2), 0 0 40px rgba(0, 0, 0, 0.2) inset;
+        .trackLinkArea {
+          .trackLink {
+            transition: $transition-enter-duration $transition-enter-func opacity;
+            opacity: 1; // NOTE: set to 1 to add track link circles
+          }
+        }
       }
       .meta {
         .title {
@@ -65,13 +72,36 @@
   }
 
   .pict {
+    cursor: default; // corresponds to detail view click handler
     width: $songcard-dim;
     height: $songcard-dim;
     background-size: contain;
     border-radius: 4px;
     border: 1px solid #e5e5e5;
     transition: $transition-exit-duration $transition-exit-func transform, $transition-exit-duration $transition-exit-func box-shadow;
-    box-shadow:0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.1) inset;
+
+    .trackLinkArea {
+      -webkit-tap-highlight-color: rgba(0,0,0,0);
+      height: $icon-dim * 3.2;
+      width: $icon-dim * 3.2;
+      margin-left: auto;
+      margin-right: 0;
+      position: relative;
+      // background-color: red; // uncomment for debugging
+
+      .trackLink {
+        position: absolute;
+        height: $icon-dim * 1.2;
+        width: $icon-dim * 1.2;
+        border-radius: 50%;
+        right: 8px;
+        top: 8px;
+        box-shadow: inset 0px 0px 40px 40px rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        transition: $transition-exit-duration $transition-exit-func opacity;
+      }
+    }
   }
 
   .meta {
@@ -100,8 +130,8 @@
       background-image: url(/static/img/ios10-apple-music-love-icon.png);
       background-repeat: no-repeat;
       background-size: cover;
-      height: 9px;
-      width: 9px;
+      height: $icon-dim;
+      width: $icon-dim;
       position: absolute;
       right: 0;
       box-shadow: -4px 0px 0px 0px white;
