@@ -37,7 +37,7 @@ func devRootHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func devUHandler(w http.ResponseWriter, r *http.Request) {
-	const profileUsername = "devuser"
+	const profileUsername = devSignedInUsername
 	const bucketName = "selective-scrobble.appspot.com"
 
 	ctx := appengine.NewContext(r)
