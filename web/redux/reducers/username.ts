@@ -1,14 +1,14 @@
 import { combineReducers } from "redux"
-import { songsReducer } from "./songs"
+import { scrobblesReducer } from "./scrobbles"
 import { UArgs } from "../../shared/types"
 
-export type State = {
-  songs: ReturnType<typeof songsReducer>
+export type AppState = {
+  scrobbles: ReturnType<typeof scrobblesReducer>
   uargs: UArgs
 }
 
-export default combineReducers<State>({
-  songs: songsReducer,
+const appReducer = combineReducers({
+  scrobbles: scrobblesReducer,
 
   // TODO: is there a better way to specify a no-op reducer for the read-only
   // preloadedState property uargs?
@@ -25,3 +25,5 @@ export default combineReducers<State>({
     },
   }),
 })
+
+export default appReducer
