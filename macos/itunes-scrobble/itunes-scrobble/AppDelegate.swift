@@ -9,19 +9,16 @@
 import Cocoa
 import iTunesLibrary
 
-// Notes
-// -----
-//
-// Using URLSession fails with "HTTP load failed (error code: 100 ...",
-// presumably because the app is unsigned? No amount of Info.plist and
-// itunes_scrobble.entitlements hacking fixes it. Hence the use of
-// the deprecated NSURLConnection.sendAsynchronousRequest.
+enum ErrorKind {
+    case Auth
+    case Other
+}
 
 // State is the state of the application.
 //
 // TODO: there's plenty of concurrent accesses of these vars,
 // but for the most part the asynchronous functions performing the
-// concurrent run far apart in time from each other.
+// concurrent accesses run far apart in time from each other.
 struct State {
     // whether scrobbling is running or paused
     var running: Bool
@@ -36,8 +33,8 @@ struct State {
     var account: API.Account?
     // whether there is a scrobble request inflight
     var scrobbling: Bool
-    // whether the latest request resulted in an auth error
-    var authError: Bool
+    // whether the latest request resulted in an error
+    var error: ErrorKind?
     
     // NOTE: when adding a new field, you may also need to handle its reset
     // behavior in clearAPIKey()
@@ -81,7 +78,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                               latestPlayed: nil,
                               account: nil,
                               scrobbling: false,
-                              authError: false)
+                              error: nil)
     
     private var lib: ITLibrary? = nil
     
@@ -107,17 +104,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         // initially fetch account info
         guard let key = state.apiKey else { return }
         let task = URLSession.shared.dataTask(with: API.accountRequest(key)) {(data, rsp, err) in
+            // TODO: handling of failure scenarios
             guard err == nil else { return }
             guard let rr = rsp as! HTTPURLResponse? else { return }
             if (rr.statusCode == 200) {
                 DispatchQueue.main.async {
                     let account = try? JSONDecoder().decode(API.Account.self, from: data!)
                     self.state.account = account
+                    self.state.error = nil
                     self.render()
                 }
             } else if rr.statusCode == 404 {
                 DispatchQueue.main.async {
-                    self.state.authError = true
+                    self.state.error = .Auth
                     self.render()
                 }
                 return
@@ -155,7 +154,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
     private func render() {
         defer { prevState = state }
         
-        profileLinkItem.title = "Browse your scrobbles..."
+        profileLinkItem.title = "Browse your scrobbles"
         profileLinkItem.action = #selector(openProfile(_:))
         
         // TODO: clean this up, gosh it's gnarly
@@ -170,17 +169,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                 multiItem.title = String(format: "Signed in as %@...", a.username)
                 multiItem.action = #selector(scrobblingAsAction(_:))
                 profileLinkItem.isHidden = false
-            } else {
-                if state.authError {
-                    // If it's an auth error, clicking clear should prompt
-                    // entering a new key
+            } else if let err = state.error {
+                switch err {
+                case .Auth:
                     multiItem.title = String(format: "Re-enter API Key")
                     multiItem.action = #selector(clearThenEnterAPIKeyAction(_:))
-                } else {
-                    multiItem.title = String(format: "Remove API Key & Sign Out")
+                case .Other:
+                    multiItem.title = String(format: "Remove API Key and Sign out")
                     multiItem.action = #selector(clearAPIKeyAction(_:))
                 }
-                profileLinkItem.isHidden = false
+                profileLinkItem.isHidden = true
             }
             if (state.running) {
                 pauseItem.title = "Pause scrobbling"
@@ -193,8 +191,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         }
         
         // Status item
-        if state.authError {
-            statusItem.title = "Failed to scrobble: API Key outdated?"
+        if let err = state.error {
+            switch err {
+            case .Auth:
+                statusItem.title = "Error: API Key outdated?"
+            case .Other:
+                statusItem.title = "Error: Failed to scrobble"
+            }
             statusItem.isHidden = false
         } else if state.scrobbling {
             statusItem.title = String(format: "Scrobbling now...")
@@ -209,7 +212,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         }
         
         // Secondary status item
-        if state.authError || state.scrobbling {
+        if state.error != nil || state.scrobbling {
             secondaryStatusItem.isHidden = true
         } else {
             if let lp = state.latestPlayed {
@@ -264,7 +267,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
             
             if r.statusCode == 404 {
                 DispatchQueue.main.async {
-                    self.state.authError = true
+                    self.state.error = .Auth
                     self.render()
                 }
                 return
@@ -274,11 +277,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                 DispatchQueue.main.async {
                     self.state.lastScrobbled = Date(timeIntervalSinceNow: 0)
                     self.state.latestPlayed = latest
-                    self.state.authError = false
+                    self.state.error = nil
                     self.render()
                 }
                 self.handleArtwork(self.lib!)
                 return
+            }
+            // any other status code
+            DispatchQueue.main.async {
+                self.state.error = .Other
+                self.render()
             }
         }
         task.resume()
@@ -330,7 +338,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         state.latestPlayed = nil
         state.account = nil
         state.scrobbling = false
-        state.authError = false
+        state.error = nil // TODO: need better discrimination errors; it doesn't feel right to unconditionally clear this
         UserDefaults.standard.set(state.running, forKey: AppDelegate.keyRunning)
         UserDefaults.standard.set(state.apiKey, forKey: AppDelegate.keyAPIKey)
         render()
@@ -372,7 +380,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         a.showsHelp = true
         a.delegate = self
         a.addButton(withTitle: "Close")
-        a.addButton(withTitle: "Remove API Key & Sign Out")
+        a.addButton(withTitle: "Remove API Key and Sign out")
         
         let result = a.runModal()
         switch result {
@@ -449,6 +457,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                             self.state.lastScrobbled = nil
                             self.state.latestPlayed = nil
                             self.state.account = account
+                            self.state.error = nil
                             UserDefaults.standard.set(self.state.running, forKey: AppDelegate.keyRunning)
                             UserDefaults.standard.set(self.state.apiKey, forKey: AppDelegate.keyAPIKey)
                             self.render()
@@ -460,6 +469,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                             self.alert!.informativeText = String(format: "Invalid API Key.")
                         }
                         return
+                    }
+                    // any other status code
+                    DispatchQueue.main.async {
+                        self.alert!.informativeText = String(format: "Something went wrong but not on your end.")
                     }
                 }
             }
