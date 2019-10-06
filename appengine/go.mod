@@ -9,3 +9,5 @@ require (
 	google.golang.org/api v0.4.0
 	google.golang.org/appengine v1.4.0
 )
+
+go 1.13

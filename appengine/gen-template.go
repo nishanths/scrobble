@@ -85,7 +85,7 @@ func appengineTemplateFsSnippetTmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "appengine/template/fs-snippet.tmpl", size: 1124, mode: os.FileMode(420), modTime: time.Unix(1570386781, 0)}
+	info := bindataFileInfo{name: "appengine/template/fs-snippet.tmpl", size: 1124, mode: os.FileMode(420), modTime: time.Unix(1570400762, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -105,7 +105,7 @@ func appengineTemplateRootTmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "appengine/template/root.tmpl", size: 370, mode: os.FileMode(420), modTime: time.Unix(1570323077, 0)}
+	info := bindataFileInfo{name: "appengine/template/root.tmpl", size: 370, mode: os.FileMode(420), modTime: time.Unix(1570400762, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
