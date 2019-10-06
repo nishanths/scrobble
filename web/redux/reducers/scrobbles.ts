@@ -3,7 +3,7 @@ import { ScrobblesState } from "../types/scrobbles"
 
 const defaultState: ScrobblesState = {
   fetching: false,
-  songs: null,
+  songs: [],
   private: false,
   error: false,
 }

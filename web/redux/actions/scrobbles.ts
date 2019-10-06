@@ -37,6 +37,7 @@ export const scrobblesFail = (err: any) => {
 
 export const fetchScrobbles = (username: string): ScrobblesThunkAction<void> => {
   return async (dispatch: ScrobblesThunkDispatch, _: () => PartialState) => {
+    dispatch(scrobblesStart(username))
     try {
       const result = await _fetchScrobbles(username)
       dispatch(scrobblesSuccess(username, result.songs, result.private))

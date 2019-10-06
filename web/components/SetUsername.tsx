@@ -1,14 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Account } from "../shared/types"
-import "../scss/username.scss";
+import "../scss/set-username.scss";
 
 interface SetUsernameProps {
   accountChange: (a: Account) => void
 }
 
-export const SetUsername: React.FC<SetUsernameProps> = ({
-  accountChange,
-}) => {
+export const SetUsername: React.FC<SetUsernameProps> = ({ accountChange }) => {
   const initialMount = useRef(true)
   const [username, setUsername] = useState("")
   const [error, setError] = useState("")

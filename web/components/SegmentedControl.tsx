@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "../scss/segmented-control.scss";
 
 interface SegmentedControlProps {
   afterChange: (value: string) => void

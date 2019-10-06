@@ -56,10 +56,6 @@ export const U: React.FC<UProps> = ({
     </>
   }
 
-  if (scrobbles.songs === null) {
-    return <>{header}</>
-  }
-
   if (scrobbles.songs.length === 0) {
     return <>
       {header}
