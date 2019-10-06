@@ -6,6 +6,6 @@ import { BootstrapArgs } from "../shared/types";
 declare var bootstrap: BootstrapArgs;
 
 ReactDOM.render(
-  <IndexPage {...bootstrap}/>,
+  <IndexPage {...bootstrap} />,
   document.querySelector("#app")
 );

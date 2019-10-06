@@ -18,7 +18,7 @@ interface AccountDetailState {
 export class AccountDetail extends React.Component<AccountDetailProps, AccountDetailState> {
   private privacyCheckbox: HTMLInputElement | null = null;
   private generating = false // inflight request to generate API key?
-  private savedTimeout: number|undefined = undefined;
+  private savedTimeout: number | undefined = undefined;
 
   constructor(props: AccountDetailProps) {
     super(props)
@@ -32,30 +32,30 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
   }
 
   private newAPIKey() {
-    this.setState({keyGenerateErr: ""})
+    this.setState({ keyGenerateErr: "" })
     this.generating = true
     let success = false
 
     const genericErr = "Failed to generate API Key. Try again?"
 
-    fetch(`/newAPIKey`, {method: "POST"})
+    fetch(`/newAPIKey`, { method: "POST" })
       .then(res => {
         if (res.status == 200) {
           success = true
           return res.json()
         }
         console.log("failed to generate API key: status=%d", res.status)
-        this.setState({keyGenerateErr: genericErr})
+        this.setState({ keyGenerateErr: genericErr })
         return res.blob()
       })
       .then(
         r => {
           if (!success) { return }
-          this.setState({apiKey: r as string})
+          this.setState({ apiKey: r as string })
         },
         err => {
           console.error(err)
-          this.setState({keyGenerateErr: genericErr})
+          this.setState({ keyGenerateErr: genericErr })
         }
       ).then(() => { // TODO: finally() would be nicer
         this.generating = false
@@ -63,17 +63,17 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
   }
 
   private setPrivacy(v: boolean) {
-    this.setState({showPrivacySaved: false, privacyFail: false})
+    this.setState({ showPrivacySaved: false, privacyFail: false })
     let success = false
 
-    fetch(`/setPrivacy?privacy=${v.toString()}`, {method: "POST"})
+    fetch(`/setPrivacy?privacy=${v.toString()}`, { method: "POST" })
       .then(
         r => {
           if (r.status == 200) {
             window.clearTimeout(this.savedTimeout)
-            this.setState({showPrivacySaved: true})
+            this.setState({ showPrivacySaved: true })
             this.savedTimeout = window.setTimeout(() => {
-              this.setState({showPrivacySaved: false})
+              this.setState({ showPrivacySaved: false })
             }, 1000)
           } else {
             console.log("failed to update privacy: status=%d", r.status)
@@ -101,12 +101,12 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
 
   private onPrivacyClick(e: React.MouseEvent<HTMLInputElement, MouseEvent>) {
     let v = this.privacyCheckbox!.checked
-    this.setState({private: v})
+    this.setState({ private: v })
     this.setPrivacy(v)
   }
 
   render() {
-    let errClass = (b: string|boolean) => b ? "error" : "error hidden"
+    let errClass = (b: string | boolean) => b ? "error" : "error hidden"
     let savedClass = (b: boolean) => this.state.showPrivacySaved ? "success" : "success hidden"
 
     return <div className="account">
@@ -122,7 +122,7 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
           <tr>
             <td>Private:</td>
             <td>
-              <input type="checkbox" defaultChecked={this.state.private} onClick={this.onPrivacyClick.bind(this)} ref={r => {this.privacyCheckbox = r}}/>
+              <input type="checkbox" defaultChecked={this.state.private} onClick={this.onPrivacyClick.bind(this)} ref={r => { this.privacyCheckbox = r }} />
             </td>
             <td className={savedClass(this.state.showPrivacySaved)}>Saved</td>
             <td></td>

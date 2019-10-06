@@ -15,7 +15,7 @@ export const SongCard: React.StatelessComponent<SongCardProps> = ({
   now
 }) => {
   const initialMount = useRef(true);
-  let trackLinkAreaElem: HTMLDivElement|null = null
+  let trackLinkAreaElem: HTMLDivElement | null = null
 
   useEffect(() => {
     if (initialMount.current === false) { return }
@@ -44,7 +44,7 @@ export const SongCard: React.StatelessComponent<SongCardProps> = ({
   })()
 
   const pict = (() => {
-    const imgStyles = artworkURL ? {backgroundImage: `url(${artworkURL})`} : {backgroundColor: "#fff"}
+    const imgStyles = artworkURL ? { backgroundImage: `url(${artworkURL})` } : { backgroundColor: "#fff" }
     return <div className="pict" style={imgStyles}>{song.trackViewURL && trackLinkArea}</div>
   })()
 

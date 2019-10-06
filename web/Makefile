@@ -1,4 +1,5 @@
-WEBPACK := node_modules/.bin/webpack-cli
+WEBPACK := npx webpack-cli
+TSFMT := npx tsfmt
 
 default:
 	@echo "the default target does nothing!"
@@ -15,5 +16,9 @@ dist:
 clean:
 	rm -rf dist
 
-.PHONY: bootstrap
-	npm i
+.PHONY: fmt
+fmt:
+	find . -type f \( -name '*.ts' -o -name '*.tsx' \) \
+		! -name '*.d.ts' \
+		! -regex '.*/node_modules/.*' | \
+		xargs $(TSFMT) --replace --

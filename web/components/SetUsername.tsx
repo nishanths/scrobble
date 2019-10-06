@@ -7,8 +7,8 @@ export interface SetUsernameProps {
   host: string
 }
 
-export class SetUsername extends React.Component<SetUsernameProps, {username: string, error: string}> {
-  private input: HTMLInputElement|null = null;
+export class SetUsername extends React.Component<SetUsernameProps, { username: string, error: string }> {
+  private input: HTMLInputElement | null = null;
   private static readonly usernameRe = /^[a-z0-9]*$/
 
   constructor(props: SetUsernameProps) {
@@ -24,27 +24,27 @@ export class SetUsername extends React.Component<SetUsernameProps, {username: st
   }
 
   private initializeAccount(u: string) {
-     let {reason, ok} = SetUsername.validate(u)
-     if (!ok) {
-       this.setState({error: reason})
-       return
-     }
+    let { reason, ok } = SetUsername.validate(u)
+    if (!ok) {
+      this.setState({ error: reason })
+      return
+    }
 
-    this.setState({error: ""})
+    this.setState({ error: "" })
     const genericError = "Something went wrong. Try again?"
     let success = false;
 
-    fetch(`/initializeAccount?username=${u}`, {method: "POST"})
+    fetch(`/initializeAccount?username=${u}`, { method: "POST" })
       .then(res => {
         if (res.status == 200) {
           success = true
           return res.json()
         }
         if (res.status == 406) {
-          this.setState({error: "The username is already taken"})
+          this.setState({ error: "The username is already taken" })
           return res.text()
         }
-        this.setState({error: genericError})
+        this.setState({ error: genericError })
         return res.blob()
       })
       .then(r => {
@@ -52,31 +52,31 @@ export class SetUsername extends React.Component<SetUsernameProps, {username: st
         this.props.accountChange(r as Account)
       }, err => {
         console.error(err)
-        this.setState({error: genericError})
+        this.setState({ error: genericError })
       })
   }
 
-  private static validate(u: string): {reason: string, ok: boolean} {
+  private static validate(u: string): { reason: string, ok: boolean } {
     if (!(u.length > 2)) {
-      return {reason: "Username must be at least 2 characters", ok: false}
+      return { reason: "Username must be at least 2 characters", ok: false }
     }
     if (!(u.length < 24)) {
-      return {reason: "Username must not be more than 24 characters", ok: false}
+      return { reason: "Username must not be more than 24 characters", ok: false }
     }
     if (!SetUsername.usernameRe.test(u)) {
-      return {reason: "Username must contain only a-z and 0-9", ok: false}
+      return { reason: "Username must contain only a-z and 0-9", ok: false }
     }
     if (u.indexOf("scrobble") != -1) {
-      return {reason: "Username cannot contain 'scrobble'", ok: false};
+      return { reason: "Username cannot contain 'scrobble'", ok: false };
     }
     if (u == "username") {
-      return {reason: "Username cannot be 'username'", ok: false};
+      return { reason: "Username cannot be 'username'", ok: false };
     }
-    return {reason: "", ok: true}
+    return { reason: "", ok: true }
   }
 
   private onChange() {
-    this.setState({username: this.input!.value})
+    this.setState({ username: this.input!.value })
   }
 
   private handleSubmit(e: any) {

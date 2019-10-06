@@ -1,17 +1,15 @@
 import * as React from "react";
-import { useSelector } from "react-redux"
 import { UArgs, Song } from "../shared/types"
 import { trimPrefix, assertExhaustive, pathComponents } from "../shared/util"
 import { Header } from "./Header"
 import { Songs } from "./Songs"
 import { SegmentedControl } from "./SegmentedControl"
-import { State } from "../redux/reducers/username"
 import "../scss/u.scss"
 
 declare var NProgress: {
   start(): void
   done(): void
-  configure(opts: {[k: string]: any}): void
+  configure(opts: { [k: string]: any }): void
 }
 
 type UsernamePageProps = UArgs
@@ -32,7 +30,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
   private static modeFromURL(wnd: Window): Mode {
     let components = pathComponents(wnd.location.pathname)
     if (components.length < 3 || // /u/username,
-        components[2] != "loved" // /u/username/song, /u/username/<gibberish>
+      components[2] != "loved" // /u/username/song, /u/username/<gibberish>
     ) {
       return Mode.All
     }
@@ -41,7 +39,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
 
   private static urlFromMode(m: Mode, username: string): string {
     switch (m) {
-      case Mode.All:   return "/u/" + username
+      case Mode.All: return "/u/" + username
       case Mode.Loved: return "/u/" + username + "/loved"
     }
     assertExhaustive(m)
@@ -59,9 +57,9 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
 
   private static modeFromControlValue(v: string): Mode {
     switch (v) {
-      case "All":   return Mode.All
+      case "All": return Mode.All
       case "Loved": return Mode.Loved
-      default:      return Mode.All // fallback
+      default: return Mode.All // fallback
     }
   }
 
@@ -118,11 +116,11 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
       .then(r => {
         if (r.status == 200) {
           success = true
-          this.setState({private: false})
+          this.setState({ private: false })
           return r.json()
         }
         if (r.status == 404) {
-          this.setState({fetched: true, private: true})
+          this.setState({ fetched: true, private: true })
           return
         }
       }).then(r => {
@@ -139,13 +137,13 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
   }
 
   private header() {
-    return <Header username={this.props.profileUsername} signedIn={!!this.props.logoutURL}/>
+    return <Header username={this.props.profileUsername} signedIn={!!this.props.logoutURL} />
   }
 
   private showMore() {
     this.setState(s => {
       let newEndIdx = UsernamePage.determineNextEndIdx(s.endIdx, this.songsForCurrentMode().length)
-      return {endIdx: Math.max(newEndIdx, s.endIdx)}
+      return { endIdx: Math.max(newEndIdx, s.endIdx) }
     })
   }
 

@@ -1,13 +1,27 @@
 import { combineReducers } from "redux"
-import { songs } from "./songs"
-import { SongsState, UArgs } from "../../shared/types"
+import { songsReducer } from "./songs"
+import { UArgs } from "../../shared/types"
 
 export type State = {
-	songs: SongsState
-	uargs: UArgs
+  songs: ReturnType<typeof songsReducer>
+  uargs: UArgs
 }
 
 export default combineReducers<State>({
-	songs,
-	uargs: () => ({}), // any non-null value will do
+  songs: songsReducer,
+
+  // TODO: is there a better way to specify a no-op reducer for the read-only
+  // preloadedState property uargs?
+  uargs: (s: UArgs | undefined): UArgs => (s !== undefined ? s : {
+    artworkBaseURL: "",
+    host: "",
+    self: false,
+    profileUsername: "",
+    logoutURL: "",
+    account: {
+      apiKey: "",
+      username: "",
+      private: false,
+    },
+  }),
 })

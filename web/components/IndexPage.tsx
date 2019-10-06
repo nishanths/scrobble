@@ -10,7 +10,7 @@ Delete account?`
 
 type IndexPageProps = BootstrapArgs
 
-export class IndexPage extends React.Component<IndexPageProps, {account: Account, deleteFail: boolean}> {
+export class IndexPage extends React.Component<IndexPageProps, { account: Account, deleteFail: boolean }> {
   private static readonly downloadURL = "https://github.com/nishanths/scrobble/releases/latest"
 
   constructor(props: IndexPageProps) {
@@ -22,11 +22,11 @@ export class IndexPage extends React.Component<IndexPageProps, {account: Account
   }
 
   updateAccount(a: Account) {
-    this.setState({account: a})
+    this.setState({ account: a })
   }
 
   private doDelete() {
-    fetch(`/api/v1/account/delete`, {method: "POST"})
+    fetch(`/api/v1/account/delete`, { method: "POST" })
       .then(
         r => {
           if (r.status == 200) {
@@ -34,11 +34,11 @@ export class IndexPage extends React.Component<IndexPageProps, {account: Account
             return
           }
           console.log("failed to delete: status=%d", r.status)
-          this.setState({deleteFail: true})
+          this.setState({ deleteFail: true })
         },
         err => {
           console.error(err)
-          this.setState({deleteFail: true})
+          this.setState({ deleteFail: true })
         }
       )
   }
@@ -80,9 +80,9 @@ export class IndexPage extends React.Component<IndexPageProps, {account: Account
     return <div>
       <h1>{this.props.host}</h1>
       {this.props.email && !this.state.account.username &&
-        <SetUsername host={this.props.host} accountChange={this.updateAccount.bind(this)}/>}
+        <SetUsername host={this.props.host} accountChange={this.updateAccount.bind(this)} />}
       {this.props.email && this.state.account.username &&
-        <AccountDetail account={this.state.account} host={this.props.host}/>}
+        <AccountDetail account={this.state.account} host={this.props.host} />}
       {this.signIn()}
       {this.state.account.username ? this.profile() : this.visit()}
 
