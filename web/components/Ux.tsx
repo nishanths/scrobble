@@ -6,7 +6,6 @@ import { Header } from "./Header"
 import { Songs } from "./Songs"
 import { SegmentedControl } from "./SegmentedControl"
 import { State } from "../redux/reducers/u"
-import { scrobblesRequest } from "../redux/actions/scrobbles"
 import "../scss/u.scss"
 
 declare var NProgress: {
@@ -42,7 +41,7 @@ export const U: React.FC<UProps> = ({
   const dispatch = useDispatch()
 
   useEffect(() => {
-    dispatch(scrobblesRequest(profileUsername))
+    // dispatch(scrobblesRequest(profileUsername))
   })
 
   useSelector((s: State) => {

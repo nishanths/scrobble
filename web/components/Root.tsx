@@ -2,7 +2,7 @@ import React from "react";
 import { BootstrapArgs, Account } from "../shared/types";
 import { SetUsername, SetUsernameProps } from "./SetUsername";
 import { AccountDetail, AccountDetailProps } from "./AccountDetail";
-import "../scss/index.scss";
+import "../scss/root.scss";
 
 const deleteMessage = `Deleting your account will remove your account and the list of scrobbled songs. Artwork you may have uploaded might not be removed, and your username can be reused.
 
