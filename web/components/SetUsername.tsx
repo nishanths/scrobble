@@ -7,16 +7,13 @@ interface SetUsernameProps {
 }
 
 export const SetUsername: React.FC<SetUsernameProps> = ({ accountChange }) => {
-  const initialMount = useRef(true)
   const [username, setUsername] = useState("")
   const [error, setError] = useState("")
   let input: HTMLInputElement | null = null
 
   useEffect(() => {
-    if (initialMount.current === false) { return }
-    initialMount.current = false
     if (input !== null) { input.focus() }
-  })
+  }, [])
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()

@@ -1,22 +1,23 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux";
-import { UArgs, Song, NProgress } from "../shared/types"
+import { UArgs, Song } from "../shared/types"
 import { trimPrefix, assertExhaustive, pathComponents } from "../shared/util"
 import { Header } from "./Header"
 import { Songs } from "./Songs"
 import { SegmentedControl } from "./SegmentedControl"
 import { State } from "../redux/types/u"
 import { fetchScrobbles } from "../redux/actions/scrobbles"
+import { useStateRef } from "../shared/hooks"
 import "../scss/u.scss"
 
-type UProps = UArgs
+declare var NProgress: {
+  start(): void
+  done(): void
+  configure(opts: { [k: string]: any }): void
+}
 
-interface UState {
-  fetched: boolean
-  songs: Song[]
-  private: boolean
-  endIdx: number
-  mode: Mode
+type UProps = UArgs & {
+  wnd: Window
 }
 
 enum Mode {
@@ -26,6 +27,7 @@ enum Mode {
 // U is the root component for the username page, e.g.,
 // https://scrobble.allele.cc/u/whatever.
 export const U: React.FC<UProps> = ({
+  wnd,
   host,
   artworkBaseURL,
   profileUsername,
@@ -33,21 +35,82 @@ export const U: React.FC<UProps> = ({
   account,
   self,
 }) => {
-  const [endIdx, setEndIdx] = useState(-1)
-  const [mode, setMode] = useState(Mode.All)
+  // Divisble by 2, 3, and 4. This is appropriate because these are the number
+  // of cards typically displayed per row. Using such a number ensures that
+  // the last row isn't an incomplete row.
+  const MoreIncrement = 36;
   const dispatch = useDispatch()
+  const header = <Header username={profileUsername} signedIn={!!logoutURL} />;
+
+  const [endIdx, endIdxRef, setEndIdx] = useStateRef(0)
+  const [mode, modeRef, setMode] = useStateRef(Mode.All)
+
+  const scrobbles = useSelector((s: State) => s.scrobbles)
+  const scrobblesRef = useRef(scrobbles)
+  useEffect(() => { scrobblesRef.current = scrobbles }, [scrobbles])
+
+  const nextEndIdx = (currentEndIdx: number, totalSongs: number): number => {
+    // increment, but don't go over the number of songs itself
+    const b = Math.min(currentEndIdx + MoreIncrement, totalSongs)
+    // if there aren't sufficient songs left for the next time, just include them now
+    return totalSongs - b < MoreIncrement ? totalSongs : b;
+  }
+
+  const initEnd = useRef(false)
+
+  useEffect(() => {
+    if (initEnd.current === true) { return }
+    initEnd.current = false
+    setEndIdx(scrobbles.error === false ? nextEndIdx(0, scrobbles.songs.length) : 0)
+  }, [scrobbles])
+
+  const songsForCurrentMode = () => {
+    const songs = scrobblesRef.current.songs
+    const mode = modeRef.current
+    switch (mode) {
+      case Mode.All:
+        return songs
+      case Mode.Loved:
+        return songs.filter(s => s.loved)
+    }
+    assertExhaustive(mode)
+  }
+
+  useEffect(() => {
+    NProgress.configure({ showSpinner: false, minimum: 0.1, trickleSpeed: 25, speed: 500 })
+  }, [])
 
   useEffect(() => {
     dispatch(fetchScrobbles(profileUsername))
-  }, [dispatch, profileUsername])
+  }, [])
 
-  const scrobbles = useSelector((s: State) => s.scrobbles)
+  useEffect(() => {
+    const f = () => {
+      const leeway = 250
+      if ((wnd.innerHeight + wnd.pageYOffset) >= (wnd.document.body.offsetHeight - leeway)) {
+        const newEnd = nextEndIdx(endIdxRef.current, songsForCurrentMode().length)
+        setEndIdx(Math.max(newEnd, endIdxRef.current))
+      }
+    }
+    wnd.addEventListener("scroll", f)
+    return () => { wnd.removeEventListener("scroll", f) }
+  }, [])
 
-  const header = <Header username={profileUsername} signedIn={!!logoutURL} />;
+  // ... render ...
+
+  if (scrobbles.error === true) {
+    return <>
+      {header}
+      <div className="info">(Failed to fetch scrobbles.)</div>
+    </>
+  }
 
   if (scrobbles.fetching) {
+    NProgress.start()
     return <>{header}</>
   }
+
+  NProgress.done()
 
   if (scrobbles.private) {
     return <>
@@ -74,7 +137,7 @@ export const U: React.FC<UProps> = ({
     </div>
     <div className="songs">
       <Songs
-        songs={scrobbles.songs} // TODO
+        songs={songsForCurrentMode().slice(0, endIdx)}
         artworkBaseURL={artworkBaseURL}
         now={() => new Date()}
       />
@@ -122,7 +185,7 @@ export const U: React.FC<UProps> = ({
 //   // Divisble by 2, 3, and 4. This is appropriate because these are the number
 //   // of cards typically displayed per row. Using such a number ensures that
 //   // the last row isn't an incomplete row.
-//   private static readonly moreIncrement = 48
+//   private static readonly moreIncrement = 36
 
 //   private static determineNextEndIdx(idx: number, nSongs: number): number {
 //     // increment, but make sure we don't go over the number of songs itself

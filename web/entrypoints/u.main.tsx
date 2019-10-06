@@ -13,7 +13,7 @@ const store = createStore(reducer, { uargs }, applyMiddleware(thunk));
 
 ReactDOM.render(
   <Provider store={store}>
-    <U {...uargs} />
+    <U {...uargs} wnd={window} />
   </Provider>,
   document.querySelector("#app")
 );

@@ -10,7 +10,7 @@ import (
 	"google.golang.org/appengine/log"
 )
 
-const devSignedInUsername = "devuser2"
+const devSignedInUsername = "devuser"
 
 var devFakeAccount = Account{
 	Username: devSignedInUsername,

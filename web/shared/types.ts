@@ -34,9 +34,3 @@ export interface Song {
 
   ident: string
 }
-
-export declare var NProgress: {
-  start(): void
-  done(): void
-  configure(opts: { [k: string]: any }): void
-}

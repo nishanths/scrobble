@@ -8,9 +8,8 @@ export type ScrobblesAction =
   ReturnType<typeof scrobblesSuccess> |
   ReturnType<typeof scrobblesFail>
 
-
-type ScrobblesThunkDispatch = ThunkDispatch<PartialState, void, ScrobblesAction>
-type ScrobblesThunkAction<R> = ThunkAction<R, PartialState, void, ScrobblesAction>
+type ScrobblesThunkDispatch = ThunkDispatch<PartialState, undefined, ScrobblesAction>
+type ScrobblesThunkResult<R> = ThunkAction<R, PartialState, undefined, ScrobblesAction>
 
 export const scrobblesStart = (username: string) => {
   return {
@@ -35,8 +34,8 @@ export const scrobblesFail = (err: any) => {
   }
 }
 
-export const fetchScrobbles = (username: string): ScrobblesThunkAction<void> => {
-  return async (dispatch: ScrobblesThunkDispatch, _: () => PartialState) => {
+export const fetchScrobbles = (username: string): ScrobblesThunkResult<void> => {
+  return async (dispatch, store) => {
     dispatch(scrobblesStart(username))
     try {
       const result = await _fetchScrobbles(username)
