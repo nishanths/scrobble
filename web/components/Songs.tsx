@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { SongCard } from "./SongCard"
 import { Song } from "../shared/types"
 

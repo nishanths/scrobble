@@ -15,7 +15,7 @@ const defaultState: ScrobblesState = {
 
 export const scrobblesReducer = (state: ScrobblesState = defaultState, action: ScrobblesAction): ScrobblesState => {
   switch (action.type) {
-    case "SCROBBLES_REQUEST":
+    case "SCROBBLES_START":
       return { ...state, fetching: true }
     case "SCROBBLES_SUCCESS":
       return { songs: action.songs, fetching: false, error: false }

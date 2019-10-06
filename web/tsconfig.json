@@ -6,7 +6,8 @@
     "module": "commonjs",
     "target": "es5",
     "lib": ["es5", "es6", "dom"],
-    "jsx": "react"
+    "jsx": "react",
+    "esModuleInterop": true
   },
   "include": [
     "./entrypoints/**/*"

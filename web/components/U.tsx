@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { UArgs, Song } from "../shared/types"
 import { trimPrefix, assertExhaustive, pathComponents } from "../shared/util"
 import { Header } from "./Header"
@@ -197,3 +197,4 @@ export class U extends React.Component<UProps, UState> {
     </div>
   }
 }
+

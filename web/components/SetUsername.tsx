@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { Account } from "../shared/types"
 import "../scss/username.scss";
 

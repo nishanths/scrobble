@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { BootstrapArgs, Account } from "../shared/types";
 import { SetUsername, SetUsernameProps } from "./SetUsername";
 import { AccountDetail, AccountDetailProps } from "./AccountDetail";

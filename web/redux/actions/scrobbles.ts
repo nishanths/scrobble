@@ -1,8 +1,8 @@
 import { Song } from "../../shared/types"
 
-export const scrobblesRequest = (username: string) => {
+export const scrobblesStart = (username: string) => {
   return {
-    type: "SCROBBLES_REQUEST" as const,
+    type: "SCROBBLES_START" as const,
     username,
   }
 }
@@ -23,6 +23,6 @@ export const scrobblesFail = (username: string) => {
 }
 
 export type ScrobblesAction =
-  ReturnType<typeof scrobblesRequest> |
+  ReturnType<typeof scrobblesStart> |
   ReturnType<typeof scrobblesSuccess> |
   ReturnType<typeof scrobblesFail>
