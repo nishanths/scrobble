@@ -10,6 +10,9 @@
     "esModuleInterop": true
   },
   "include": [
-    "./entrypoints/**/*"
+    "./components/**/*",
+    "./entrypoints/**/*",
+    "./redux/**/*",
+    "./shared/**/*"
   ]
 }

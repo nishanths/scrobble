@@ -1,16 +1,9 @@
-import { Song } from "../../shared/types"
 import { ScrobblesAction } from "../actions/scrobbles"
-
-type ScrobblesState = {
-  fetching: boolean
-  songs: Song[]
-  private: boolean
-  error: boolean
-}
+import { ScrobblesState } from "../types/scrobbles"
 
 const defaultState: ScrobblesState = {
   fetching: false,
-  songs: [],
+  songs: null,
   private: false,
   error: false,
 }

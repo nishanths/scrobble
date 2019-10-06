@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux";
-import { UArgs, Song } from "../shared/types"
+import { UArgs, Song, NProgress } from "../shared/types"
 import { trimPrefix, assertExhaustive, pathComponents } from "../shared/util"
 import { Header } from "./Header"
 import { Songs } from "./Songs"
 import { SegmentedControl } from "./SegmentedControl"
-import { State } from "../redux/reducers/u"
+import { State } from "../redux/types/u"
+import { fetchScrobbles } from "../redux/actions/scrobbles"
 import "../scss/u.scss"
-
-declare var NProgress: {
-  start(): void
-  done(): void
-  configure(opts: { [k: string]: any }): void
-}
 
 type UProps = UArgs
 
@@ -28,6 +23,8 @@ enum Mode {
   All, Loved
 }
 
+// U is the root component for the username page, e.g.,
+// https://scrobble.allele.cc/u/whatever.
 export const U: React.FC<UProps> = ({
   host,
   artworkBaseURL,
@@ -41,14 +38,52 @@ export const U: React.FC<UProps> = ({
   const dispatch = useDispatch()
 
   useEffect(() => {
-    // dispatch(scrobblesRequest(profileUsername))
-  })
+    dispatch(fetchScrobbles(profileUsername))
+  }, [dispatch, profileUsername])
 
-  useSelector((s: State) => {
-    console.log(s)
-  })
+  const scrobbles = useSelector((s: State) => s.scrobbles)
 
-  return <></>
+  const header = <Header username={profileUsername} signedIn={!!logoutURL} />;
+
+  if (scrobbles.fetching) {
+    return <>{header}</>
+  }
+
+  if (scrobbles.private) {
+    return <>
+      {header}
+      <div className="info">(This user's scrobbles are private.)</div>
+    </>
+  }
+
+  if (scrobbles.songs === null) {
+    return <>{header}</>
+  }
+
+  if (scrobbles.songs.length === 0) {
+    return <>
+      {header}
+      <div className="info">({self ? "You haven't" : "This user hasn't"} scrobbled yet.)</div>
+    </>
+  }
+
+  return <>
+    {header}
+    <div className="control">
+      <SegmentedControl
+        afterChange={() => {}} // TODO
+        values={["All", "Loved"]}
+        initialValue={"All"} // TODO
+      />
+    </div>
+    <div className="songs">
+      <Songs
+        songs={scrobbles.songs} // TODO
+        artworkBaseURL={artworkBaseURL}
+        now={() => new Date()}
+      />
+    </div>
+  </>
 }
 
 
