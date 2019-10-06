@@ -21,7 +21,7 @@ var devFakeAccount = Account{
 func devRootHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 
-	a := IndexArgs{
+	a := RootArgs{
 		Title: "Dev Scrobble",
 		Bootstrap: BootstrapArgs{
 			Host:      r.Host,
@@ -31,7 +31,7 @@ func devRootHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	if err := indexTmpl.Execute(w, a); err != nil {
+	if err := rootTmpl.Execute(w, a); err != nil {
 		log.Errorf(ctx, "failed to execute template: %v", err.Error())
 	}
 }

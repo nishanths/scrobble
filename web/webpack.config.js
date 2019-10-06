@@ -5,7 +5,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
   entry: {
-    index: "./entrypoints/index.main.tsx",
+    root: "./entrypoints/root.main.tsx",
     u: "./entrypoints/u.main.tsx",
   },
   output: {

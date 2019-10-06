@@ -2,12 +2,12 @@ import { combineReducers } from "redux"
 import { scrobblesReducer } from "./scrobbles"
 import { UArgs } from "../../shared/types"
 
-export type AppState = {
+export type State = {
   scrobbles: ReturnType<typeof scrobblesReducer>
   uargs: UArgs
 }
 
-const appReducer = combineReducers({
+const reducer = combineReducers({
   scrobbles: scrobblesReducer,
 
   // TODO: is there a better way to specify a no-op reducer for the read-only
@@ -26,4 +26,4 @@ const appReducer = combineReducers({
   }),
 })
 
-export default appReducer
+export default reducer

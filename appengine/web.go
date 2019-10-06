@@ -20,9 +20,9 @@ import (
 
 // TODO: WTF is this monstrosity
 var (
-	indexTmpl = template.Must(
+	rootTmpl = template.Must(
 		template.Must(template.New("").Parse(string(MustAsset("appengine/template/fs-snippet.tmpl")))).
-			Parse(string(MustAsset("appengine/template/index.tmpl"))),
+			Parse(string(MustAsset("appengine/template/root.tmpl"))),
 	)
 	uTmpl = template.Must(
 		template.Must(template.New("").Parse(string(MustAsset("appengine/template/fs-snippet.tmpl")))).
@@ -40,7 +40,7 @@ type BootstrapArgs struct {
 	Account   Account `json:"account"`
 }
 
-type IndexArgs struct {
+type RootArgs struct {
 	Title     string
 	Bootstrap BootstrapArgs
 }
@@ -63,8 +63,8 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	title := "Scrobble"
 
 	// helper function
-	exec := func(a IndexArgs) {
-		if err := indexTmpl.Execute(w, a); err != nil {
+	exec := func(a RootArgs) {
+		if err := rootTmpl.Execute(w, a); err != nil {
 			log.Errorf(ctx, "failed to execute template: %v", err.Error())
 		}
 	}
@@ -77,7 +77,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		exec(IndexArgs{
+		exec(RootArgs{
 			Title: title,
 			Bootstrap: BootstrapArgs{
 				Host:     host,
@@ -99,7 +99,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	exec(IndexArgs{
+	exec(RootArgs{
 		Title: title,
 		Bootstrap: BootstrapArgs{
 			Host:      host,

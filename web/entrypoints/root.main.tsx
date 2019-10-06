@@ -1,11 +1,11 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { IndexPage } from "../components/IndexPage";
+import { Root } from "../components/Root";
 import { BootstrapArgs } from "../shared/types";
 
 declare var bootstrap: BootstrapArgs;
 
 ReactDOM.render(
-  <IndexPage {...bootstrap} />,
+  <Root {...bootstrap} />,
   document.querySelector("#app")
 );

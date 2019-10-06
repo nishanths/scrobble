@@ -12,9 +12,9 @@ declare var NProgress: {
   configure(opts: { [k: string]: any }): void
 }
 
-type UsernamePageProps = UArgs
+type UProps = UArgs
 
-interface UsernamePageState {
+interface UState {
   fetched: boolean
   songs: Song[]
   private: boolean
@@ -26,7 +26,7 @@ enum Mode {
   All, Loved
 }
 
-export class UsernamePage extends React.Component<UsernamePageProps, UsernamePageState> {
+export class U extends React.Component<UProps, UState> {
   private static modeFromURL(wnd: Window): Mode {
     let components = pathComponents(wnd.location.pathname)
     if (components.length < 3 || // /u/username,
@@ -70,13 +70,13 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
 
   private static determineNextEndIdx(idx: number, nSongs: number): number {
     // increment, but make sure we don't go over the number of songs itself
-    let b = Math.min(idx + UsernamePage.moreIncrement, nSongs)
+    let b = Math.min(idx + U.moreIncrement, nSongs)
     // if there aren't sufficient songs left for the next time, just include
     // them now
-    return nSongs - b < UsernamePage.moreIncrement ? nSongs : b;
+    return nSongs - b < U.moreIncrement ? nSongs : b;
   }
 
-  constructor(props: UsernamePageProps) {
+  constructor(props: UProps) {
     super(props)
     this.state = {
       fetched: false,
@@ -98,14 +98,14 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
       }
     })
 
-    this.setState({ mode: UsernamePage.modeFromURL(window) })
+    this.setState({ mode: U.modeFromURL(window) })
     this.fetchSongs()
   }
 
   private onControlToggled(v: string) {
-    const mode = UsernamePage.modeFromControlValue(v)
+    const mode = U.modeFromControlValue(v)
     this.setState({ mode }, () => {
-      window.history.pushState(null, "", UsernamePage.urlFromMode(this.state.mode, this.props.profileUsername)) // TODO: gross side-effect in this function?
+      window.history.pushState(null, "", U.urlFromMode(this.state.mode, this.props.profileUsername)) // TODO: gross side-effect in this function?
     })
   }
 
@@ -129,7 +129,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
         this.setState({
           fetched: true,
           songs: songs,
-          endIdx: UsernamePage.determineNextEndIdx(this.state.endIdx, songs.length),
+          endIdx: U.determineNextEndIdx(this.state.endIdx, songs.length),
         })
       }, err => {
         console.error(err)
@@ -142,7 +142,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
 
   private showMore() {
     this.setState(s => {
-      let newEndIdx = UsernamePage.determineNextEndIdx(s.endIdx, this.songsForCurrentMode().length)
+      let newEndIdx = U.determineNextEndIdx(s.endIdx, this.songsForCurrentMode().length)
       return { endIdx: Math.max(newEndIdx, s.endIdx) }
     })
   }
@@ -184,7 +184,7 @@ export class UsernamePage extends React.Component<UsernamePageProps, UsernamePag
         <SegmentedControl
           afterChange={this.onControlToggled.bind(this)}
           values={["All", "Loved"]}
-          initialValue={UsernamePage.controlValueForMode(this.state.mode)}
+          initialValue={U.controlValueForMode(this.state.mode)}
         />
       </div>
       <div className="songs">

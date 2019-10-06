@@ -1,18 +1,18 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { UsernamePage } from "../components/UsernamePage"
+import { U } from "../components/U"
 import { UArgs } from "../shared/types";
 import { createStore } from "redux";
 import { Provider } from "react-redux";
-import rootReducer from "../redux/reducers/username"
+import reducer from "../redux/reducers/u"
 
 declare var uargs: UArgs;
 
-const store = createStore(rootReducer, { uargs });
+const store = createStore(reducer, { uargs });
 
 ReactDOM.render(
   <Provider store={store}>
-    <UsernamePage {...uargs} />
+    <U {...uargs} />
   </Provider>,
   document.querySelector("#app")
 );

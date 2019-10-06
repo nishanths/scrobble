@@ -8,12 +8,12 @@ const deleteMessage = `Deleting your account will remove your account and the li
 
 Delete account?`
 
-type IndexPageProps = BootstrapArgs
+type RootProps = BootstrapArgs
 
-export class IndexPage extends React.Component<IndexPageProps, { account: Account, deleteFail: boolean }> {
+export class Root extends React.Component<RootProps, { account: Account, deleteFail: boolean }> {
   private static readonly downloadURL = "https://github.com/nishanths/scrobble/releases/latest"
 
-  constructor(props: IndexPageProps) {
+  constructor(props: RootProps) {
     super(props)
     this.state = {
       account: this.props.account,
@@ -71,7 +71,7 @@ export class IndexPage extends React.Component<IndexPageProps, { account: Accoun
   }
 
   private download() {
-    return <p><a href={IndexPage.downloadURL}>Download</a> menu bar scrobble client for iTunes (macOS 10.14+)</p>
+    return <p><a href={Root.downloadURL}>Download</a> menu bar scrobble client for iTunes (macOS 10.14+)</p>
   }
 
   render() {
