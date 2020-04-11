@@ -9,7 +9,7 @@ APP_YAML          := appengine/app.yaml
 # You may optionally need `make bootstrap`.
 #
 # Only certain paths may be supported with fake data in local dev
-# (see appengine/server.go).
+# (see appengine/main.go).
 
 default:
 	@echo "the default target does nothing!"
@@ -32,11 +32,6 @@ bindata:
 .PHONY: dev-deps
 dev-deps:
 	go get github.com/jteeuwen/go-bindata/...
-
-.PHONY: check-go
-check-go:
-	@go version
-	cd appengine && go build -mod=vendor -o=/dev/null # to check successful compilation
 
 .PHONY: go
 go:
