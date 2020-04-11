@@ -135,7 +135,7 @@ func (svr *server) fillITunesFields(ctx context.Context, namespace string, songP
 		}
 
 		// store track for use in future calls
-		trackKey := &datastore.Key{Kind: KindITunesTrack, Name: songIdent, Namespace: namespace}
+		trackKey := &datastore.Key{Kind: KindITunesTrack, Name: songIdent}
 		if _, err := tx.Put(trackKey, &tracks[matchingIdx]); err != nil {
 			return errors.Wrapf(err, "failed to put track %s", trackKey)
 		}

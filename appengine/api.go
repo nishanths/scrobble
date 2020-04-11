@@ -38,7 +38,7 @@ const (
 	KindAPIKey        = "APIKey"   // stored for uniqueness checking
 	KindSongParent    = "SongParent"
 	KindSong          = "Song"
-	KindArtworkRecord = "ArtworkRecord" // for fast determination of missing artwork
+	KindArtworkRecord = "ArtworkRecord" // for fast key-only determination of missing artwork
 	KindITunesTrack   = "ITunesTrack"
 	KindSecret        = "Secret"
 )
