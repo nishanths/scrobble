@@ -38,7 +38,7 @@ dev-deps:
 .PHONY: go
 go:
 	@go version
-	go build -o /dev/null ./appengine # to check successful compilation
+	cd appengine && go build -mod=vendor -o=/dev/null # to check successful compilation
 
 .PHONY: web
 web:

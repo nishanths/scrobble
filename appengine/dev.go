@@ -6,8 +6,7 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"google.golang.org/appengine"
-	"google.golang.org/appengine/log"
+	"github.com/nishanths/scrobble/appengine/log"
 )
 
 const devSignedInUsername = "devuser"
@@ -19,7 +18,7 @@ var devFakeAccount = Account{
 }
 
 func devRootHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := appengine.NewContext(r)
+	ctx := r.Context()
 
 	a := RootArgs{
 		Title: "Dev Scrobble",
@@ -40,7 +39,7 @@ func devUHandler(w http.ResponseWriter, r *http.Request) {
 	const profileUsername = devSignedInUsername
 	const bucketName = "selective-scrobble.appspot.com"
 
-	ctx := appengine.NewContext(r)
+	ctx := r.Context()
 
 	if err := uTmpl.Execute(w, UArgs{
 		Title:           profileUsername,
