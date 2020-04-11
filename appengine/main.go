@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2beta2"
 	"cloud.google.com/go/datastore"
@@ -97,6 +98,12 @@ func run(ctx context.Context) error {
 	http.Handle("/internal/fillITunesFields", s.requireTasksSecretHeader(http.HandlerFunc(s.fillITunesFieldsHandler)))
 	http.Handle("/internal/markParentComplete", s.requireTasksSecretHeader(http.HandlerFunc(s.markParentCompleteHandler)))
 	http.Handle("/internal/deleteEntities", s.requireTasksSecretHeader(http.HandlerFunc(s.deleteEntitiesHandler)))
+
+	if isDev() {
+		// in production these are handled by app.yaml
+		http.Handle("/dist/", http.StripPrefix("/dist/", http.FileServer(http.Dir(filepath.Join("web", "dist")))))
+		http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(filepath.Join("web", "static")))))
+	}
 
 	// Serve.
 	if err := http.ListenAndServe(":"+port, nil); err != nil {

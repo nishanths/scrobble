@@ -1,9 +1,7 @@
 PWD               := $(shell pwd)
 PROJECT_ID        := selective-scrobble
-DEV_APPSERVER     := dev_appserver.py
 INDEX_YAML        := appengine/index.yaml
 APP_YAML          := appengine/app.yaml
-DEV_APP_YAML      := appengine/dev_app.yaml
 
 # NOTE: To deploy, typically you want `make all` followed by `make deploy`.
 #
@@ -35,10 +33,15 @@ bindata:
 dev-deps:
 	go get github.com/jteeuwen/go-bindata/...
 
+.PHONY: check-go
+check-go:
+	@go version
+	cd appengine && go build -mod=vendor -o=/dev/null # to check successful compilation
+
 .PHONY: go
 go:
 	@go version
-	cd appengine && go build -mod=vendor -o=/dev/null # to check successful compilation
+	cd appengine && go build -mod=vendor -o=main
 
 .PHONY: web
 web:
@@ -56,6 +59,7 @@ ln-web:
 .PHONY: clean
 clean:
 	@cd web && $(MAKE) clean
+	rm -f appengine/main
 	rm -rf appengine/web
 	rm -rf web/static/{css/nprogress.css,js/nprogress.js}
 
@@ -67,5 +71,5 @@ _bootstrap:
 	mkdir -p web/dist
 
 .PHONY: dev
-dev:
-	$(DEV_APPSERVER) $(DEV_APP_YAML)
+dev: go
+	cd appengine && ./main
