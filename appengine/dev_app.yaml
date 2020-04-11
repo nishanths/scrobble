@@ -1,5 +1,0 @@
-api_version: go113
-
-handlers:
-- url: /.*
-  script: auto
