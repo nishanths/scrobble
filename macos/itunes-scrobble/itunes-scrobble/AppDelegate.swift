@@ -304,11 +304,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
             if r.statusCode != 200 {
                 return
             }
-            guard let d = data else {
-                return
-            }
             
-            guard let incomingHashes = try? JSONDecoder().decode(Dictionary<String, Bool>.self, from: d) else { return }
+            guard let incomingHashes = try? JSONDecoder().decode([String: Bool].self, from: data!) else { return }
             
             DispatchQueue.global(qos: .userInitiated).async {
                 var items = Dictionary<String, ITLibMediaItem>()
