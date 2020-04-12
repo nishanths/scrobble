@@ -120,10 +120,6 @@ export const U: React.FC<UProps> = ({
   }, [scrobbles])
 
   useEffect(() => {
-    NProgress.configure({ showSpinner: false, minimum: 0.1, trickleSpeed: 25, speed: 500 })
-  }, [])
-
-  useEffect(() => {
     dispatch(fetchScrobbles(profileUsername))
   }, [])
 
@@ -141,8 +137,10 @@ export const U: React.FC<UProps> = ({
 
   // ... render ...
 
+  NProgress.configure({ showSpinner: false, minimum: 0.1, trickleSpeed: 25, speed: 500 })
+  NProgress.start()
+
   if (scrobbles.done === false) {
-    NProgress.start()
     return <>{header}</>
   }
 
