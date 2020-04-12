@@ -32,13 +32,13 @@ func (s *server) deleteEntitiesHandler(w http.ResponseWriter, r *http.Request) {
 
 	var t deleteEntitiesTask
 	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	if err := s.deleteEntities(ctx, t.Namespace, t.Kind); err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -48,7 +48,7 @@ func (s *server) deleteEntitiesHandler(w http.ResponseWriter, r *http.Request) {
 
 // Deletes entities of the given kind in the namespace.
 func (svr *server) deleteEntities(ctx context.Context, namespace string, kind string) error {
-	log.Infof(ctx, "deleting namespace=%s, kind=%s", namespace, kind)
+	log.Infof("deleting namespace=%s, kind=%s", namespace, kind)
 
 	allKeys, err := svr.ds.GetAll(ctx, datastore.NewQuery(kind).Namespace(namespace).KeysOnly(), nil)
 	if err != nil {
@@ -84,7 +84,7 @@ func deleteKeysChunk(c context.Context, keys []*datastore.Key, ds *datastore.Cli
 
 func trimSongParents(ctx context.Context, namespace string, createdBefore int64, ds *datastore.Client) error {
 	f := func() error {
-		log.Infof(ctx, "about to delete SongParents created before %d", createdBefore)
+		log.Infof("about to delete SongParents created before %d", createdBefore)
 
 		q := datastore.NewQuery(KindSongParent).
 			Namespace(namespace).
@@ -99,7 +99,7 @@ func trimSongParents(ctx context.Context, namespace string, createdBefore int64,
 		g, gctx := errgroup.WithContext(ctx)
 
 		for _, spKey := range toDeleteSpKeys {
-			log.Infof(ctx, "deleting %s as part of trimming", spKey)
+			log.Infof("deleting %s as part of trimming", spKey)
 		}
 
 		// Gather and delete the Songs under each SongParent.
@@ -146,7 +146,7 @@ func trimSongParents(ctx context.Context, namespace string, createdBefore int64,
 
 		for len(chunk) > 0 {
 			if err := deleteKeysChunk(ctx, chunk, ds); err != nil {
-				log.Errorf(ctx, "failed to delete chunk: %v", err.Error())
+				log.Errorf("failed to delete chunk: %v", err.Error())
 				return errors.Wrapf(err, "failed to delete chunk")
 			}
 

@@ -18,8 +18,6 @@ var devFakeAccount = Account{
 }
 
 func devRootHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
 	a := RootArgs{
 		Title: "Dev Scrobble",
 		Bootstrap: BootstrapArgs{
@@ -31,15 +29,13 @@ func devRootHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := rootTmpl.Execute(w, a); err != nil {
-		log.Errorf(ctx, "failed to execute template: %v", err.Error())
+		log.Errorf("failed to execute template: %v", err.Error())
 	}
 }
 
 func devUHandler(w http.ResponseWriter, r *http.Request) {
 	const profileUsername = devSignedInUsername
 	const bucketName = "selective-scrobble.appspot.com"
-
-	ctx := r.Context()
 
 	if err := uTmpl.Execute(w, UArgs{
 		Title:           profileUsername,
@@ -50,7 +46,7 @@ func devUHandler(w http.ResponseWriter, r *http.Request) {
 		Account:         devFakeAccount,
 		Self:            profileUsername == devSignedInUsername,
 	}); err != nil {
-		log.Errorf(ctx, "failed to execute template: %v", err.Error())
+		log.Errorf("failed to execute template: %v", err.Error())
 	}
 }
 

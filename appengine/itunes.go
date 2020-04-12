@@ -33,13 +33,13 @@ func (s *server) fillITunesFieldsHandler(w http.ResponseWriter, r *http.Request)
 
 	var t fillITunesFieldsTask
 	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	if err := s.fillITunesFields(ctx, t.Namespace, t.SongParentIdent, t.SongIdent); err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -84,7 +84,7 @@ func (svr *server) fillITunesFields(ctx context.Context, namespace string, songP
 		// else err == datastore.ErrNoSuchEntity (will fetch from iTunes API below)
 		return nil
 	}); err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		return err
 	}
 
@@ -114,7 +114,7 @@ func (svr *server) fillITunesFields(ctx context.Context, namespace string, songP
 		searchTerm := strings.Join([]string{s.Title, s.ArtistName}, " ") // including the album name produces poorer results
 		tracks, retry, err := iTunesSearchSong(tctx, svr.httpClient, searchTerm)
 		if err != nil {
-			log.Errorf(ctx, "failed to search iTunes for %q: %s (retry=%v)", searchTerm, err, retry)
+			log.Errorf("failed to search iTunes for %q: %s (retry=%v)", searchTerm, err, retry)
 			if retry {
 				return err // returning a non-nil error causes the task to retry
 			}
@@ -130,7 +130,7 @@ func (svr *server) fillITunesFields(ctx context.Context, namespace string, songP
 		}
 
 		if matchingIdx == -1 {
-			log.Infof(ctx, "no matching tracks found for %q (len=%d)", searchTerm, len(tracks))
+			log.Infof("no matching tracks found for %q (len=%d)", searchTerm, len(tracks))
 			return nil
 		}
 
@@ -147,7 +147,7 @@ func (svr *server) fillITunesFields(ctx context.Context, namespace string, songP
 		}
 		return nil
 	}); err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		return err
 	}
 

@@ -25,7 +25,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/iterator"
 	"google.golang.org/appengine/user"
-	"google.golang.org/genproto/googleapis/cloud/tasks/v2beta2"
+	tasks "google.golang.org/genproto/googleapis/cloud/tasks/v2beta2"
 )
 
 const (
@@ -147,7 +147,7 @@ func (s *server) accountHandler(w http.ResponseWriter, r *http.Request) {
 	}{acc.Username})
 
 	if err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -168,7 +168,7 @@ func (s *server) deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 	if u := user.Current(ctx); u == nil {
 		key := r.Header.Get(headerAPIKey)
 		if key == "" {
-			log.Errorf(ctx, "not signed in and missing API key header")
+			log.Errorf("not signed in and missing API key header")
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -183,12 +183,12 @@ func (s *server) deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 
 	tasksSecret, err := tasksSecret(ctx, s.ds)
 	if err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	log.Infof(ctx, "deleting account %q", accID)
+	log.Infof("deleting account %q", accID)
 
 	if _, err := s.ds.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
 		// synchronously delete Username, Account entities
@@ -200,7 +200,7 @@ func (s *server) deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 			return errors.Wrapf(err, "failed to get account")
 		}
 
-		log.Infof(ctx, "Account entity %+v for key %s", account, aKey)
+		log.Infof("Account entity %+v for key %s", account, aKey)
 
 		// If the account isn't initialized, the username won't be set
 		// and a corresponding Username entity won't exist. So only
@@ -260,7 +260,7 @@ func (s *server) deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return nil
 	}); err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -275,7 +275,7 @@ func (svr *server) scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 	writeSuccessRsp := func(s []SongResponse) {
 		w.Header().Set("Content-Type", "application/json")
 		if err := json.NewEncoder(w).Encode(s); err != nil {
-			log.Errorf(ctx, "failed to write response: %v", err.Error())
+			log.Errorf("failed to write response: %v", err.Error())
 		}
 	}
 
@@ -318,7 +318,7 @@ func (svr *server) scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 
 	parentKeys, err := svr.ds.GetAll(ctx, q, nil)
 	if err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -333,7 +333,7 @@ func (svr *server) scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 		key := songKey(namespace, songIdent, parentKeys[0])
 		var s SongResponse
 		if err := svr.ds.Get(ctx, key, &s); err != nil {
-			log.Errorf(ctx, "failed to fetch song %s: %v", key, err.Error())
+			log.Errorf("failed to fetch song %s: %v", key, err.Error())
 			if err == datastore.ErrNoSuchEntity {
 				w.WriteHeader(http.StatusNotFound)
 			} else {
@@ -357,7 +357,7 @@ func (svr *server) scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 		songs := make([]SongResponse, 0) // use "make" to marshal as empty JSON array instead of null when there are 0 songs
 		keys, err := svr.ds.GetAll(ctx, q, &songs)
 		if err != nil {
-			log.Errorf(ctx, "failed to fetch songs: %v", err.Error())
+			log.Errorf("failed to fetch songs: %v", err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -406,7 +406,7 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 
 	tasksSecret, err := tasksSecret(ctx, svr.ds)
 	if err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -434,7 +434,7 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	var mis []MediaItem
 	if err := json.NewDecoder(r.Body).Decode(&mis); err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -461,7 +461,7 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		// played times far into the future, for instance, in the year 2040.
 		// So ignore such songs.
 		if last := time.Unix(int64(m.LastPlayed), 0); last.Sub(now) > 365*24*time.Hour {
-			log.Warningf(ctx, "skipping song with future LastPlayed = %s", last)
+			log.Warningf("skipping song with future LastPlayed = %s", last)
 			continue
 		}
 
@@ -491,7 +491,7 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		Complete: false,
 		Created:  newParentCreated,
 	}); err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -516,7 +516,7 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 
 		for len(chunk) > 0 {
 			if _, err := svr.ds.PutMulti(ctx, keysChunk, chunk); err != nil {
-				log.Errorf(ctx, "failed to put songs: %v", err.Error())
+				log.Errorf("failed to put songs: %v", err.Error())
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
@@ -569,7 +569,7 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := g.Wait(); err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -582,8 +582,8 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: make this deterministic instead of using a delay?
 	if err := func() error {
 		payload := markParentCompleteTask{
-			Namespace:       namespaceID(accID),
-			SongParentIdent: newParentIdent,
+			Namespace:         namespaceID(accID),
+			SongParentIdent:   newParentIdent,
 			SongParentCreated: newParentCreated,
 		}
 		createReq, err := jsonPostTask("/internal/markParentComplete", payload, tasksSecret)
@@ -597,7 +597,7 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return nil
 	}(); err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -628,7 +628,7 @@ func (s *server) artworkHandler(w http.ResponseWriter, r *http.Request) {
 
 	artwork, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Errorf(ctx, "failed to read request body: %v", err.Error())
+		log.Errorf("failed to read request body: %v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -640,17 +640,17 @@ func (s *server) artworkHandler(w http.ResponseWriter, r *http.Request) {
 	wr := s.storage.Bucket(DefaultBucketName).Object(artworkStorageDirectory + "/" + hash).NewWriter(ctx)
 	wr.Metadata = map[string]string{"format": format}
 	if _, err := wr.Write(artwork); err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	if err := wr.Close(); err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	log.Infof(ctx, "saved artwork hash=%s", hash)
+	log.Infof("saved artwork hash=%s", hash)
 
 	w.Header().Set("Content-Type", "application/json")
 	io.WriteString(w, hash)
@@ -690,7 +690,7 @@ func (s *server) artworkMissingHandler(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 			if err != nil {
-				log.Errorf(gctx, "%v", err.Error()) // only log
+				log.Errorf("%v", err.Error()) // only log
 				break
 			}
 			have[strings.TrimPrefix(o.Name, artworkStorageDirectory+"/")] = struct{}{}
@@ -709,7 +709,7 @@ func (s *server) artworkMissingHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err := g.Wait(); err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -721,17 +721,17 @@ func (s *server) artworkMissingHandler(w http.ResponseWriter, r *http.Request) {
 		want[k.Name] = true
 	}
 
-	log.Infof(ctx, "%d artwork records with missing data", len(want))
+	log.Infof("%d artwork records with missing data", len(want))
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(want); err != nil {
-		log.Errorf(ctx, "failed to write response: %v", err.Error())
+		log.Errorf("failed to write response: %v", err.Error())
 	}
 }
 
 type markParentCompleteTask struct {
-	Namespace       string
-	SongParentIdent string
+	Namespace         string
+	SongParentIdent   string
 	SongParentCreated int64
 }
 
@@ -745,13 +745,13 @@ func (s *server) markParentCompleteHandler(w http.ResponseWriter, r *http.Reques
 
 	var t markParentCompleteTask
 	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	if err := s.markParentComplete(ctx, t.Namespace, t.SongParentIdent, t.SongParentCreated); err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -803,7 +803,7 @@ func accountForKey(ctx context.Context, apiKey string, ds *datastore.Client) (Ac
 
 	if len(keys) > 1 {
 		m := fmt.Sprintf("multiple accounts for API key %q", apiKey)
-		log.Criticalf(ctx, m)
+		log.Criticalf(m)
 		panic(m)
 	}
 
@@ -825,7 +825,7 @@ func accountForUsername(ctx context.Context, username string, ds *datastore.Clie
 
 	if len(keys) > 1 {
 		m := fmt.Sprintf("multiple accounts for username %q", username)
-		log.Criticalf(ctx, m)
+		log.Criticalf(m)
 		panic(m)
 	}
 
@@ -839,7 +839,7 @@ func accountForUsername(ctx context.Context, username string, ds *datastore.Clie
 func fetchAccountForKey(ctx context.Context, apiKey string, ds *datastore.Client, w http.ResponseWriter) (Account, string, bool) {
 	a, id, code, err := accountForKey(ctx, apiKey, ds)
 	if err != nil {
-		log.Errorf(ctx, err.Error())
+		log.Errorf(err.Error())
 		w.WriteHeader(code)
 		return Account{}, "", false
 	}
@@ -849,7 +849,7 @@ func fetchAccountForKey(ctx context.Context, apiKey string, ds *datastore.Client
 func fetchAccountForUsername(ctx context.Context, username string, ds *datastore.Client, w http.ResponseWriter) (Account, string, bool) {
 	a, id, code, err := accountForUsername(ctx, username, ds)
 	if err != nil {
-		log.Errorf(ctx, err.Error())
+		log.Errorf(err.Error())
 		w.WriteHeader(code)
 		return Account{}, "", false
 	}
@@ -874,20 +874,20 @@ func (s *server) requireTasksSecretHeader(h http.Handler) http.Handler {
 		ctx := r.Context()
 		got := r.Header.Get(headerTasksSecret)
 		if got == "" {
-			log.Errorf(ctx, "missing tasks secret header")
+			log.Errorf("missing tasks secret header")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 
 		want, err := tasksSecret(ctx, s.ds)
 		if err != nil {
-			log.Errorf(ctx, "tasks secret: %s", err)
+			log.Errorf("tasks secret: %s", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
 		if want != got {
-			log.Errorf(ctx, "bad tasks secret header")
+			log.Errorf("bad tasks secret header")
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}

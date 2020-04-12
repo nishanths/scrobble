@@ -29,7 +29,7 @@ func main() {
 	ctx := context.Background()
 
 	if err := run(ctx); err != nil {
-		log.Errorf(ctx, err.Error())
+		log.Errorf(err.Error())
 	}
 }
 

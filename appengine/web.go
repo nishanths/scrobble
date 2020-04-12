@@ -60,7 +60,7 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 	// helper function
 	exec := func(a RootArgs) {
 		if err := rootTmpl.Execute(w, a); err != nil {
-			log.Errorf(ctx, "failed to execute template: %v", err.Error())
+			log.Errorf("failed to execute template: %v", err.Error())
 		}
 	}
 
@@ -193,7 +193,7 @@ func (s *server) uHandler(w http.ResponseWriter, r *http.Request) {
 		Self:            self,
 		Private:         acc.Private,
 	}); err != nil {
-		log.Errorf(ctx, "failed to execute template: %v", err.Error())
+		log.Errorf("failed to execute template: %v", err.Error())
 	}
 }
 
@@ -270,7 +270,7 @@ func (s *server) initializeAccountHandler(w http.ResponseWriter, r *http.Request
 	})
 
 	if err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		if inUse {
 			w.WriteHeader(http.StatusNotAcceptable) // gross, but whatever
 		} else {
@@ -281,7 +281,7 @@ func (s *server) initializeAccountHandler(w http.ResponseWriter, r *http.Request
 
 	b, err := json.Marshal(account)
 	if err != nil {
-		log.Errorf(ctx, "failed to json-marshal account: %v", err.Error())
+		log.Errorf("failed to json-marshal account: %v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -324,14 +324,14 @@ func (s *server) newAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	b, err := json.Marshal(apiKey)
 	if err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -372,7 +372,7 @@ func (s *server) setPrivacyHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
