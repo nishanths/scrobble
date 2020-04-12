@@ -23,6 +23,7 @@ type server struct {
 	storage    *storage.Client
 	tasks      *cloudtasks.Client
 	httpClient *http.Client
+	secret     *Secret
 }
 
 func main() {
@@ -42,6 +43,7 @@ func run(ctx context.Context) error {
 	var ds *datastore.Client         // nil in dev
 	var cloudStorage *storage.Client // ...
 	var tasks *cloudtasks.Client
+	var secret *Secret
 
 	if !isDev() {
 		var err error
@@ -63,6 +65,12 @@ func run(ctx context.Context) error {
 			return errors.Wrapf(err, "tasks client")
 		}
 		defer tasks.Close()
+
+		s, err := fetchSecret(ctx, ds)
+		if err != nil {
+			return errors.Wrapf(err, "fetching secret")
+		}
+		secret = &s
 	}
 
 	s := &server{
@@ -70,6 +78,7 @@ func run(ctx context.Context) error {
 		storage:    cloudStorage,
 		tasks:      tasks,
 		httpClient: &http.Client{},
+		secret:     secret,
 	}
 
 	// Register handlers.
@@ -83,6 +92,10 @@ func run(ctx context.Context) error {
 	http.Handle("/initializeAccount", withHTTPS(http.HandlerFunc(s.initializeAccountHandler)))
 	http.Handle("/newAPIKey", withHTTPS(http.HandlerFunc(s.newAPIKeyHandler)))
 	http.Handle("/setPrivacy", withHTTPS(http.HandlerFunc(s.setPrivacyHandler)))
+	http.Handle("/login", withHTTPS(http.HandlerFunc(s.loginHandler)))
+	http.Handle("/googleAuth", withHTTPS(http.HandlerFunc(s.googleAuthHandler)))
+	http.Handle("/logout", withHTTPS(http.HandlerFunc(s.logoutHandler)))
+	http.Handle("/privacy-policy", withHTTPS(http.HandlerFunc(s.privacyPolicyHandler)))
 
 	if isDev() {
 		http.HandleFunc("/api/v1/scrobbled", devScrobbledHandler)

@@ -23,6 +23,8 @@ github.com/golang/protobuf/ptypes/wrappers
 github.com/google/uuid
 # github.com/googleapis/gax-go/v2 v2.0.4
 github.com/googleapis/gax-go/v2
+# github.com/gorilla/securecookie v1.1.1
+github.com/gorilla/securecookie
 # github.com/hashicorp/golang-lru v0.5.0
 github.com/hashicorp/golang-lru/simplelru
 # github.com/pkg/errors v0.8.0

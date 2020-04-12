@@ -24,7 +24,6 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/iterator"
-	"google.golang.org/appengine/user"
 	tasks "google.golang.org/genproto/googleapis/cloud/tasks/v2beta2"
 )
 
@@ -165,7 +164,7 @@ func (s *server) deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var accID string
-	if u := user.Current(ctx); u == nil {
+	if u, err := currentUser(r); err != nil {
 		key := r.Header.Get(headerAPIKey)
 		if key == "" {
 			log.Errorf("not signed in and missing API key header")
@@ -179,13 +178,6 @@ func (s *server) deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		accID = u.Email
-	}
-
-	tasksSecret, err := tasksSecret(ctx, s.ds)
-	if err != nil {
-		log.Errorf("%v", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return
 	}
 
 	log.Infof("deleting account %q", accID)
@@ -224,7 +216,7 @@ func (s *server) deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 			createReq, err := jsonPostTask("/internal/deleteEntities", deleteEntitiesTask{
 				Namespace: namespace,
 				Kind:      KindArtworkRecord,
-			}, tasksSecret)
+			}, s.secret.TasksSecret)
 			if err != nil {
 				return errors.Wrapf(err, "failed to build task")
 			}
@@ -237,7 +229,7 @@ func (s *server) deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 			createReq, err := jsonPostTask("/internal/deleteEntities", deleteEntitiesTask{
 				Namespace: namespace,
 				Kind:      KindSongParent,
-			}, tasksSecret)
+			}, s.secret.TasksSecret)
 			if err != nil {
 				return errors.Wrapf(err, "failed to build task")
 			}
@@ -250,7 +242,7 @@ func (s *server) deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 			createReq, err := jsonPostTask("/internal/deleteEntities", deleteEntitiesTask{
 				Namespace: namespace,
 				Kind:      KindSong,
-			}, tasksSecret)
+			}, s.secret.TasksSecret)
 			if err != nil {
 				return errors.Wrapf(err, "failed to build task")
 			}
@@ -303,7 +295,7 @@ func (svr *server) scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if acc.Private && !canViewScrobbled(ctx, svr.ds, accID, user.Current(ctx), r.Header) {
+	if acc.Private && !canViewScrobbled(ctx, svr.ds, accID, r) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -368,13 +360,14 @@ func (svr *server) scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func canViewScrobbled(ctx context.Context, ds *datastore.Client, forAccountID string, u *user.User, h http.Header) bool {
-	if u != nil && u.Email == forAccountID {
+func canViewScrobbled(ctx context.Context, ds *datastore.Client, forAccountID string, r *http.Request) bool {
+	u, err := currentUser(r)
+	if err == nil && u.Email == forAccountID {
 		// a logged in user can view their own account's scrobbles
 		return true
 	}
 
-	if key := h.Get(headerAPIKey); key != "" {
+	if key := r.Header.Get(headerAPIKey); key != "" {
 		if _, id, _, err := accountForKey(ctx, key, ds); err == nil && id == forAccountID {
 			return true
 		}
@@ -403,13 +396,6 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	namespace := namespaceID(accID)
-
-	tasksSecret, err := tasksSecret(ctx, svr.ds)
-	if err != nil {
-		log.Errorf("%v", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
 
 	// Parse request.
 	type MediaItem struct {
@@ -557,7 +543,7 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 				Namespace:       namespace,
 				SongParentIdent: newParentIdent,
 				SongIdent:       songIdent,
-			}, tasksSecret)
+			}, svr.secret.TasksSecret)
 			if err != nil {
 				return errors.Wrapf(err, "failed to build task")
 			}
@@ -586,7 +572,7 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 			SongParentIdent:   newParentIdent,
 			SongParentCreated: newParentCreated,
 		}
-		createReq, err := jsonPostTask("/internal/markParentComplete", payload, tasksSecret)
+		createReq, err := jsonPostTask("/internal/markParentComplete", payload, svr.secret.TasksSecret)
 		if err != nil {
 			return errors.Wrapf(err, "failed to build task")
 		}
@@ -854,46 +840,6 @@ func fetchAccountForUsername(ctx context.Context, username string, ds *datastore
 		return Account{}, "", false
 	}
 	return a, id, true
-}
-
-const headerTasksSecret = "X-Scrobble-Tasks-Secret"
-
-func tasksSecret(ctx context.Context, ds *datastore.Client) (string, error) {
-	var secret Secret
-	if err := ds.Get(ctx, datastore.NameKey(KindSecret, "singleton", nil), &secret); err != nil {
-		return "", errors.Wrapf(err, "failed to get from datastore")
-	}
-	if secret.TasksSecret == "" {
-		panic("empty TasksSecret")
-	}
-	return secret.TasksSecret, nil
-}
-
-func (s *server) requireTasksSecretHeader(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-		got := r.Header.Get(headerTasksSecret)
-		if got == "" {
-			log.Errorf("missing tasks secret header")
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-
-		want, err := tasksSecret(ctx, s.ds)
-		if err != nil {
-			log.Errorf("tasks secret: %s", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		if want != got {
-			log.Errorf("bad tasks secret header")
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-
-		h.ServeHTTP(w, r)
-	})
 }
 
 func jsonPostTask(path string, payload interface{}, secret string) (*tasks.CreateTaskRequest, error) {
