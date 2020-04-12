@@ -4,8 +4,8 @@
 
 1. Increment `Version` in General > Identity
 1. Product > Archive, then choose Distribute App > Copy App
-1. Export the app to `macos/archive/<defaultname>`
+1. Export the app to `./macos/archive/<defaultname>`
 1. Zip the `itunes-scrobble` app found at the export directory
-1. `git tag $(date "+%s")` and `git push --tags`
+1. Commit changes, `git tag $(date "+%s")`, and `git push --tags`
 1. Create a new release at https://github.com/nishanths/scrobble/releases.
-   Use the tag as the title for the release. Include the zip file.
+   Use the tag as the title for the release. Include the zip file in the release.
