@@ -204,7 +204,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
             statusItem.isHidden = false
         } else {
             if let ls = state.lastScrobbled {
-                statusItem.title = String(format: "Last scrobbled:   %@", formatDate(ls)) // extra spaces for text alignment with secondary status item
+                statusItem.title = String(format: "Last scrobbled: %@", formatDate(ls)) // extra spaces for text alignment with secondary status item
                 statusItem.isHidden = false
             } else {
                 statusItem.isHidden = true
