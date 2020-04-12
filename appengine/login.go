@@ -102,7 +102,7 @@ func userInfoCookieCodec(hashKey, blockKey string) (*securecookie.SecureCookie, 
 	return s.MaxAge(int(CookieAgeUserInfo / time.Second)), nil
 }
 
-// ErrNoUser is returned when there is no user logged in.
+// ErrNoUser is returned by currentUser when there is no user logged in.
 var ErrNoUser = errors.New("no current user")
 
 type UserInfo CookieData
