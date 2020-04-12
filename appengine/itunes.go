@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,30 +12,49 @@ import (
 	"strings"
 	"time"
 
-	"golang.org/x/net/context"
-
+	"cloud.google.com/go/datastore"
+	"github.com/nishanths/scrobble/appengine/log"
 	"github.com/pkg/errors"
-	"google.golang.org/appengine"
-	"google.golang.org/appengine/datastore"
-	"google.golang.org/appengine/delay"
-	"google.golang.org/appengine/log"
-	"google.golang.org/appengine/urlfetch"
 )
 
-var fillITunesFields = delay.Func("fillITunesFields", func(ctx context.Context, namespace string, songParentIdent string, songIdent string) error {
-	done := false
+type fillITunesFieldsTask struct {
+	Namespace       string
+	SongParentIdent string
+	SongIdent       string
+}
 
-	ns, err := appengine.Namespace(ctx, namespace)
-	if err != nil {
-		return errors.Wrapf(err, "failed to make namespace for %q", namespace)
+func (s *server) fillITunesFieldsHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+
+	if r.Method != "POST" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
-	sKey := songKey(ns, songIdent, songParentKey(ns, songParentIdent))
+	var t fillITunesFieldsTask
+	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
+		log.Errorf("%v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if err := s.fillITunesFields(ctx, t.Namespace, t.SongParentIdent, t.SongIdent); err != nil {
+		log.Errorf("%v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (svr *server) fillITunesFields(ctx context.Context, namespace string, songParentIdent string, songIdent string) error {
+	done := false
+	sKey := songKey(namespace, songIdent, songParentKey(namespace, songParentIdent))
 
 	// Only fill from existing data.
-	if err := datastore.RunInTransaction(ctx, func(ctx context.Context) error {
+	if _, err := svr.ds.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
 		var s Song
-		if err := datastore.Get(ns, sKey, &s); err != nil {
+		if err := tx.Get(sKey, &s); err != nil {
 			if err == datastore.ErrNoSuchEntity {
 				done = true
 				return nil // deleted sometime in between?
@@ -47,14 +67,14 @@ var fillITunesFields = delay.Func("fillITunesFields", func(ctx context.Context, 
 		}
 
 		var track ITunesTrack
-		trackKey := datastore.NewKey(ctx, KindITunesTrack, songIdent, 0, nil)
-		if err := datastore.Get(ctx, trackKey, &track); err != nil && err != datastore.ErrNoSuchEntity {
+		trackKey := &datastore.Key{Kind: KindITunesTrack, Name: songIdent}
+		if err := tx.Get(trackKey, &track); err != nil && err != datastore.ErrNoSuchEntity {
 			return errors.Wrapf(err, "failed to get track %s", trackKey)
 		} else if err == nil {
 			// update the song and we are done
 			s.PreviewURL = track.PreviewURL
 			s.TrackViewURL = track.TrackViewURL
-			if _, err := datastore.Put(ns, sKey, &s); err != nil {
+			if _, err := tx.Put(sKey, &s); err != nil {
 				return errors.Wrapf(err, "failed to put song %s", sKey)
 			}
 			done = true
@@ -63,8 +83,8 @@ var fillITunesFields = delay.Func("fillITunesFields", func(ctx context.Context, 
 
 		// else err == datastore.ErrNoSuchEntity (will fetch from iTunes API below)
 		return nil
-	}, defaultTxOpts); err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+	}); err != nil {
+		log.Errorf("%v", err.Error())
 		return err
 	}
 
@@ -76,9 +96,9 @@ var fillITunesFields = delay.Func("fillITunesFields", func(ctx context.Context, 
 	time.Sleep(time.Duration(rand.Intn(60e3)) * time.Millisecond)
 
 	// Try both.
-	if err := datastore.RunInTransaction(ctx, func(ctx context.Context) error {
+	if _, err := svr.ds.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
 		var s Song
-		if err := datastore.Get(ns, sKey, &s); err != nil {
+		if err := tx.Get(sKey, &s); err != nil {
 			if err == datastore.ErrNoSuchEntity {
 				return nil // deleted sometime in between?
 			}
@@ -89,12 +109,12 @@ var fillITunesFields = delay.Func("fillITunesFields", func(ctx context.Context, 
 		}
 
 		// Fetch data from iTunes API
-		tctx, cancel := context.WithTimeout(ns, 5*time.Second)
+		tctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 		defer cancel()
 		searchTerm := strings.Join([]string{s.Title, s.ArtistName}, " ") // including the album name produces poorer results
-		tracks, retry, err := iTunesSearchSong(tctx, searchTerm)
+		tracks, retry, err := iTunesSearchSong(tctx, svr.httpClient, searchTerm)
 		if err != nil {
-			log.Errorf(ctx, "failed to search iTunes for %q: %s (retry=%v)", searchTerm, err, retry)
+			log.Errorf("failed to search iTunes for %q: %s (retry=%v)", searchTerm, err, retry)
 			if retry {
 				return err // returning a non-nil error causes the task to retry
 			}
@@ -110,29 +130,29 @@ var fillITunesFields = delay.Func("fillITunesFields", func(ctx context.Context, 
 		}
 
 		if matchingIdx == -1 {
-			log.Infof(ctx, "no matching tracks found for %q (len=%d)", searchTerm, len(tracks))
+			log.Infof("no matching tracks found for %q (len=%d)", searchTerm, len(tracks))
 			return nil
 		}
 
 		// store track for use in future calls
-		trackKey := datastore.NewKey(ctx, KindITunesTrack, songIdent, 0, nil)
-		if _, err := datastore.Put(ctx, trackKey, &tracks[matchingIdx]); err != nil {
+		trackKey := &datastore.Key{Kind: KindITunesTrack, Name: songIdent}
+		if _, err := tx.Put(trackKey, &tracks[matchingIdx]); err != nil {
 			return errors.Wrapf(err, "failed to put track %s", trackKey)
 		}
 
 		s.PreviewURL = tracks[matchingIdx].PreviewURL
 		s.TrackViewURL = tracks[matchingIdx].TrackViewURL
-		if _, err := datastore.Put(ns, sKey, &s); err != nil {
+		if _, err := tx.Put(sKey, &s); err != nil {
 			return errors.Wrapf(err, "failed to put song %s", sKey)
 		}
 		return nil
-	}, defaultTxOpts); err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+	}); err != nil {
+		log.Errorf("%v", err.Error())
 		return err
 	}
 
 	return nil
-})
+}
 
 type ITunesTrack struct {
 	ArtistName     string    `datastore:",noindex"`
@@ -157,7 +177,7 @@ func (i *ITunesTrack) Ident() string {
 }
 
 // See https://affiliate.itunes.apple.com/resources/documentation/itunes-store-web-service-search-api/
-func iTunesSearchSong(ctx context.Context, searchTerm string) ([]ITunesTrack, bool, error) {
+func iTunesSearchSong(ctx context.Context, httpClient *http.Client, searchTerm string) ([]ITunesTrack, bool, error) {
 	vals := make(url.Values)
 	vals.Set("term", searchTerm)
 	vals.Set("media", "music")
@@ -166,16 +186,20 @@ func iTunesSearchSong(ctx context.Context, searchTerm string) ([]ITunesTrack, bo
 	vals.Set("version", "2")
 	vals.Set("explicit", "Yes")
 
-	u := fmt.Sprintf("https://itunes.apple.com/search?%s", vals.Encode())
-	rsp, err := urlfetch.Client(ctx).Get(u)
+	req, err := http.NewRequest("GET", fmt.Sprintf("https://itunes.apple.com/search?%s", vals.Encode()), nil)
+	if err != nil {
+		return nil, true, errors.Wrapf(err, "failed to build itunes request")
+	}
+	req = req.WithContext(ctx)
+	rsp, err := httpClient.Do(req)
 	if err != nil {
 		// assume all errors are transient, indicate to retry
-		return nil, true, errors.Wrapf(err, "failed to make itunes request")
+		return nil, true, errors.Wrapf(err, "failed to do itunes request")
 	}
 	defer drainAndClose(rsp.Body)
 
 	if rsp.StatusCode != http.StatusOK {
-		// indicate retry on 403s, which appears to the "too many requests" code
+		// indicate retry on 403s, which appears to be the "too many requests" code
 		return nil, rsp.StatusCode == http.StatusForbidden, fmt.Errorf("bad status code %d", rsp.StatusCode)
 	}
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"crypto/rand"
 	"crypto/sha1"
 	"encoding/base64"
@@ -15,24 +16,19 @@ import (
 	"strings"
 	"time"
 
-	"golang.org/x/net/context"
-
+	"cloud.google.com/go/datastore"
 	"cloud.google.com/go/storage"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/google/uuid"
+	"github.com/nishanths/scrobble/appengine/log"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/iterator"
-	"google.golang.org/appengine"
-	"google.golang.org/appengine/datastore"
-	"google.golang.org/appengine/delay"
-	"google.golang.org/appengine/file"
-	"google.golang.org/appengine/log"
-	"google.golang.org/appengine/taskqueue"
-	"google.golang.org/appengine/user"
+	tasks "google.golang.org/genproto/googleapis/cloud/tasks/v2"
 )
 
 const (
-	artworkStorageDirectory = "aw" // Clould Storage directory name for artwork
+	artworkStorageDirectory = "aw" // Cloud Storage directory name for artwork
 )
 
 const (
@@ -41,8 +37,9 @@ const (
 	KindAPIKey        = "APIKey"   // stored for uniqueness checking
 	KindSongParent    = "SongParent"
 	KindSong          = "Song"
-	KindArtworkRecord = "ArtworkRecord" // for fast determination of missing artwork
+	KindArtworkRecord = "ArtworkRecord" // for fast key-only determination of missing artwork
 	KindITunesTrack   = "ITunesTrack"
+	KindSecret        = "Secret"
 )
 
 func songparentident(t time.Time, u uuid.UUID) string {
@@ -72,8 +69,8 @@ type SongParent struct {
 	Created  int64 // unix seconds
 }
 
-func songParentKey(ns context.Context, ident string) *datastore.Key {
-	return datastore.NewKey(ns, KindSongParent, ident, 0, nil)
+func songParentKey(namespace, ident string) *datastore.Key {
+	return &datastore.Key{Kind: KindSongParent, Name: ident, Namespace: namespace}
 }
 
 // Namespace: account
@@ -114,8 +111,8 @@ func (s *Song) iTunesFilled() bool {
 	return s.PreviewURL != "" && s.TrackViewURL != ""
 }
 
-func songKey(ns context.Context, ident string, parent *datastore.Key) *datastore.Key {
-	return datastore.NewKey(ns, KindSong, ident, 0, parent)
+func songKey(namespace, ident string, parent *datastore.Key) *datastore.Key {
+	return &datastore.Key{Kind: KindSong, Name: ident, Parent: parent, Namespace: namespace}
 }
 
 type SongResponse struct {
@@ -125,8 +122,8 @@ type SongResponse struct {
 
 const headerAPIKey = "X-Scrobble-API-Key"
 
-func accountHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := appengine.NewContext(r)
+func (s *server) accountHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 
 	if r.Method != "GET" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -139,7 +136,7 @@ func accountHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	acc, _, ok := fetchAccountForKey(ctx, key, w)
+	acc, _, ok := fetchAccountForKey(ctx, key, s.ds, w)
 	if !ok {
 		return
 	}
@@ -149,6 +146,7 @@ func accountHandler(w http.ResponseWriter, r *http.Request) {
 	}{acc.Username})
 
 	if err != nil {
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -157,8 +155,8 @@ func accountHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(b)
 }
 
-func deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := appengine.NewContext(r)
+func (s *server) deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -166,15 +164,15 @@ func deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var accID string
-	if u := user.Current(ctx); u == nil {
+	if u, err := s.currentUser(r); err != nil {
 		key := r.Header.Get(headerAPIKey)
 		if key == "" {
-			log.Errorf(ctx, "not signed in and missing API key header")
+			log.Errorf("not signed in and missing API key header")
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 		var ok bool
-		_, accID, ok = fetchAccountForKey(ctx, key, w)
+		_, accID, ok = fetchAccountForKey(ctx, key, s.ds, w)
 		if !ok {
 			return
 		}
@@ -182,50 +180,79 @@ func deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 		accID = u.Email
 	}
 
-	log.Infof(ctx, "deleting account %q", accID)
+	log.Infof("deleting account %q", accID)
 
-	if err := datastore.RunInTransaction(ctx, func(tx context.Context) error {
+	if _, err := s.ds.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
 		// synchronously delete Username, Account entities
 		// NOTE: we intentionally do not delete the APIKey entity because
 		// those should always exist to guarantee non-reuse.
-		aKey := datastore.NewKey(tx, KindAccount, accID, 0, nil)
+		aKey := &datastore.Key{Kind: KindAccount, Name: accID}
 		var account Account
-		if err := datastore.Get(tx, aKey, &account); err != nil {
+		if err := tx.Get(aKey, &account); err != nil {
 			return errors.Wrapf(err, "failed to get account")
 		}
 
-		log.Infof(tx, "Account entity %+v for key %s", account, aKey)
+		log.Infof("Account entity %+v for key %s", account, aKey)
 
 		// If the account isn't initialized, the username won't be set
 		// and a corresponding Username entity won't exist. So only
 		// attempt to delete the Username entity if the username is
 		// set.
 		if account.Username != "" {
-			if err := datastore.Delete(tx, datastore.NewKey(tx, KindUsername, account.Username, 0, nil)); err != nil {
+			if err := tx.Delete(&datastore.Key{Kind: KindUsername, Name: account.Username}); err != nil {
 				return errors.Wrapf(err, "failed to delete Username entity")
 			}
 		}
 
-		if err := datastore.Delete(tx, aKey); err != nil {
+		if err := tx.Delete(aKey); err != nil {
 			return errors.Wrapf(err, "failed to delete Account entity")
 		}
 
 		// asynchronously delete the namespace's entities
 		// (deletion order should not matter here)
 		namespace := namespaceID(accID)
-		if err := deleteFunc.Call(tx, namespace, KindArtworkRecord); err != nil {
-			return errors.Wrapf(err, "failed to call deleteFunc for %s,%s", namespace, KindArtworkRecord)
-		}
-		if err := deleteFunc.Call(tx, namespace, KindSongParent); err != nil {
-			return errors.Wrapf(err, "failed to call deleteFunc for %s,%s", namespace, KindSongParent)
-		}
-		if err := deleteFunc.Call(tx, namespace, KindSong); err != nil {
-			return errors.Wrapf(err, "failed to call deleteFunc for %s,%s", namespace, KindSong)
+
+		{
+			createReq, err := jsonPostTask("/internal/deleteEntities", deleteEntitiesTask{
+				Namespace: namespace,
+				Kind:      KindArtworkRecord,
+			}, s.secret.TasksSecret)
+			if err != nil {
+				return errors.Wrapf(err, "failed to build task")
+			}
+			if _, err := s.tasks.CreateTask(ctx, createReq); err != nil {
+				return errors.Wrapf(err, "failed to add task for %s,%s", namespace, KindArtworkRecord)
+			}
 		}
 
+		{
+			createReq, err := jsonPostTask("/internal/deleteEntities", deleteEntitiesTask{
+				Namespace: namespace,
+				Kind:      KindSongParent,
+			}, s.secret.TasksSecret)
+			if err != nil {
+				return errors.Wrapf(err, "failed to build task")
+			}
+			if _, err := s.tasks.CreateTask(ctx, createReq); err != nil {
+				return errors.Wrapf(err, "failed to add task for %s,%s", namespace, KindSongParent)
+			}
+		}
+
+		{
+			createReq, err := jsonPostTask("/internal/deleteEntities", deleteEntitiesTask{
+				Namespace: namespace,
+				Kind:      KindSong,
+			}, s.secret.TasksSecret)
+			if err != nil {
+				return errors.Wrapf(err, "failed to build task")
+			}
+			if _, err := s.tasks.CreateTask(ctx, createReq); err != nil {
+				return errors.Wrapf(err, "failed to add task for %s,%s", namespace, KindSong)
+			}
+		}
 		return nil
-	}, defaultTxOpts); err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+	}); err != nil {
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -233,14 +260,14 @@ func deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func scrobbledHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := appengine.NewContext(r)
+func (svr *server) scrobbledHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate, private")
 
 	writeSuccessRsp := func(s []SongResponse) {
 		w.Header().Set("Content-Type", "application/json")
 		if err := json.NewEncoder(w).Encode(s); err != nil {
-			log.Errorf(ctx, "failed to write response: %v", err.Error())
+			log.Errorf("failed to write response: %v", err.Error())
 		}
 	}
 
@@ -263,29 +290,27 @@ func scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	acc, accID, ok := fetchAccountForUsername(ctx, username, w)
+	acc, accID, ok := fetchAccountForUsername(ctx, username, svr.ds, w)
 	if !ok {
 		return
 	}
 
-	if acc.Private && !canViewScrobbled(ctx, accID, user.Current(ctx), r.Header) {
+	if acc.Private && !svr.canViewScrobbled(ctx, accID, r) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	ns, ok := namespaceFromAccount(ctx, accID, w)
-	if !ok {
-		return
-	}
+	namespace := namespaceID(accID)
 
 	// Get the latest parent.
 	q := datastore.NewQuery(KindSongParent).
+		Namespace(namespace).
 		Order("-Created").Filter("Complete=", true).
 		Limit(1).KeysOnly()
 
-	parentKeys, err := q.GetAll(ns, nil)
+	parentKeys, err := svr.ds.GetAll(ctx, q, nil)
 	if err != nil {
-		log.Errorf(ns, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -297,10 +322,10 @@ func scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 
 	if songIdent != "" {
 		// Get song by ident.
-		key := songKey(ns, songIdent, parentKeys[0])
+		key := songKey(namespace, songIdent, parentKeys[0])
 		var s SongResponse
-		if err := datastore.Get(ns, key, &s); err != nil {
-			log.Errorf(ns, "failed to fetch song %s: %v", key, err.Error())
+		if err := svr.ds.Get(ctx, key, &s); err != nil {
+			log.Errorf("failed to fetch song %s: %v", key, err.Error())
 			if err == datastore.ErrNoSuchEntity {
 				w.WriteHeader(http.StatusNotFound)
 			} else {
@@ -308,11 +333,12 @@ func scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		}
-		s.Ident = key.StringID()
+		s.Ident = key.Name
 		writeSuccessRsp([]SongResponse{s})
 	} else {
 		// Get all songs.
 		q = datastore.NewQuery(KindSong).
+			Namespace(namespace).
 			Order("-LastPlayed").
 			Ancestor(parentKeys[0])
 
@@ -321,27 +347,28 @@ func scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		songs := make([]SongResponse, 0) // use "make" to marshal as empty JSON array instead of null when there are 0 songs
-		keys, err := q.GetAll(ns, &songs)
+		keys, err := svr.ds.GetAll(ctx, q, &songs)
 		if err != nil {
-			log.Errorf(ns, "failed to fetch songs: %v", err.Error())
+			log.Errorf("failed to fetch songs: %v", err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		for i := range songs {
-			songs[i].Ident = keys[i].StringID()
+			songs[i].Ident = keys[i].Name
 		}
 		writeSuccessRsp(songs)
 	}
 }
 
-func canViewScrobbled(ctx context.Context, forAccountID string, u *user.User, h http.Header) bool {
-	if u != nil && u.Email == forAccountID {
+func (s *server) canViewScrobbled(ctx context.Context, forAccountID string, r *http.Request) bool {
+	u, err := s.currentUser(r)
+	if err == nil && u.Email == forAccountID {
 		// a logged in user can view their own account's scrobbles
 		return true
 	}
 
-	if key := h.Get(headerAPIKey); key != "" {
-		if _, id, _, err := accountForKey(ctx, key); err == nil && id == forAccountID {
+	if key := r.Header.Get(headerAPIKey); key != "" {
+		if _, id, _, err := accountForKey(ctx, key, s.ds); err == nil && id == forAccountID {
 			return true
 		}
 	}
@@ -349,8 +376,8 @@ func canViewScrobbled(ctx context.Context, forAccountID string, u *user.User, h 
 	return false
 }
 
-func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := appengine.NewContext(r)
+func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -363,15 +390,12 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, accID, ok := fetchAccountForKey(ctx, key, w)
+	_, accID, ok := fetchAccountForKey(ctx, key, svr.ds, w)
 	if !ok {
 		return
 	}
 
-	ns, ok := namespaceFromAccount(ctx, accID, w)
-	if !ok {
-		return
-	}
+	namespace := namespaceID(accID)
 
 	// Parse request.
 	type MediaItem struct {
@@ -396,15 +420,16 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	var mis []MediaItem
 	if err := json.NewDecoder(r.Body).Decode(&mis); err != nil {
-		log.Errorf(ns, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	now := time.Now()
 
-	// Convert to Songs.
+	// Convert to Songs (along with de-duplication)
 	var songs []Song
+	songIdentsSet := make(map[string]struct{}) // for de-duplication
 	for _, m := range mis {
 		sal := m.SortAlbumTitle
 		if sal == "" {
@@ -422,11 +447,12 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		// There is a bug (somewhere) that leads to some songs having last
 		// played times far into the future, for instance, in the year 2040.
 		// So ignore such songs.
-		if time.Unix(int64(m.LastPlayed), 0).Sub(now) > 365*24*time.Hour {
+		if last := time.Unix(int64(m.LastPlayed), 0); last.Sub(now) > 365*24*time.Hour {
+			log.Warningf("skipping song with future LastPlayed = %s", last)
 			continue
 		}
 
-		songs = append(songs, Song{
+		s := Song{
 			AlbumTitle:     m.AlbumTitle,
 			ArtistName:     m.ArtistName,
 			Title:          m.Title,
@@ -440,30 +466,47 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 			PlayCount:      int(m.PlayCount),
 			ArtworkHash:    m.ArtworkHash,
 			Loved:          m.Loved,
-		})
+		}
+
+		// Handle de-duplication
+		if _, ok := songIdentsSet[s.Ident()]; ok {
+			// NOTE: This happens in practice; macOS client seems bad.
+			log.Warningf("duplicate incoming song ident %v; skipping", s.Ident())
+			continue
+		}
+		songIdentsSet[s.Ident()] = struct{}{}
+
+		songs = append(songs, s)
 	}
 
 	newParentIdent := songparentident(now, uuid.New())
-	newParentKey := songParentKey(ns, newParentIdent)
+	newParentKey := songParentKey(namespace, newParentIdent)
+	newParentCreated := now.Unix()
 
 	// Create new incomplete SongParent.
-	if _, err := datastore.Put(ns, newParentKey, &SongParent{
+	if _, err := svr.ds.Put(ctx, newParentKey, &SongParent{
 		Complete: false,
-		Created:  now.Unix(),
+		Created:  newParentCreated,
 	}); err != nil {
-		log.Errorf(ns, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	sKeys := make([]*datastore.Key, len(songs))
+	var sKeys []*datastore.Key
 	var aKeys []*datastore.Key
-	for i, s := range songs {
+	// for de-duplication (otherwise PutMulti with repeated artwork hashes fails)
+	aKeysSet := make(map[string]struct{})
+	for _, s := range songs {
 		// Create song key.
-		sKeys[i] = songKey(ns, s.Ident(), newParentKey)
+		sKeys = append(sKeys, songKey(namespace, s.Ident(), newParentKey))
 		// Create artwork hash key.
 		if h := s.ArtworkHash; h != "" {
-			aKeys = append(aKeys, datastore.NewKey(ns, KindArtworkRecord, h, 0, nil))
+			if _, ok := aKeysSet[h]; ok {
+				continue
+			}
+			aKeysSet[h] = struct{}{}
+			aKeys = append(aKeys, &datastore.Key{Kind: KindArtworkRecord, Name: h, Namespace: namespace})
 		}
 	}
 
@@ -475,8 +518,8 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		keysChunk := sKeys[s:e]
 
 		for len(chunk) > 0 {
-			if _, err := datastore.PutMulti(ns, keysChunk, chunk); err != nil {
-				log.Errorf(ns, "failed to put songs: %v", err.Error())
+			if _, err := svr.ds.PutMulti(ctx, keysChunk, chunk); err != nil {
+				log.Errorf("failed to put songs: %v", err.Error())
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
@@ -488,7 +531,7 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	var g errgroup.Group
+	var g errgroup.Group // TODO: why is this group not deriving from request context?
 
 	// Put artwork hash keys.
 	g.Go(func() error {
@@ -497,7 +540,7 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		keysChunk := aKeys[s:e]
 
 		for len(keysChunk) > 0 {
-			if _, err := datastore.PutMulti(ns, keysChunk, make([]struct{}, len(keysChunk))); err != nil {
+			if _, err := svr.ds.PutMulti(ctx, keysChunk, make([]struct{}, len(keysChunk))); err != nil {
 				return errors.Wrapf(err, "failed to put artwork records")
 			}
 
@@ -511,17 +554,28 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Create tasks to fill in iTunes-related fields.
 	for _, s := range songs {
+		if s.iTunesFilled() {
+			continue
+		}
 		songIdent := s.Ident()
 		g.Go(func() error {
-			if err := fillITunesFields.Call(ctx, namespaceID(accID), newParentIdent, songIdent); err != nil {
-				return errors.Wrapf(err, "failed to call fillITunesFields for %s,%s", namespaceID(accID), newParentIdent, songIdent)
+			createReq, err := jsonPostTask("/internal/fillITunesFields", fillITunesFieldsTask{
+				Namespace:       namespace,
+				SongParentIdent: newParentIdent,
+				SongIdent:       songIdent,
+			}, svr.secret.TasksSecret)
+			if err != nil {
+				return errors.Wrapf(err, "failed to build task")
+			}
+			if _, err := svr.tasks.CreateTask(ctx, createReq); err != nil {
+				return errors.Wrapf(err, "failed to add fillITunesFields tasks for %s,%s,%s", namespaceID(accID), newParentIdent, songIdent)
 			}
 			return nil
 		})
 	}
 
 	if err := g.Wait(); err != nil {
-		log.Errorf(ns, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -533,17 +587,23 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 	//
 	// TODO: make this deterministic instead of using a delay?
 	if err := func() error {
-		task, err := markParentComplete.Task(namespaceID(accID), newParentIdent)
-		if err != nil {
-			return errors.Wrapf(err, "failed to make task")
+		payload := markParentCompleteTask{
+			Namespace:         namespaceID(accID),
+			SongParentIdent:   newParentIdent,
+			SongParentCreated: newParentCreated,
 		}
-		task.Delay = 2 * time.Minute
-		if _, err := taskqueue.Add(ns, task, ""); err != nil {
+		createReq, err := jsonPostTask("/internal/markParentComplete", payload, svr.secret.TasksSecret)
+		if err != nil {
+			return errors.Wrapf(err, "failed to build task")
+		}
+		createReq.Task.ScheduleTime, _ = ptypes.TimestampProto(time.Now().Add(2 * time.Minute))
+
+		if _, err := svr.tasks.CreateTask(ctx, createReq); err != nil {
 			return errors.Wrapf(err, "failed to add task")
 		}
 		return nil
 	}(); err != nil {
-		log.Errorf(ns, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -551,8 +611,8 @@ func scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func artworkHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := appengine.NewContext(r)
+func (s *server) artworkHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -567,14 +627,14 @@ func artworkHandler(w http.ResponseWriter, r *http.Request) {
 
 	// validate API key
 	// TODO: make this more explicit
-	_, _, ok := fetchAccountForKey(ctx, key, w)
+	_, _, ok := fetchAccountForKey(ctx, key, s.ds, w)
 	if !ok {
 		return
 	}
 
 	artwork, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Errorf(ctx, "failed to read request body: %v", err.Error())
+		log.Errorf("failed to read request body: %v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -583,42 +643,27 @@ func artworkHandler(w http.ResponseWriter, r *http.Request) {
 	hash := artworkHash(artwork, format)
 
 	// upload to GCS
-	name, err := file.DefaultBucketName(ctx)
-	if err != nil {
-		log.Errorf(ctx, "failed to get default GCS bucket name: %v", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	client, err := storage.NewClient(ctx)
-	if err != nil {
-		log.Errorf(ctx, "failed to create client: %v", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	defer client.Close()
-
-	wr := client.Bucket(name).Object(artworkStorageDirectory + "/" + hash).NewWriter(ctx)
+	wr := s.storage.Bucket(DefaultBucketName).Object(artworkStorageDirectory + "/" + hash).NewWriter(ctx)
 	wr.Metadata = map[string]string{"format": format}
 	if _, err := wr.Write(artwork); err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	if err := wr.Close(); err != nil {
-		log.Errorf(ctx, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	log.Infof(ctx, "saved artwork hash=%s", hash)
+	log.Infof("saved artwork hash=%s", hash)
 
 	w.Header().Set("Content-Type", "application/json")
 	io.WriteString(w, hash)
 }
 
-func artworkMissingHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := appengine.NewContext(r)
+func (s *server) artworkMissingHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 
 	if r.Method != "GET" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -631,41 +676,27 @@ func artworkMissingHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, accID, ok := fetchAccountForKey(ctx, key, w)
+	_, accID, ok := fetchAccountForKey(ctx, key, s.ds, w)
 	if !ok {
 		return
 	}
 
-	ns, ok := namespaceFromAccount(ctx, accID, w)
-	if !ok {
-		return
-	}
+	namespace := namespaceID(accID)
 
-	g, gns := errgroup.WithContext(ns)
+	g, gctx := errgroup.WithContext(ctx)
 	have := make(map[string]struct{})
 	want := make(map[string]bool)
 	var artworkKeys []*datastore.Key
 
 	g.Go(func() error {
-		name, err := file.DefaultBucketName(gns)
-		if err != nil {
-			return errors.Wrapf(err, "failed to get default GCS bucket name")
-		}
-
-		client, err := storage.NewClient(gns)
-		if err != nil {
-			return errors.Wrapf(err, "failed to create client")
-		}
-		defer client.Close()
-
-		it := client.Bucket(name).Objects(gns, &storage.Query{Prefix: artworkStorageDirectory + "/"})
+		it := s.storage.Bucket(DefaultBucketName).Objects(gctx, &storage.Query{Prefix: artworkStorageDirectory + "/"})
 		for {
 			o, err := it.Next()
 			if err == iterator.Done {
 				break
 			}
 			if err != nil {
-				log.Errorf(gns, "%v", err.Error()) // only log
+				log.Errorf("%v", err.Error()) // only log
 				break
 			}
 			have[strings.TrimPrefix(o.Name, artworkStorageDirectory+"/")] = struct{}{}
@@ -674,7 +705,8 @@ func artworkMissingHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	g.Go(func() error {
-		keys, err := datastore.NewQuery(KindArtworkRecord).KeysOnly().GetAll(gns, nil)
+		q := datastore.NewQuery(KindArtworkRecord).Namespace(namespace).KeysOnly()
+		keys, err := s.ds.GetAll(gctx, q, nil)
 		if err != nil {
 			return errors.Wrapf(err, "failed to fetch artwork records")
 		}
@@ -683,59 +715,81 @@ func artworkMissingHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err := g.Wait(); err != nil {
-		log.Errorf(ns, "%v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	for _, k := range artworkKeys {
-		if _, ok := have[k.StringID()]; ok {
+		if _, ok := have[k.Name]; ok {
 			continue
 		}
-		want[k.StringID()] = true
+		want[k.Name] = true
 	}
 
-	log.Infof(ns, "%d artwork records with missing data", len(want))
+	log.Infof("%d artwork records with missing data", len(want))
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(want); err != nil {
-		log.Errorf(ns, "failed to write response: %v", err.Error())
+		log.Errorf("failed to write response: %v", err.Error())
 	}
 }
 
-// Marks a SongParent as complete, and deletes really old SongParents and their
-// child Songs.
-var markParentComplete = delay.Func("markParentComplete", func(ctx context.Context, namespace string, songParentIdent string) error {
-	ns, err := appengine.Namespace(ctx, namespace)
-	if err != nil {
-		log.Errorf(ctx, "failed to make namespace: %v", err.Error())
-		return errors.Wrapf(err, "failed to make namespace")
+type markParentCompleteTask struct {
+	Namespace         string
+	SongParentIdent   string
+	SongParentCreated int64
+}
+
+func (s *server) markParentCompleteHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+
+	if r.Method != "POST" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
+	var t markParentCompleteTask
+	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
+		log.Errorf("%v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if err := s.markParentComplete(ctx, t.Namespace, t.SongParentIdent, t.SongParentCreated); err != nil {
+		log.Errorf("%v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+// Marks a SongParent as complete, and deletes any other SongParents and their
+// child Songs.
+func (s *server) markParentComplete(ctx context.Context, namespace, songParentIdent string, songParentCreated int64) error {
 	// Create parent link.
-	newParentKey := songParentKey(ns, songParentIdent)
-	if err := datastore.RunInTransaction(ns, func(tx context.Context) error {
+	newParentKey := songParentKey(namespace, songParentIdent)
+	if _, err := s.ds.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
 		var sp SongParent
-		if err := datastore.Get(ns, newParentKey, &sp); err != nil {
+		if err := tx.Get(newParentKey, &sp); err != nil {
 			return errors.Wrapf(err, "failed to get %s", newParentKey)
 		}
 		sp.Complete = true
-		if _, err := datastore.Put(ns, newParentKey, &sp); err != nil {
+		if _, err := tx.Put(newParentKey, &sp); err != nil {
 			return errors.Wrapf(err, "failed to put %s", newParentKey)
 		}
 		return nil
-	}, defaultTxOpts); err != nil {
-		log.Errorf(ns, "%v", err.Error())
+	}); err != nil {
 		return err
 	}
 
-	if err := trimSongParents(ns); err != nil {
-		log.Errorf(ns, "%v", err.Error())
+	if err := trimSongParents(ctx, namespace, songParentCreated, s.ds); err != nil {
 		return err
 	}
 
 	return nil
-})
+}
 
 func min(a, b int) int {
 	if a < b {
@@ -744,16 +798,18 @@ func min(a, b int) int {
 	return b
 }
 
-func accountForKey(ctx context.Context, apiKey string) (Account, string, int, error) {
+func accountForKey(ctx context.Context, apiKey string, ds *datastore.Client) (Account, string, int, error) {
+	q := datastore.NewQuery(KindAccount).Filter("APIKey=", apiKey).Limit(2)
+
 	var as []Account
-	keys, err := datastore.NewQuery(KindAccount).Filter("APIKey=", apiKey).Limit(2).GetAll(ctx, &as)
+	keys, err := ds.GetAll(ctx, q, &as)
 	if err != nil {
 		return Account{}, "", http.StatusInternalServerError, err
 	}
 
 	if len(keys) > 1 {
 		m := fmt.Sprintf("multiple accounts for API key %q", apiKey)
-		log.Criticalf(ctx, m)
+		log.Criticalf(m)
 		panic(m)
 	}
 
@@ -761,19 +817,21 @@ func accountForKey(ctx context.Context, apiKey string) (Account, string, int, er
 		return Account{}, "", http.StatusNotFound, fmt.Errorf("no accounts for API key: %s", apiKey)
 	}
 
-	return as[0], keys[0].StringID(), 0, nil
+	return as[0], keys[0].Name, 0, nil
 }
 
-func accountForUsername(ctx context.Context, username string) (Account, string, int, error) {
+func accountForUsername(ctx context.Context, username string, ds *datastore.Client) (Account, string, int, error) {
+	q := datastore.NewQuery(KindAccount).Filter("Username=", username).Limit(2)
+
 	var as []Account
-	keys, err := datastore.NewQuery(KindAccount).Filter("Username=", username).Limit(2).GetAll(ctx, &as)
+	keys, err := ds.GetAll(ctx, q, &as)
 	if err != nil {
 		return Account{}, "", http.StatusInternalServerError, err
 	}
 
 	if len(keys) > 1 {
 		m := fmt.Sprintf("multiple accounts for username %q", username)
-		log.Criticalf(ctx, m)
+		log.Criticalf(m)
 		panic(m)
 	}
 
@@ -781,42 +839,53 @@ func accountForUsername(ctx context.Context, username string) (Account, string, 
 		return Account{}, "", http.StatusNotFound, fmt.Errorf("no accounts for username: %s", username)
 	}
 
-	return as[0], keys[0].StringID(), 0, nil
+	return as[0], keys[0].Name, 0, nil
 }
 
-func fetchAccountForKey(ctx context.Context, apiKey string, w http.ResponseWriter) (Account, string, bool) {
-	a, id, code, err := accountForKey(ctx, apiKey)
+func fetchAccountForKey(ctx context.Context, apiKey string, ds *datastore.Client, w http.ResponseWriter) (Account, string, bool) {
+	a, id, code, err := accountForKey(ctx, apiKey, ds)
 	if err != nil {
-		log.Errorf(ctx, err.Error())
+		log.Errorf(err.Error())
 		w.WriteHeader(code)
 		return Account{}, "", false
 	}
 	return a, id, true
 }
 
-func fetchAccountForUsername(ctx context.Context, username string, w http.ResponseWriter) (Account, string, bool) {
-	a, id, code, err := accountForUsername(ctx, username)
+func fetchAccountForUsername(ctx context.Context, username string, ds *datastore.Client, w http.ResponseWriter) (Account, string, bool) {
+	a, id, code, err := accountForUsername(ctx, username, ds)
 	if err != nil {
-		log.Errorf(ctx, err.Error())
+		log.Errorf(err.Error())
 		w.WriteHeader(code)
 		return Account{}, "", false
 	}
 	return a, id, true
+}
+
+func jsonPostTask(path string, payload interface{}, secret string) (*tasks.CreateTaskRequest, error) {
+	p, err := json.Marshal(payload)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to json-marshal payload")
+	}
+
+	return &tasks.CreateTaskRequest{
+		Parent: DefaultQueueName,
+		Task: &tasks.Task{
+			MessageType: &tasks.Task_AppEngineHttpRequest{
+				AppEngineHttpRequest: &tasks.AppEngineHttpRequest{
+					HttpMethod:  tasks.HttpMethod_POST,
+					RelativeUri: path,
+					Headers:     map[string]string{headerTasksSecret: secret},
+					Body:        p,
+				},
+			},
+		},
+	}, nil
 }
 
 func namespaceID(accountID string) string {
 	// allowed namespace pattern: /^[0-9A-Za-z._-]{0,100}$/
 	return string(hexencode([]byte(accountID)))
-}
-
-func namespaceFromAccount(ctx context.Context, accountID string, w http.ResponseWriter) (context.Context, bool) {
-	ns, err := appengine.Namespace(ctx, namespaceID(accountID))
-	if err != nil {
-		log.Errorf(ctx, err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return nil, false
-	}
-	return ns, true
 }
 
 func generateAPIKey() (string, error) {

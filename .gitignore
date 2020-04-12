@@ -4,5 +4,10 @@ web/node_modules
 # symlinks
 appengine/web
 
+# binary
+appengine/main
+
 # directory for local archive exporting
 macos/archive
+
+.DS_Store

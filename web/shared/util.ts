@@ -1,5 +1,7 @@
 import * as base64js from "base64-js";
 
+export const cookieAuthErrorMessage = "Cookie authentication failed. Log in again?"
+
 export function hasPrefix(s: string, prefix: string): boolean {
   return s.length >= prefix.length && s.slice(0, prefix.length) == prefix
 }

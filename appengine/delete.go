@@ -1,34 +1,57 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
+	"net/http"
 
+	"cloud.google.com/go/datastore"
+	"github.com/nishanths/scrobble/appengine/log"
 	"github.com/pkg/errors"
-	"golang.org/x/net/context"
 	"golang.org/x/sync/errgroup"
-	"google.golang.org/appengine"
-	"google.golang.org/appengine/datastore"
-	"google.golang.org/appengine/delay"
-	"google.golang.org/appengine/log"
+	"google.golang.org/api/iterator"
 )
 
 // Datastore limit per operation, i.e. the number of entities that can be
 // put/get/deleted in a single call. App Engine documentation?
 const datastoreLimitPerOp = 500
 
-// Deletes entities of the given kind in the namespace.
-var deleteFunc = delay.Func("delete", func(ctx context.Context, namespace string, kind string) error {
-	log.Infof(ctx, "deleting namespace=%s, kind=%s", namespace, kind)
+type deleteEntitiesTask struct {
+	Namespace string
+	Kind      string
+}
 
-	ns, err := appengine.Namespace(ctx, namespace)
-	if err != nil {
-		log.Errorf(ctx, "failed to make namespace: %v", err.Error())
-		return errors.Wrapf(err, "failed to make namespace")
+func (s *server) deleteEntitiesHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+
+	if r.Method != "POST" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
-	allKeys, err := datastore.NewQuery(kind).KeysOnly().GetAll(ns, nil)
+	var t deleteEntitiesTask
+	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
+		log.Errorf("%v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if err := s.deleteEntities(ctx, t.Namespace, t.Kind); err != nil {
+		log.Errorf("%v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+// Deletes entities of the given kind in the namespace.
+func (svr *server) deleteEntities(ctx context.Context, namespace string, kind string) error {
+	log.Infof("deleting namespace=%s, kind=%s", namespace, kind)
+
+	allKeys, err := svr.ds.GetAll(ctx, datastore.NewQuery(kind).Namespace(namespace).KeysOnly(), nil)
 	if err != nil {
-		log.Errorf(ctx, "failed to get keys: %v", err.Error())
 		return errors.Wrapf(err, "failed to get keys")
 	}
 
@@ -37,8 +60,7 @@ var deleteFunc = delay.Func("delete", func(ctx context.Context, namespace string
 	chunk := allKeys[s:e]
 
 	for len(chunk) > 0 {
-		if err := deleteKeysChunk(ns, chunk); err != nil {
-			log.Errorf(ns, "failed to delete chunk: %v", err.Error())
+		if err := deleteKeysChunk(ctx, chunk, svr.ds); err != nil {
 			return errors.Wrapf(err, "failed to delete chunk")
 		}
 
@@ -48,39 +70,36 @@ var deleteFunc = delay.Func("delete", func(ctx context.Context, namespace string
 	}
 
 	return nil
-})
+}
 
-func deleteKeysChunk(c context.Context, keys []*datastore.Key) error {
+func deleteKeysChunk(c context.Context, keys []*datastore.Key, ds *datastore.Client) error {
 	if len(keys) > datastoreLimitPerOp {
 		panic(fmt.Sprintf("length must be <= %d, got %d", datastoreLimitPerOp, len(keys)))
 	}
 	if len(keys) == 0 {
 		return nil
 	}
-	return datastore.DeleteMulti(c, keys)
+	return ds.DeleteMulti(c, keys)
 }
 
-func trimSongParents(ns context.Context) error {
-	f := func(complete bool, trimAt, nDelete int) error {
-		// Get the oldest up to the limit.
-		q := datastore.NewQuery(KindSongParent).
-			Order("Created").Filter("Complete=", complete).
-			Limit(trimAt).KeysOnly()
+func trimSongParents(ctx context.Context, namespace string, createdBefore int64, ds *datastore.Client) error {
+	f := func() error {
+		log.Infof("about to delete SongParents created before %d", createdBefore)
 
-		spKeys, err := q.GetAll(ns, nil)
+		q := datastore.NewQuery(KindSongParent).
+			Namespace(namespace).
+			Filter("Created <", createdBefore).
+			KeysOnly()
+
+		toDeleteSpKeys, err := ds.GetAll(ctx, q, nil)
 		if err != nil {
 			return errors.Wrapf(err, "failed to get SongParents")
 		}
 
-		if len(spKeys) < trimAt {
-			return nil // don't trim
-		}
-
-		toDeleteSpKeys := spKeys[:nDelete]
-		g, gns := errgroup.WithContext(ns)
+		g, gctx := errgroup.WithContext(ctx)
 
 		for _, spKey := range toDeleteSpKeys {
-			log.Infof(ns, "deleting %s as part of trimming", spKey)
+			log.Infof("deleting %s as part of trimming", spKey)
 		}
 
 		// Gather and delete the Songs under each SongParent.
@@ -88,11 +107,11 @@ func trimSongParents(ns context.Context) error {
 			spKey := spKey // for closure
 			g.Go(func() error {
 				var del []*datastore.Key // accumulate keys to delete
-				q := datastore.NewQuery(KindSong).Ancestor(spKey).KeysOnly()
+				q := datastore.NewQuery(KindSong).Namespace(namespace).Ancestor(spKey).KeysOnly()
 
-				for t := q.Run(gns); ; {
+				for t := ds.Run(gctx, q); ; {
 					songKey, err := t.Next(nil)
-					if err == datastore.Done {
+					if err == iterator.Done {
 						break
 					}
 					if err != nil {
@@ -101,7 +120,7 @@ func trimSongParents(ns context.Context) error {
 
 					del = append(del, songKey)
 					if len(del) == datastoreLimitPerOp {
-						if err := deleteKeysChunk(gns, del); err != nil {
+						if err := deleteKeysChunk(gctx, del, ds); err != nil {
 							return err
 						}
 						del = del[:0]
@@ -109,7 +128,7 @@ func trimSongParents(ns context.Context) error {
 				}
 
 				// delete last remaining (if any)
-				if err := deleteKeysChunk(gns, del); err != nil {
+				if err := deleteKeysChunk(gctx, del, ds); err != nil {
 					return err
 				}
 				return nil
@@ -126,8 +145,8 @@ func trimSongParents(ns context.Context) error {
 		chunk := toDeleteSpKeys[s:e]
 
 		for len(chunk) > 0 {
-			if err := deleteKeysChunk(ns, chunk); err != nil {
-				log.Errorf(ns, "failed to delete chunk: %v", err.Error())
+			if err := deleteKeysChunk(ctx, chunk, ds); err != nil {
+				log.Errorf("failed to delete chunk: %v", err.Error())
 				return errors.Wrapf(err, "failed to delete chunk")
 			}
 
@@ -139,11 +158,5 @@ func trimSongParents(ns context.Context) error {
 		return nil
 	}
 
-	if err := f(true, 10, 5); err != nil {
-		return err
-	}
-	if err := f(false, 5, 3); err != nil {
-		return err
-	}
-	return nil
+	return f()
 }
