@@ -7,4 +7,4 @@ service, with a client app available for macOS.
 
 ## Icons
 
-The macOS app icon is Flower by nitut786 from the Noun Project.
+The macOS app icon is _Flower_ by _nitut786_ from The Noun Project.
