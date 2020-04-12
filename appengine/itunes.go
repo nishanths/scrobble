@@ -199,7 +199,7 @@ func iTunesSearchSong(ctx context.Context, httpClient *http.Client, searchTerm s
 	defer drainAndClose(rsp.Body)
 
 	if rsp.StatusCode != http.StatusOK {
-		// indicate retry on 403s, which appears to the "too many requests" code
+		// indicate retry on 403s, which appears to be the "too many requests" code
 		return nil, rsp.StatusCode == http.StatusForbidden, fmt.Errorf("bad status code %d", rsp.StatusCode)
 	}
 
