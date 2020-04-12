@@ -17,7 +17,7 @@
 // Package cloudtasks is an auto-generated package for the
 // Cloud Tasks API.
 //
-//   NOTE: This package is in beta. It is not stable, and may be subject to changes.
+//   NOTE: This package is in alpha. It is not stable, and is likely to change.
 //
 // Manages the execution of large numbers of distributed requests.
 //
@@ -31,7 +31,7 @@
 //
 // For information about setting deadlines, reusing contexts, and more
 // please visit godoc.org/cloud.google.com/go.
-package cloudtasks // import "cloud.google.com/go/cloudtasks/apiv2beta2"
+package cloudtasks // import "cloud.google.com/go/cloudtasks/apiv2"
 
 import (
 	"context"

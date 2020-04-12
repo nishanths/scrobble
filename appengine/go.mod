@@ -9,7 +9,6 @@ require (
 	golang.org/x/oauth2 v0.0.0-20190226205417-e64efc72b421
 	golang.org/x/sync v0.0.0-20190227155943-e225da77a7e6
 	google.golang.org/api v0.4.0
-	google.golang.org/appengine v1.4.0
 	google.golang.org/genproto v0.0.0-20190418145605-e7d98fc518a7
 )
 

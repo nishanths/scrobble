@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	cloudtasks "cloud.google.com/go/cloudtasks/apiv2beta2"
+	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	"cloud.google.com/go/datastore"
 	"cloud.google.com/go/storage"
 	"github.com/nishanths/scrobble/appengine/log"

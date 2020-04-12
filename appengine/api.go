@@ -24,7 +24,7 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/iterator"
-	tasks "google.golang.org/genproto/googleapis/cloud/tasks/v2beta2"
+	tasks "google.golang.org/genproto/googleapis/cloud/tasks/v2"
 )
 
 const (
@@ -427,8 +427,9 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 
 	now := time.Now()
 
-	// Convert to Songs.
+	// Convert to Songs (along with de-duplication)
 	var songs []Song
+	songIdentsSet := make(map[string]struct{}) // for de-duplication
 	for _, m := range mis {
 		sal := m.SortAlbumTitle
 		if sal == "" {
@@ -451,7 +452,7 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		songs = append(songs, Song{
+		s := Song{
 			AlbumTitle:     m.AlbumTitle,
 			ArtistName:     m.ArtistName,
 			Title:          m.Title,
@@ -465,7 +466,17 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 			PlayCount:      int(m.PlayCount),
 			ArtworkHash:    m.ArtworkHash,
 			Loved:          m.Loved,
-		})
+		}
+
+		// Handle de-duplication
+		if _, ok := songIdentsSet[s.Ident()]; ok {
+			// NOTE: This happens in practice; macOS client seems bad.
+			log.Warningf("duplicate incoming song ident %v; skipping", s.Ident())
+			continue
+		}
+		songIdentsSet[s.Ident()] = struct{}{}
+
+		songs = append(songs, s)
 	}
 
 	newParentIdent := songparentident(now, uuid.New())
@@ -482,13 +493,19 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sKeys := make([]*datastore.Key, len(songs))
+	var sKeys []*datastore.Key
 	var aKeys []*datastore.Key
-	for i, s := range songs {
+	// for de-duplication (otherwise PutMulti with repeated artwork hashes fails)
+	aKeysSet := make(map[string]struct{})
+	for _, s := range songs {
 		// Create song key.
-		sKeys[i] = songKey(namespace, s.Ident(), newParentKey)
+		sKeys = append(sKeys, songKey(namespace, s.Ident(), newParentKey))
 		// Create artwork hash key.
 		if h := s.ArtworkHash; h != "" {
+			if _, ok := aKeysSet[h]; ok {
+				continue
+			}
+			aKeysSet[h] = struct{}{}
 			aKeys = append(aKeys, &datastore.Key{Kind: KindArtworkRecord, Name: h, Namespace: namespace})
 		}
 	}
@@ -537,6 +554,9 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Create tasks to fill in iTunes-related fields.
 	for _, s := range songs {
+		if s.iTunesFilled() {
+			continue
+		}
 		songIdent := s.Ident()
 		g.Go(func() error {
 			createReq, err := jsonPostTask("/internal/fillITunesFields", fillITunesFieldsTask{
@@ -851,12 +871,12 @@ func jsonPostTask(path string, payload interface{}, secret string) (*tasks.Creat
 	return &tasks.CreateTaskRequest{
 		Parent: DefaultQueueName,
 		Task: &tasks.Task{
-			PayloadType: &tasks.Task_AppEngineHttpRequest{
+			MessageType: &tasks.Task_AppEngineHttpRequest{
 				AppEngineHttpRequest: &tasks.AppEngineHttpRequest{
 					HttpMethod:  tasks.HttpMethod_POST,
-					RelativeUrl: path,
+					RelativeUri: path,
 					Headers:     map[string]string{headerTasksSecret: secret},
-					Payload:     p,
+					Body:        p,
 				},
 			},
 		},
