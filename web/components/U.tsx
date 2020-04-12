@@ -117,9 +117,8 @@ export const U: React.FC<UProps> = ({
     if (initEnd.current === true) { return }
     initEnd.current = false
     const e = scrobbles.error === false ? nextEndIdx(0, songsForMode(mode, scrobblesRef.current.songs).length) : 0
-    console.log('setting end idx initial', e)
     setEndIdx(e)
-  }, [scrobbles])
+  }, [scrobbles, mode])
 
   useEffect(() => {
     dispatch(fetchScrobbles(profileUsername))
@@ -131,13 +130,12 @@ export const U: React.FC<UProps> = ({
       if ((wnd.innerHeight + wnd.pageYOffset) >= (wnd.document.body.offsetHeight - leeway)) {
         const newEnd = nextEndIdx(endIdxRef.current, songsForMode(mode, scrobblesRef.current.songs).length)
         const e = Math.max(newEnd, endIdxRef.current)
-        console.log('setting end idx scroll', e)
         setEndIdx(e)
       }
     }
     wnd.addEventListener("scroll", f)
     return () => { wnd.removeEventListener("scroll", f) }
-  }, [])
+  }, [scrobbles, mode])
 
   // ... render ...
 
