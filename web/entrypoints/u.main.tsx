@@ -4,7 +4,7 @@ import * as ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom"
 import { createStore, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
-import { U, Mode } from "../components/Ux"
+import { U, Mode } from "../components/U"
 import { UArgs } from "../shared/types";
 import reducer from "../redux/reducers/u"
 
