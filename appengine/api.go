@@ -484,11 +484,12 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 
 	newParentIdent := songparentident(now, uuid.New())
 	newParentKey := songParentKey(namespace, newParentIdent)
+	newParentCreated := now.Unix()
 
 	// Create new incomplete SongParent.
 	if _, err := svr.ds.Put(ctx, newParentKey, &SongParent{
 		Complete: false,
-		Created:  now.Unix(),
+		Created:  newParentCreated,
 	}); err != nil {
 		log.Errorf(ctx, "%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
@@ -583,6 +584,7 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		payload := markParentCompleteTask{
 			Namespace:       namespaceID(accID),
 			SongParentIdent: newParentIdent,
+			SongParentCreated: newParentCreated,
 		}
 		createReq, err := jsonPostTask("/internal/markParentComplete", payload, tasksSecret)
 		if err != nil {
@@ -730,6 +732,7 @@ func (s *server) artworkMissingHandler(w http.ResponseWriter, r *http.Request) {
 type markParentCompleteTask struct {
 	Namespace       string
 	SongParentIdent string
+	SongParentCreated int64
 }
 
 func (s *server) markParentCompleteHandler(w http.ResponseWriter, r *http.Request) {
@@ -747,7 +750,7 @@ func (s *server) markParentCompleteHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if err := s.markParentComplete(ctx, t.Namespace, t.SongParentIdent); err != nil {
+	if err := s.markParentComplete(ctx, t.Namespace, t.SongParentIdent, t.SongParentCreated); err != nil {
 		log.Errorf(ctx, "%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -756,9 +759,9 @@ func (s *server) markParentCompleteHandler(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusOK)
 }
 
-// Marks a SongParent as complete, and deletes really old SongParents and their
+// Marks a SongParent as complete, and deletes any other SongParents and their
 // child Songs.
-func (s *server) markParentComplete(ctx context.Context, namespace string, songParentIdent string) error {
+func (s *server) markParentComplete(ctx context.Context, namespace, songParentIdent string, songParentCreated int64) error {
 	// Create parent link.
 	newParentKey := songParentKey(namespace, songParentIdent)
 	if _, err := s.ds.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
@@ -775,7 +778,7 @@ func (s *server) markParentComplete(ctx context.Context, namespace string, songP
 		return err
 	}
 
-	if err := trimSongParents(ctx, namespace, s.ds); err != nil {
+	if err := trimSongParents(ctx, namespace, songParentCreated, s.ds); err != nil {
 		return err
 	}
 

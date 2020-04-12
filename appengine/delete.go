@@ -82,24 +82,20 @@ func deleteKeysChunk(c context.Context, keys []*datastore.Key, ds *datastore.Cli
 	return ds.DeleteMulti(c, keys)
 }
 
-func trimSongParents(ctx context.Context, namespace string, ds *datastore.Client) error {
-	f := func(complete bool, trimAt, nDelete int) error {
-		// Get the oldest up to the limit.
+func trimSongParents(ctx context.Context, namespace string, createdBefore int64, ds *datastore.Client) error {
+	f := func() error {
+		log.Infof(ctx, "about to delete SongParents created before %d", createdBefore)
+
 		q := datastore.NewQuery(KindSongParent).
 			Namespace(namespace).
-			Order("Created").Filter("Complete=", complete).
-			Limit(trimAt).KeysOnly()
+			Filter("Created <", createdBefore).
+			KeysOnly()
 
-		spKeys, err := ds.GetAll(ctx, q, nil)
+		toDeleteSpKeys, err := ds.GetAll(ctx, q, nil)
 		if err != nil {
 			return errors.Wrapf(err, "failed to get SongParents")
 		}
 
-		if len(spKeys) < trimAt {
-			return nil // don't trim
-		}
-
-		toDeleteSpKeys := spKeys[:nDelete]
 		g, gctx := errgroup.WithContext(ctx)
 
 		for _, spKey := range toDeleteSpKeys {
@@ -162,11 +158,5 @@ func trimSongParents(ctx context.Context, namespace string, ds *datastore.Client
 		return nil
 	}
 
-	if err := f(true, 10, 5); err != nil {
-		return err
-	}
-	if err := f(false, 5, 3); err != nil {
-		return err
-	}
-	return nil
+	return f()
 }
