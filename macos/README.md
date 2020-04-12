@@ -8,4 +8,4 @@
 1. Zip the `itunes-scrobble` app found at the export directory
 1. Commit changes, `git tag $(date "+%s")`, and `git push --tags`
 1. Create a new release at https://github.com/nishanths/scrobble/releases.
-   Use the tag as the title for the release. Include the zip file in the release.
+   Use the tag as the title for the release. Attach the zip file in the release.
