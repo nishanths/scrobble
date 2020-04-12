@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Account } from "../shared/types"
+import { cookieAuthErrorMessage } from "../shared/util"
 import "../scss/set-username.scss";
 
 interface SetUsernameProps {
@@ -40,6 +41,10 @@ export const SetUsername: React.FC<SetUsernameProps> = ({ accountChange }) => {
         }
         if (res.status == 406) {
           setError("The username is already taken")
+          return res.text()
+        }
+        if (res.status == 401) {
+          setError(cookieAuthErrorMessage)
           return res.text()
         }
         setError(genericError)

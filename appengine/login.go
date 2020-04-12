@@ -33,12 +33,12 @@ const (
 	redirectParam = "redirect_to"
 )
 
-func loginUrlWithRedirect(v string) {
+func loginURLWithRedirect(v string) string {
 	vals := url.Values{redirectParam: []string{v}}
 	return "/login?" + vals.Encode()
 }
 
-func logoutUrlWithRedirect(v string) {
+func logoutURLWithRedirect(v string) string {
 	vals := url.Values{redirectParam: []string{v}}
 	return "/logout?" + vals.Encode()
 }
@@ -134,7 +134,7 @@ func (s *server) currentUser(r *http.Request) (UserInfo, error) {
 
 	var g CookieData
 	if err := json.Unmarshal([]byte(jsonCookieData), &g); err != nil {
-		return CookieData{}, fmt.Errorf("failed to json-unmarshal cookie data: %s", err)
+		return UserInfo{}, fmt.Errorf("failed to json-unmarshal cookie data: %s", err)
 	}
 
 	return UserInfo(g), nil

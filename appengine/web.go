@@ -13,7 +13,6 @@ import (
 	"cloud.google.com/go/datastore"
 	"github.com/nishanths/scrobble/appengine/log"
 	"github.com/pkg/errors"
-	"google.golang.org/appengine/user"
 )
 
 // TODO: WTF is this monstrosity
@@ -65,14 +64,11 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	u := user.Current(ctx)
+	u, err := s.currentUser(r)
 
-	if u == nil {
-		login, err := user.LoginURL(ctx, dest)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+	if err != nil {
+		// either generic error or ErrNoUser
+		login := loginURLWithRedirect(dest)
 		exec(RootArgs{
 			Title: title,
 			Bootstrap: BootstrapArgs{
@@ -83,11 +79,7 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logout, err := user.LogoutURL(ctx, dest)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+	logout := logoutURLWithRedirect(dest)
 
 	a, err := ensureAccount(ctx, u.Email, s.ds)
 	if err != nil {
@@ -163,20 +155,14 @@ func (s *server) uHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u := user.Current(ctx)
-
 	// If the user is logged in, gather a logout URL and the account info.
 	var logoutURL string
 	var account Account
 	self := false
 
-	if u != nil {
-		var err error
-		logoutURL, err = user.LogoutURL(ctx, r.RequestURI)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+	u, err := s.currentUser(r)
+	if err == nil {
+		logoutURL = logoutURLWithRedirect(r.RequestURI)
 		if err := s.ds.Get(ctx, datastore.NameKey(KindAccount, u.Email, nil), &account); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -218,9 +204,13 @@ func (s *server) initializeAccountHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	u := user.Current(ctx)
-	if u == nil {
+	u, err := s.currentUser(r)
+	if err == ErrNoUser {
 		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
@@ -232,7 +222,7 @@ func (s *server) initializeAccountHandler(w http.ResponseWriter, r *http.Request
 
 	inUse := false
 	var account Account
-	_, err := s.ds.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
+	_, err = s.ds.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
 		// Ensure username uniqueness.
 		uKey := datastore.NameKey(KindUsername, username, nil)
 		if err := tx.Get(uKey, ptrStruct()); err != datastore.ErrNoSuchEntity {
@@ -297,14 +287,18 @@ func (s *server) newAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u := user.Current(ctx)
-	if u == nil {
+	u, err := s.currentUser(r)
+	if err == ErrNoUser {
 		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	var apiKey string
-	_, err := s.ds.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
+	_, err = s.ds.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
 		k, err := setAPIKey(tx, generateAPIKey)
 		if err != nil {
 			return err
@@ -347,9 +341,13 @@ func (s *server) setPrivacyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u := user.Current(ctx)
-	if u == nil {
+	u, err := s.currentUser(r)
+	if err == ErrNoUser {
 		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 

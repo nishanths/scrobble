@@ -1,5 +1,6 @@
 import React from "react";
 import { Account } from "../shared/types"
+import { cookieAuthErrorMessage } from "../shared/util"
 import "../scss/account"
 
 // TODO: refactor using hooks
@@ -14,7 +15,7 @@ interface AccountDetailState {
   keyGenerateErr: string
   private: boolean
   showPrivacySaved: boolean
-  privacyFail: boolean
+  setPrivacyErr: string
 }
 
 export class AccountDetail extends React.Component<AccountDetailProps, AccountDetailState> {
@@ -29,7 +30,7 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
       keyGenerateErr: "",
       private: this.props.account.private,
       showPrivacySaved: false,
-      privacyFail: false,
+      setPrivacyErr: "",
     }
   }
 
@@ -45,6 +46,10 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
         if (res.status == 200) {
           success = true
           return res.json()
+        }
+        if (res.status == 401) {
+          this.setState({ keyGenerateErr: cookieAuthErrorMessage })
+          return res.blob()
         }
         console.log("failed to generate API key: status=%d", res.status)
         this.setState({ keyGenerateErr: genericErr })
@@ -65,8 +70,9 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
   }
 
   private setPrivacy(v: boolean) {
-    this.setState({ showPrivacySaved: false, privacyFail: false })
+    this.setState({ showPrivacySaved: false, setPrivacyErr: "" })
     let success = false
+    const genericErr = "Failed to toggle privacy. Try again?"
 
     fetch(`/setPrivacy?privacy=${v.toString()}`, { method: "POST" })
       .then(
@@ -81,7 +87,7 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
             console.log("failed to update privacy: status=%d", r.status)
             this.setState({
               private: !v, // revert
-              privacyFail: true,
+              setPrivacyErr: (r.status == 401) ? cookieAuthErrorMessage : genericErr,
             })
           }
         },
@@ -89,7 +95,7 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
           console.error(err)
           this.setState({
             private: !v, // revert
-            privacyFail: true,
+            setPrivacyErr: genericErr,
           })
         }
       )
@@ -108,7 +114,7 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
   }
 
   render() {
-    let errClass = (b: string | boolean) => b ? "error" : "error hidden"
+    let errClass = (b: string) => b ? "error" : "error hidden"
     let savedClass = (b: boolean) => this.state.showPrivacySaved ? "success" : "success hidden"
 
     return <div className="account">
@@ -128,7 +134,7 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
             </td>
             <td className={savedClass(this.state.showPrivacySaved)}>Saved</td>
             <td></td>
-            <td className={errClass(this.state.privacyFail)}>Failed to toggle privacy. Try again?</td>
+            <td className={errClass(this.state.setPrivacyErr)}>{this.state.setPrivacyErr}</td>
           </tr>
         </tbody>
       </table>

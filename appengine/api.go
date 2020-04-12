@@ -164,7 +164,7 @@ func (s *server) deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var accID string
-	if u, err := currentUser(r); err != nil {
+	if u, err := s.currentUser(r); err != nil {
 		key := r.Header.Get(headerAPIKey)
 		if key == "" {
 			log.Errorf("not signed in and missing API key header")
@@ -295,7 +295,7 @@ func (svr *server) scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if acc.Private && !canViewScrobbled(ctx, svr.ds, accID, r) {
+	if acc.Private && !svr.canViewScrobbled(ctx, accID, r) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -360,15 +360,15 @@ func (svr *server) scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func canViewScrobbled(ctx context.Context, ds *datastore.Client, forAccountID string, r *http.Request) bool {
-	u, err := currentUser(r)
+func (s *server) canViewScrobbled(ctx context.Context, forAccountID string, r *http.Request) bool {
+	u, err := s.currentUser(r)
 	if err == nil && u.Email == forAccountID {
 		// a logged in user can view their own account's scrobbles
 		return true
 	}
 
 	if key := r.Header.Get(headerAPIKey); key != "" {
-		if _, id, _, err := accountForKey(ctx, key, ds); err == nil && id == forAccountID {
+		if _, id, _, err := accountForKey(ctx, key, s.ds); err == nil && id == forAccountID {
 			return true
 		}
 	}
