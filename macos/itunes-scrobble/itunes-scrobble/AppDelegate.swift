@@ -321,7 +321,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                     guard let p = items[h] else { continue }
                     guard let d = p.artwork?.imageData else { continue }
                     guard let f = p.artwork?.imageDataFormat else { continue }
-                    URLSession.shared.dataTask(with: API.artworkRequest(key, f, d)) {(_, _, _) in}
+                    let upload = URLSession.shared.dataTask(with: API.artworkRequest(key, f, d)) {(_, _, _) in}
+                    upload.resume()
                 }
             }
         }
