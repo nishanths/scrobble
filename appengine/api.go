@@ -554,9 +554,6 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Create tasks to fill in iTunes-related fields.
 	for _, s := range songs {
-		if s.iTunesFilled() {
-			continue
-		}
 		songIdent := s.Ident()
 		g.Go(func() error {
 			createReq, err := jsonPostTask("/internal/fillITunesFields", fillITunesFieldsTask{
