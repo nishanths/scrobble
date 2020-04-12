@@ -139,7 +139,7 @@ export const U: React.FC<UProps> = ({
 
   // ... render ...
 
-  NProgress.configure({ showSpinner: false, minimum: 0.1, trickleSpeed: 25, speed: 500 })
+  NProgress.configure({ showSpinner: false, minimum: 0.1, trickleSpeed: 150, speed: 500 })
   NProgress.start()
 
   if (scrobbles.done === false) {
