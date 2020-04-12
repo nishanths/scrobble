@@ -116,7 +116,9 @@ export const U: React.FC<UProps> = ({
   useEffect(() => {
     if (initEnd.current === true) { return }
     initEnd.current = false
-    setEndIdx(scrobbles.error === false ? nextEndIdx(0, scrobbles.songs.length) : 0)
+    const e = scrobbles.error === false ? nextEndIdx(0, songsForMode(mode, scrobblesRef.current.songs).length) : 0
+    console.log('setting end idx initial', e)
+    setEndIdx(e)
   }, [scrobbles])
 
   useEffect(() => {
@@ -128,7 +130,9 @@ export const U: React.FC<UProps> = ({
       const leeway = 250
       if ((wnd.innerHeight + wnd.pageYOffset) >= (wnd.document.body.offsetHeight - leeway)) {
         const newEnd = nextEndIdx(endIdxRef.current, songsForMode(mode, scrobblesRef.current.songs).length)
-        setEndIdx(Math.max(newEnd, endIdxRef.current))
+        const e = Math.max(newEnd, endIdxRef.current)
+        console.log('setting end idx scroll', e)
+        setEndIdx(e)
       }
     }
     wnd.addEventListener("scroll", f)
