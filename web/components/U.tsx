@@ -56,6 +56,7 @@ const modeFromPath = (p: string): Mode => {
     case "/all":
       return Mode.All
     case "/loved":
+    case "/loved/":
       return Mode.Loved
     default:
       return Mode.All
