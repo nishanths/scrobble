@@ -49,21 +49,6 @@ const pathForMode = (m: Mode): string => {
   assertExhaustive(m)
 }
 
-const modeFromPath = (p: string): Mode => {
-  switch (p) {
-    case "":
-    case "/":
-    case "/all":
-    case "/all/":
-      return Mode.All
-    case "/loved":
-    case "/loved/":
-      return Mode.Loved
-    default:
-      return Mode.All
-  }
-}
-
 type UProps = UArgs & {
   wnd: Window
   mode: Mode
