@@ -66,5 +66,5 @@ _bootstrap:
 	mkdir -p web/dist
 
 .PHONY: dev
-dev: go
+dev: bindata go
 	cd appengine && ./main
