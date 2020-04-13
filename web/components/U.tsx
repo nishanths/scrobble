@@ -7,7 +7,7 @@ import { Header } from "./Header"
 import { Songs } from "./Songs"
 import { SegmentedControl } from "./SegmentedControl"
 import { State } from "../redux/types/u"
-import { fetchScrobbles } from "../redux/actions/scrobbles"
+import { fetchAllScrobbles, fetchLovedScrobbles } from "../redux/actions/scrobbles"
 import { useStateRef } from "../shared/hooks"
 import "../scss/u.scss"
 
@@ -95,7 +95,6 @@ export const U: React.FC<UProps> = ({
     }
     throw assertExhaustive(mode)
   })
-
   const scrobblesRef = useRef(scrobbles)
   useEffect(() => { scrobblesRef.current = scrobbles }, [scrobbles])
 
@@ -110,7 +109,7 @@ export const U: React.FC<UProps> = ({
     return totalSongs - b < moreIncrement ? totalSongs : b;
   }
 
-  const initEnd = useRef(false)
+  const initEnd = useRef(false) // whether endIdx was set the first time
   useEffect(() => {
     if (initEnd.current === true) { return }
     initEnd.current = false
@@ -121,10 +120,14 @@ export const U: React.FC<UProps> = ({
   useEffect(() => {
     switch (mode) {
       case Mode.All:
-        dispatch(fetchScrobbles(profileUsername, limit, false))
+        if (scrobblesRef.current.done === false || scrobblesRef.current.error === true) {
+          dispatch(fetchAllScrobbles(profileUsername, limit))
+        }
         break
       case Mode.Loved:
-        dispatch(fetchScrobbles(profileUsername, limit, true))
+        if (scrobblesRef.current.done === false || scrobblesRef.current.error === true) {
+          dispatch(fetchLovedScrobbles(profileUsername, limit))
+        }
         break
       default:
         throw assertExhaustive(mode)

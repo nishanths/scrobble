@@ -3,24 +3,32 @@ import { Dispatch } from "redux"
 import { Song, ScrobbledResponse } from "../../shared/types"
 import { PartialState } from "../types/u"
 
-export type ScrobblesAction =
-  ReturnType<typeof scrobblesStart> |
-  ReturnType<typeof scrobblesSuccess> |
-  ReturnType<typeof scrobblesFail>
+export type AllScrobblesAction =
+  ReturnType<typeof allScrobblesStart> |
+  ReturnType<typeof allScrobblesSuccess> |
+  ReturnType<typeof allScrobblesFail>
 
-type ScrobblesThunkDispatch = ThunkDispatch<PartialState, undefined, ScrobblesAction>
-type ScrobblesThunkResult<R> = ThunkAction<R, PartialState, undefined, ScrobblesAction>
+export type LovedScrobblesAction =
+  ReturnType<typeof lovedScrobblesStart> |
+  ReturnType<typeof lovedScrobblesSuccess> |
+  ReturnType<typeof lovedScrobblesFail>
 
-export const scrobblesStart = (username: string) => {
+type AllScrobblesThunkDispatch = ThunkDispatch<PartialState, undefined, AllScrobblesAction>
+type AllScrobblesThunkResult<R> = ThunkAction<R, PartialState, undefined, AllScrobblesAction>
+
+type LovedScrobblesThunkDispatch = ThunkDispatch<PartialState, undefined, LovedScrobblesAction>
+type LovedScrobblesThunkResult<R> = ThunkAction<R, PartialState, undefined, LovedScrobblesAction>
+
+export const allScrobblesStart = (username: string) => {
   return {
-    type: "SCROBBLES_START" as const,
+    type: "ALL_SCROBBLES_START" as const,
     username,
   }
 }
 
-export const scrobblesSuccess = (username: string, songs: Song[], total: number, priv: boolean) => {
+export const allScrobblesSuccess = (username: string, songs: Song[], total: number, priv: boolean) => {
   return {
-    type: "SCROBBLES_SUCCESS" as const,
+    type: "ALL_SCROBBLES_SUCCESS" as const,
     username,
     songs,
     total,
@@ -28,21 +36,59 @@ export const scrobblesSuccess = (username: string, songs: Song[], total: number,
   }
 }
 
-export const scrobblesFail = (err: any) => {
+export const allScrobblesFail = (err: any) => {
   return {
-    type: "SCROBBLES_FAIL" as const,
+    type: "ALL_SCROBBLES_FAIL" as const,
     err,
   }
 }
 
-export const fetchScrobbles = (username: string, limit: number, loved: boolean): ScrobblesThunkResult<void> => {
+export const lovedScrobblesStart = (username: string) => {
+  return {
+    type: "LOVED_SCROBBLES_START" as const,
+    username,
+  }
+}
+
+export const lovedScrobblesSuccess = (username: string, songs: Song[], total: number, priv: boolean) => {
+  return {
+    type: "LOVED_SCROBBLES_SUCCESS" as const,
+    username,
+    songs,
+    total,
+    private: priv,
+  }
+}
+
+export const lovedScrobblesFail = (err: any) => {
+  return {
+    type: "LOVED_SCROBBLES_FAIL" as const,
+    err,
+  }
+}
+
+export const fetchAllScrobbles = (username: string, limit: number): AllScrobblesThunkResult<void> => {
   return async (dispatch, store) => {
-    dispatch(scrobblesStart(username))
+    dispatch(allScrobblesStart(username))
+
     try {
-      const result = await _fetchScrobbles(username, limit, loved)
-      dispatch(scrobblesSuccess(username, result.songs, result.total, result.private))
+      const result = await _fetchScrobbles(username, limit, false)
+      dispatch(allScrobblesSuccess(username, result.songs, result.total, result.private))
     } catch (e) {
-      dispatch(scrobblesFail(e))
+      dispatch(allScrobblesFail(e))
+    }
+  }
+}
+
+export const fetchLovedScrobbles = (username: string, limit: number): LovedScrobblesThunkResult<void> => {
+  return async (dispatch, store) => {
+    dispatch(lovedScrobblesStart(username))
+
+    try {
+      const result = await _fetchScrobbles(username, limit, true)
+      dispatch(lovedScrobblesSuccess(username, result.songs, result.total, result.private))
+    } catch (e) {
+      dispatch(lovedScrobblesFail(e))
     }
   }
 }
