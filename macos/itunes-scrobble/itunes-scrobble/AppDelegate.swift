@@ -202,25 +202,21 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         } else if state.scrobbling {
             statusItem.title = String(format: "Scrobbling now...")
             statusItem.isHidden = false
+        } else if let ls = state.lastScrobbled {
+            statusItem.title = String(format: "Last scrobbled: %@", formatDate(ls)) // extra spaces for text alignment with secondary status item
+            statusItem.isHidden = false
         } else {
-            if let ls = state.lastScrobbled {
-                statusItem.title = String(format: "Last scrobbled: %@", formatDate(ls)) // extra spaces for text alignment with secondary status item
-                statusItem.isHidden = false
-            } else {
-                statusItem.isHidden = true
-            }
+            statusItem.isHidden = true
         }
         
         // Secondary status item
         if state.error != nil || state.scrobbling {
             secondaryStatusItem.isHidden = true
+        } else if let lp = state.latestPlayed {
+            secondaryStatusItem.title = String(format: "Latest song time: %@", formatDate(lp))
+            secondaryStatusItem.isHidden = false
         } else {
-            if let lp = state.latestPlayed {
-                secondaryStatusItem.title = String(format: "Latest song time: %@", formatDate(lp))
-                secondaryStatusItem.isHidden = false
-            } else {
-                secondaryStatusItem.isHidden = true
-            }
+            secondaryStatusItem.isHidden = true
         }
         
         // Timers
