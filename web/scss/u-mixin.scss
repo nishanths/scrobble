@@ -154,3 +154,30 @@
     }
   }
 }
+
+@mixin moreSongCardProps($adjust-font-size) {
+  .scaleArea:hover {
+    .pict {
+      transform: none !important;
+    }
+  }
+  .pict {
+    border: 1px dashed rgba(0, 0, 0, 0.2) !important;
+    box-shadow: 0 0px 0px rgba(0, 0, 0, 0.1), 0 0 7px rgba(0, 0, 0, 0.1) inset !important;
+    display: flex;
+    justify-content: center;
+  }
+  .moreContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: $meta-color;
+    .and {
+      font-size: 25px + $adjust-font-size;
+    }
+    .number {
+      font-size: 27px + $adjust-font-size;
+    }
+  }
+}

@@ -1,6 +1,6 @@
 import { ThunkAction, ThunkDispatch } from "redux-thunk"
 import { Dispatch } from "redux"
-import { Song } from "../../shared/types"
+import { Song, ScrobbledResponse } from "../../shared/types"
 import { PartialState } from "../types/u"
 
 export type ScrobblesAction =
@@ -18,11 +18,12 @@ export const scrobblesStart = (username: string) => {
   }
 }
 
-export const scrobblesSuccess = (username: string, songs: Song[], priv: boolean) => {
+export const scrobblesSuccess = (username: string, songs: Song[], total: number, priv: boolean) => {
   return {
     type: "SCROBBLES_SUCCESS" as const,
     username,
     songs,
+    total,
     private: priv,
   }
 }
@@ -34,12 +35,12 @@ export const scrobblesFail = (err: any) => {
   }
 }
 
-export const fetchScrobbles = (username: string): ScrobblesThunkResult<void> => {
+export const fetchScrobbles = (username: string, limit: number, loved: boolean): ScrobblesThunkResult<void> => {
   return async (dispatch, store) => {
     dispatch(scrobblesStart(username))
     try {
-      const result = await _fetchScrobbles(username)
-      dispatch(scrobblesSuccess(username, result.songs, result.private))
+      const result = await _fetchScrobbles(username, limit, loved)
+      dispatch(scrobblesSuccess(username, result.songs, result.total, result.private))
     } catch (e) {
       dispatch(scrobblesFail(e))
     }
@@ -48,18 +49,25 @@ export const fetchScrobbles = (username: string): ScrobblesThunkResult<void> => 
 
 type FetchScrobblesResult = {
   songs: Song[]
+  total: number
   private: boolean
   err: any | null
 }
 
-const _fetchScrobbles = async (username: string): Promise<FetchScrobblesResult> => {
-  const r = await fetch("/api/v1/scrobbled?username=" + username)
+const _fetchScrobbles = async (username: string, limit: number, loved: boolean): Promise<FetchScrobblesResult> => {
+  let url = "/api/v1/scrobbled?username=" + username + "&limit=" + limit;
+  if (loved === true) {
+    url += "&loved=true"
+  }
+  const r = await fetch(url)
   switch (r.status) {
     case 200:
-      const songs: Song[] = await r.json()
-      return { songs, private: false, err: null }
+      const rsp: ScrobbledResponse = await r.json()
+      return { songs: rsp.songs, total: rsp.total, private: false, err: null }
     case 404:
-      throw { songs: [], private: true, err: null }
+      return { songs: [], total: 0, private: true, err: null }
+    // TODO: if we had the ability to display toast notifications, we could show
+    // "please sign in again" for 401 status
     default:
       throw "bad status: " + r.status
   }

@@ -51,13 +51,20 @@ func devUHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func devScrobbledHandler(w http.ResponseWriter, r *http.Request) {
-	var devScrobbledResponse = func() string {
-		b, err := ioutil.ReadFile(filepath.Join(".devdata", "scrobbled.json"))
+	file := "scrobbled_all.json"
+
+	if r.FormValue("loved") == "true" {
+		file = "scrobbled_loved.json"
+		// jq '[.[] | select(.loved == true)] | length'
+	}
+
+	data := func() string {
+		b, err := ioutil.ReadFile(filepath.Join(".devdata", file))
 		if err != nil {
 			panic(err)
 		}
 		return string(b)
 	}()
 
-	io.WriteString(w, devScrobbledResponse)
+	io.WriteString(w, data)
 }
