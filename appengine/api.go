@@ -400,12 +400,15 @@ func (svr *server) scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 				songs[i].Ident = keys[i].Name
 			}
 
-			total = len(songs)
+			if !hasLimit {
+				total = len(songs)
+			}
 
 			return nil
 		})
 
-		if !hasLimit {
+		if hasLimit {
+			// need to compute total count with a separate query
 			g.Go(func() error {
 				q = datastore.NewQuery(KindSong).
 					Namespace(namespace).
