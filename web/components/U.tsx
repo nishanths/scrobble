@@ -54,6 +54,7 @@ const modeFromPath = (p: string): Mode => {
     case "":
     case "/":
     case "/all":
+    case "/all/":
       return Mode.All
     case "/loved":
     case "/loved/":
