@@ -260,6 +260,20 @@ func (s *server) deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func parseLimit(lim string) (int, bool) {
+	i, err := strconv.Atoi(lim)
+	if err != nil {
+		return -1, false
+	}
+	if i < 0 {
+		return -1, false
+	}
+	if i > 2000 {
+		i = 2000
+	}
+	return i, true
+}
+
 func (svr *server) scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate, private")
@@ -284,8 +298,11 @@ func (svr *server) scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 
 	lovedOnly := r.FormValue("loved") == "true"
 	songIdent := r.FormValue("song")
+	limit, hasLimit := parseLimit(r.FormValue("limit"))
 
-	if songIdent != "" && lovedOnly {
+	// songIdent must be mutually exclusive with loved.
+	// songIdent must be mutually exclusive with limit.
+	if songIdent != "" && (lovedOnly || hasLimit) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -344,6 +361,10 @@ func (svr *server) scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 
 		if lovedOnly {
 			q = q.Filter("Loved=", true)
+		}
+
+		if hasLimit {
+			q = q.Limit(limit)
 		}
 
 		songs := make([]SongResponse, 0) // use "make" to marshal as empty JSON array instead of null when there are 0 songs

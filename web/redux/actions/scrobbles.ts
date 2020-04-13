@@ -34,11 +34,11 @@ export const scrobblesFail = (err: any) => {
   }
 }
 
-export const fetchScrobbles = (username: string): ScrobblesThunkResult<void> => {
+export const fetchScrobbles = (username: string, limit: number): ScrobblesThunkResult<void> => {
   return async (dispatch, store) => {
     dispatch(scrobblesStart(username))
     try {
-      const result = await _fetchScrobbles(username)
+      const result = await _fetchScrobbles(username, limit)
       dispatch(scrobblesSuccess(username, result.songs, result.private))
     } catch (e) {
       dispatch(scrobblesFail(e))
@@ -52,14 +52,16 @@ type FetchScrobblesResult = {
   err: any | null
 }
 
-const _fetchScrobbles = async (username: string): Promise<FetchScrobblesResult> => {
-  const r = await fetch("/api/v1/scrobbled?username=" + username)
+const _fetchScrobbles = async (username: string, limit: number): Promise<FetchScrobblesResult> => {
+  const r = await fetch("/api/v1/scrobbled?username=" + username + "&limit=" + limit)
   switch (r.status) {
     case 200:
       const songs: Song[] = await r.json()
       return { songs, private: false, err: null }
     case 404:
-      throw { songs: [], private: true, err: null }
+      return { songs: [], private: true, err: null }
+    // TODO: if we had the ability to display toast notifications, we could show
+    // "please sign in again" for 401 status
     default:
       throw "bad status: " + r.status
   }

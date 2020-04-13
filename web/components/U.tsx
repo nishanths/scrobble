@@ -92,7 +92,9 @@ export const U: React.FC<UProps> = ({
   // Divisble by 2, 3, and 4. This is appropriate because these are the number
   // of cards typically displayed per row. Using such a number ensures that
   // the last row isn't an incomplete row.
-  const MoreIncrement = 36;
+  const moreIncrement = 36;
+  const limit = 720; // moreIncrement * 20
+
   const header = <Header username={profileUsername} signedIn={!!logoutURL} />;
   const dispatch = useDispatch()
   const [endIdx, endIdxRef, setEndIdx] = useStateRef(0)
@@ -107,9 +109,9 @@ export const U: React.FC<UProps> = ({
 
   const nextEndIdx = (currentEndIdx: number, totalSongs: number): number => {
     // increment, but don't go over the number of songs itself
-    const b = Math.min(currentEndIdx + MoreIncrement, totalSongs)
+    const b = Math.min(currentEndIdx + moreIncrement, totalSongs)
     // if there aren't sufficient songs left for the next time, just include them now
-    return totalSongs - b < MoreIncrement ? totalSongs : b;
+    return totalSongs - b < moreIncrement ? totalSongs : b;
   }
 
   const initEnd = useRef(false)
@@ -121,7 +123,7 @@ export const U: React.FC<UProps> = ({
   }, [scrobbles, mode])
 
   useEffect(() => {
-    dispatch(fetchScrobbles(profileUsername))
+    dispatch(fetchScrobbles(profileUsername, limit))
   }, [])
 
   useEffect(() => {
