@@ -205,7 +205,8 @@ export const U: React.FC<UProps> = ({
       <Songs
         songs={songsToShow}
         more={scrobbles.total - songsToShow.length}
-        showMore={scrobbles.total > scrobbles.songs.length}
+        // "showing all songs that are available on the client" && "more number of songs present for the user"
+        showMore={(songsToShow.length === scrobbles.songs.length) && (scrobbles.total > scrobbles.songs.length)}
         artworkBaseURL={artworkBaseURL}
         now={() => new Date()}
       />
