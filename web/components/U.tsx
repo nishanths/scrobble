@@ -83,7 +83,7 @@ export const U: React.FC<UProps> = ({
   // of cards typically displayed per row. Using such a number ensures that
   // the last row isn't an incomplete row.
   const moreIncrement = 36;
-  const limit = 720; // moreIncrement * 20
+  const limit = 540; // moreIncrement * 15
 
   const header = <Header username={profileUsername} signedIn={!!logoutURL} />;
   const dispatch = useDispatch()
