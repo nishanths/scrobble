@@ -109,10 +109,7 @@ export const U: React.FC<UProps> = ({
     return totalSongs - b < moreIncrement ? totalSongs : b;
   }
 
-  const initEnd = useRef(false) // whether endIdx was set the first time
   useEffect(() => {
-    if (initEnd.current === true) { return }
-    initEnd.current = false
     const e = scrobbles.error === false ? nextEndIdx(0, scrobblesRef.current.songs.length) : 0
     setEndIdx(e)
   }, [scrobbles, mode])
@@ -163,9 +160,9 @@ export const U: React.FC<UProps> = ({
   // ... render ...
 
   NProgress.configure({ showSpinner: false, minimum: 0.1, trickleSpeed: 150, speed: 500 })
-  NProgress.start()
 
   if (scrobbles.done === false) {
+    NProgress.start()
     return <>{top}</>
   }
 
@@ -175,10 +172,6 @@ export const U: React.FC<UProps> = ({
       {header}
       <div className="info">(Failed to fetch scrobbles.)</div>
     </>
-  }
-
-  if (scrobbles.fetching) {
-    return <>{top}</>
   }
 
   NProgress.done()
@@ -205,7 +198,7 @@ export const U: React.FC<UProps> = ({
       <Songs
         songs={songsToShow}
         more={scrobbles.total - songsToShow.length}
-        // "showing all songs that are available on the client" && "more number of songs present for the user"
+        // "showing all songs that are available on the client" && "more number of songs present for the user "
         showMore={(songsToShow.length === scrobbles.songs.length) && (scrobbles.total > scrobbles.songs.length)}
         artworkBaseURL={artworkBaseURL}
         now={() => new Date()}
