@@ -41,16 +41,6 @@ const modeFromControlValue = (v: ControlValue): Mode => {
   }
 }
 
-const songsForMode = (m: Mode, s: Song[]): Song[] => {
-  switch (m) {
-    case Mode.All:
-      return s
-    case Mode.Loved:
-      return s.filter(song => song.loved)
-  }
-  assertExhaustive(m)
-}
-
 const pathForMode = (m: Mode): string => {
   switch (m) {
     case Mode.All: return ""
@@ -99,7 +89,14 @@ export const U: React.FC<UProps> = ({
   const dispatch = useDispatch()
   const [endIdx, endIdxRef, setEndIdx] = useStateRef(0)
 
-  const scrobbles = useSelector((s: State) => s.scrobbles)
+  const scrobbles = useSelector((s: State) => {
+    switch (mode) {
+      case Mode.All: return s.allScrobbles
+      case Mode.Loved: return s.lovedScrobbles
+    }
+    throw assertExhaustive(mode)
+  })
+
   const scrobblesRef = useRef(scrobbles)
   useEffect(() => { scrobblesRef.current = scrobbles }, [scrobbles])
 
@@ -118,19 +115,28 @@ export const U: React.FC<UProps> = ({
   useEffect(() => {
     if (initEnd.current === true) { return }
     initEnd.current = false
-    const e = scrobbles.error === false ? nextEndIdx(0, songsForMode(mode, scrobblesRef.current.songs).length) : 0
+    const e = scrobbles.error === false ? nextEndIdx(0, scrobblesRef.current.songs.length) : 0
     setEndIdx(e)
   }, [scrobbles, mode])
 
   useEffect(() => {
-    dispatch(fetchScrobbles(profileUsername, limit))
-  }, [])
+    switch (mode) {
+      case Mode.All:
+        dispatch(fetchScrobbles(profileUsername, limit, false))
+        break
+      case Mode.Loved:
+        dispatch(fetchScrobbles(profileUsername, limit, true))
+        break
+      default:
+        throw assertExhaustive(mode)
+    }
+  }, [profileUsername, mode])
 
   useEffect(() => {
     const f = () => {
       const leeway = 250
       if ((wnd.innerHeight + wnd.pageYOffset) >= (wnd.document.body.offsetHeight - leeway)) {
-        const newEnd = nextEndIdx(endIdxRef.current, songsForMode(mode, scrobblesRef.current.songs).length)
+        const newEnd = nextEndIdx(endIdxRef.current, scrobblesRef.current.songs.length)
         const e = Math.max(newEnd, endIdxRef.current)
         setEndIdx(e)
       }
@@ -176,6 +182,8 @@ export const U: React.FC<UProps> = ({
     </>
   }
 
+  const songsToShow = scrobbles.songs.slice(0, endIdx);
+
   return <>
     {header}
     <div className="control">
@@ -187,7 +195,9 @@ export const U: React.FC<UProps> = ({
     </div>
     <div className="songs">
       <Songs
-        songs={songsForMode(mode, scrobbles.songs).slice(0, endIdx)}
+        songs={songsToShow}
+        more={scrobbles.total - songsToShow.length}
+        showMore={scrobbles.total > scrobbles.songs.length}
         artworkBaseURL={artworkBaseURL}
         now={() => new Date()}
       />

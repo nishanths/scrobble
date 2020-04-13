@@ -274,11 +274,19 @@ func parseLimit(lim string) (int, bool) {
 	return i, true
 }
 
+type ScrobbledResponse struct {
+	// Total is the total number of scrobbled songs.
+	// It is valid only if the request wasn't for a specific song (i.e., "song"
+	// query parameter wasn't set).
+	Total int            `json:"total"`
+	Songs []SongResponse `json:"songs"`
+}
+
 func (svr *server) scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate, private")
 
-	writeSuccessRsp := func(s []SongResponse) {
+	writeSuccessRsp := func(s ScrobbledResponse) {
 		w.Header().Set("Content-Type", "application/json")
 		if err := json.NewEncoder(w).Encode(s); err != nil {
 			log.Errorf("failed to write response: %v", err.Error())
@@ -301,7 +309,7 @@ func (svr *server) scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 	limit, hasLimit := parseLimit(r.FormValue("limit"))
 
 	// songIdent must be mutually exclusive with loved.
-	// songIdent must be mutually exclusive with limit.
+	// Also, songIdent must be mutually exclusive with limit.
 	if songIdent != "" && (lovedOnly || hasLimit) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -319,7 +327,7 @@ func (svr *server) scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 
 	namespace := namespaceID(accID)
 
-	// Get the latest parent.
+	// Get the latest complete parent.
 	q := datastore.NewQuery(KindSongParent).
 		Namespace(namespace).
 		Order("-Created").Filter("Complete=", true).
@@ -332,8 +340,11 @@ func (svr *server) scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(parentKeys) == 0 {
-		// no songs, respond with empty JSON array
-		writeSuccessRsp(make([]SongResponse, 0))
+		// no songs
+		writeSuccessRsp(ScrobbledResponse{
+			Total: 0,
+			Songs: make([]SongResponse, 0),
+		})
 		return
 	}
 
@@ -341,43 +352,88 @@ func (svr *server) scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 		// Get song by ident.
 		key := songKey(namespace, songIdent, parentKeys[0])
 		var s SongResponse
-		if err := svr.ds.Get(ctx, key, &s); err != nil {
-			log.Errorf("failed to fetch song %s: %v", key, err.Error())
-			if err == datastore.ErrNoSuchEntity {
-				w.WriteHeader(http.StatusNotFound)
-			} else {
-				w.WriteHeader(http.StatusInternalServerError)
-			}
+		err := svr.ds.Get(ctx, key, &s)
+		if err == datastore.ErrNoSuchEntity {
+			// 200 with empty songs list
+			writeSuccessRsp(ScrobbledResponse{
+				Total: -1,
+				Songs: make([]SongResponse, 0),
+			})
 			return
 		}
-		s.Ident = key.Name
-		writeSuccessRsp([]SongResponse{s})
-	} else {
-		// Get all songs.
-		q = datastore.NewQuery(KindSong).
-			Namespace(namespace).
-			Order("-LastPlayed").
-			Ancestor(parentKeys[0])
-
-		if lovedOnly {
-			q = q.Filter("Loved=", true)
-		}
-
-		if hasLimit {
-			q = q.Limit(limit)
-		}
-
-		songs := make([]SongResponse, 0) // use "make" to marshal as empty JSON array instead of null when there are 0 songs
-		keys, err := svr.ds.GetAll(ctx, q, &songs)
 		if err != nil {
-			log.Errorf("failed to fetch songs: %v", err.Error())
+			log.Errorf("failed to fetch song %s: %v", key, err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		for i := range songs {
-			songs[i].Ident = keys[i].Name
+		s.Ident = key.Name
+		writeSuccessRsp(ScrobbledResponse{
+			Total: -1,
+			Songs: []SongResponse{s},
+		})
+	} else {
+		var songs []SongResponse
+		var total int
+		g, gctx := errgroup.WithContext(ctx)
+
+		g.Go(func() error {
+			// Get all songs.
+			q = datastore.NewQuery(KindSong).
+				Namespace(namespace).
+				Order("-LastPlayed").
+				Ancestor(parentKeys[0])
+
+			if lovedOnly {
+				q = q.Filter("Loved=", true)
+			}
+
+			if hasLimit {
+				q = q.Limit(limit)
+			}
+
+			songs = make([]SongResponse, 0) // "make" to json-marshal as empty array instead of null when there are 0 songs
+			keys, err := svr.ds.GetAll(gctx, q, &songs)
+			if err != nil {
+				return errors.Wrapf(err, "failed to fetch songs")
+			}
+			for i := range songs {
+				songs[i].Ident = keys[i].Name
+			}
+
+			total = len(songs)
+
+			return nil
+		})
+
+		if !hasLimit {
+			g.Go(func() error {
+				q = datastore.NewQuery(KindSong).
+					Namespace(namespace).
+					Ancestor(parentKeys[0])
+
+				if lovedOnly {
+					q = q.Filter("Loved=", true)
+				}
+
+				n, err := svr.ds.Count(gctx, q)
+				if err != nil {
+					return errors.Wrapf(err, "failed to count total songs")
+				}
+				total = n
+				return nil
+			})
 		}
-		writeSuccessRsp(songs)
+
+		if err := g.Wait(); err != nil {
+			log.Errorf("%v", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		writeSuccessRsp(ScrobbledResponse{
+			Total: total,
+			Songs: songs,
+		})
 	}
 }
 

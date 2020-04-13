@@ -34,3 +34,8 @@ export interface Song {
 
   ident: string
 }
+
+export interface ScrobbledResponse {
+  total: number
+  songs: Song[]
+}
