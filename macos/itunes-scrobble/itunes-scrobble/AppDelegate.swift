@@ -216,7 +216,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
             secondaryStatusItem.isHidden = true
         } else {
             if let lp = state.latestPlayed {
-                secondaryStatusItem.title = String(format: "Latest play time: %@", formatDate(lp))
+                secondaryStatusItem.title = String(format: "Latest song time: %@", formatDate(lp))
                 secondaryStatusItem.isHidden = false
             } else {
                 secondaryStatusItem.isHidden = true
