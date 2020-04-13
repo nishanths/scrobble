@@ -213,7 +213,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         if state.error != nil || state.scrobbling {
             secondaryStatusItem.isHidden = true
         } else if let lp = state.latestPlayed {
-            secondaryStatusItem.title = String(format: "Latest song time: %@", formatDate(lp))
+            secondaryStatusItem.title = String(format: "Latest played song: %@", formatDate(lp))
             secondaryStatusItem.isHidden = false
         } else {
             secondaryStatusItem.isHidden = true
