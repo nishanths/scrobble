@@ -44,7 +44,7 @@ const modeFromControlValue = (v: ControlValue): Mode => {
 const pathForMode = (m: Mode): string => {
   switch (m) {
     case Mode.All: return ""
-    case Mode.Loved: return "loved"
+    case Mode.Loved: return "/loved"
   }
   assertExhaustive(m)
 }
@@ -52,9 +52,10 @@ const pathForMode = (m: Mode): string => {
 const modeFromPath = (p: string): Mode => {
   switch (p) {
     case "":
-    case "all":
+    case "/":
+    case "/all":
       return Mode.All
-    case "loved":
+    case "/loved":
       return Mode.Loved
     default:
       return Mode.All
@@ -99,7 +100,7 @@ export const U: React.FC<UProps> = ({
   useEffect(() => { scrobblesRef.current = scrobbles }, [scrobbles])
 
   const onControlChange = (newMode: Mode): void => {
-    history.push("/u/" + profileUsername + "/" + pathForMode(newMode))
+    history.push("/u/" + profileUsername + pathForMode(newMode))
   }
 
   const nextEndIdx = (currentEndIdx: number, totalSongs: number): number => {
