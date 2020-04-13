@@ -85,7 +85,6 @@ export const U: React.FC<UProps> = ({
   const moreIncrement = 36;
   const limit = 504; // moreIncrement * 14
 
-  const header = <Header username={profileUsername} signedIn={!!logoutURL} />;
   const dispatch = useDispatch()
   const [endIdx, endIdxRef, setEndIdx] = useStateRef(0)
 
@@ -145,13 +144,26 @@ export const U: React.FC<UProps> = ({
     return () => { wnd.removeEventListener("scroll", f) }
   }, [scrobbles, mode])
 
+  const header = <Header username={profileUsername} signedIn={!!logoutURL} />
+
+  const top = <>
+    {header}
+    <div className="control">
+      <SegmentedControl
+        afterChange={(v) => { onControlChange(modeFromControlValue(v)) }}
+        values={controlValues}
+        initialValue={controlValueForMode(mode)}
+      />
+    </div>
+  </>
+
   // ... render ...
 
   NProgress.configure({ showSpinner: false, minimum: 0.1, trickleSpeed: 150, speed: 500 })
   NProgress.start()
 
   if (scrobbles.done === false) {
-    return <>{header}</>
+    return <>{top}</>
   }
 
   if (scrobbles.error === true) {
@@ -163,7 +175,7 @@ export const U: React.FC<UProps> = ({
   }
 
   if (scrobbles.fetching) {
-    return <>{header}</>
+    return <>{top}</>
   }
 
   NProgress.done()
@@ -185,14 +197,7 @@ export const U: React.FC<UProps> = ({
   const songsToShow = scrobbles.songs.slice(0, endIdx);
 
   return <>
-    {header}
-    <div className="control">
-      <SegmentedControl
-        afterChange={(v) => { onControlChange(modeFromControlValue(v)) }}
-        values={controlValues}
-        initialValue={controlValueForMode(mode)}
-      />
-    </div>
+    {top}
     <div className="songs">
       <Songs
         songs={songsToShow}
