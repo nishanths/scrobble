@@ -1,4 +1,4 @@
-import React, { useState, ReactNode } from "react";
+import React, { useState, useEffect, ReactNode } from "react";
 import "../scss/segmented-control.scss";
 
 interface SegmentedControlProps<V extends readonly string[]> {
@@ -12,7 +12,12 @@ interface SegmentedControlProps<V extends readonly string[]> {
 
 export const SegmentedControl = <V extends readonly string[]>(props: (SegmentedControlProps<V> & { children?: ReactNode })) => {
   const { afterChange, initialValue, values } = props;
+
   const [selected, setSelected] = useState(initialValue);
+  useEffect(() => {
+    setSelected(initialValue)
+  }, [initialValue])
+
   const className = (selected: boolean, idx: number) => selected ? `c c${idx} selected` : `c c${idx}`
   const onControlClick = (v: string) => {
     const old = selected
