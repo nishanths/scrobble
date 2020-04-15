@@ -31,7 +31,7 @@ bindata:
 
 .PHONY: dev-deps
 dev-deps:
-	go get github.com/jteeuwen/go-bindata/...
+	go get github.com/kevinburke/go-bindata/...
 
 .PHONY: go
 go:
