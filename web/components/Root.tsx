@@ -21,7 +21,7 @@ export class Root extends React.Component<RootProps, { account: Account, deleteF
     }
   }
 
-  updateAccount(a: Account) {
+  private updateAccount(a: Account) {
     this.setState({ account: a })
   }
 
@@ -74,6 +74,10 @@ export class Root extends React.Component<RootProps, { account: Account, deleteF
     return <p><a href={Root.downloadURL}>Download</a> menu bar scrobble client for iTunes (macOS 10.14+)</p>
   }
 
+  private privacyPolicy() {
+    return <p><a href="/privacy-policy">Privacy policy</a></p>
+  }
+
   render() {
     let errClass = (b: boolean) => b ? "error" : "error hidden"
 
@@ -95,6 +99,7 @@ export class Root extends React.Component<RootProps, { account: Account, deleteF
       }
 
       {this.download()}
+      {this.privacyPolicy()}
     </div>
   }
 }
