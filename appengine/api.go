@@ -9,7 +9,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -735,8 +734,15 @@ func (s *server) artworkHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Infof("saved artwork hash=%s", hash)
 
+	hashJson, err := json.Marshal(hash)
+	if err != nil {
+		log.Errorf("%v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	io.WriteString(w, hash)
+	w.Write(hashJson)
 }
 
 func (s *server) artworkMissingHandler(w http.ResponseWriter, r *http.Request) {
