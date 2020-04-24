@@ -210,45 +210,21 @@ func (s *server) deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 		// asynchronously delete the namespace's entities
 		// (deletion order should not matter here)
 		namespace := namespaceID(accID)
+		deleteKinds := []string{KindArtworkRecord, KindSongParent, KindSong}
 
-		{
+		for _, k := range deleteKinds {
 			createReq, err := jsonPostTask("/internal/deleteEntities", deleteEntitiesTask{
 				Namespace: namespace,
-				Kind:      KindArtworkRecord,
+				Kind:      k,
 			}, s.secret.TasksSecret)
 			if err != nil {
 				return errors.Wrapf(err, "failed to build task")
 			}
 			if _, err := s.tasks.CreateTask(ctx, createReq); err != nil {
-				return errors.Wrapf(err, "failed to add task for %s,%s", namespace, KindArtworkRecord)
+				return errors.Wrapf(err, "failed to add task for %s,%s", namespace, k)
 			}
 		}
 
-		{
-			createReq, err := jsonPostTask("/internal/deleteEntities", deleteEntitiesTask{
-				Namespace: namespace,
-				Kind:      KindSongParent,
-			}, s.secret.TasksSecret)
-			if err != nil {
-				return errors.Wrapf(err, "failed to build task")
-			}
-			if _, err := s.tasks.CreateTask(ctx, createReq); err != nil {
-				return errors.Wrapf(err, "failed to add task for %s,%s", namespace, KindSongParent)
-			}
-		}
-
-		{
-			createReq, err := jsonPostTask("/internal/deleteEntities", deleteEntitiesTask{
-				Namespace: namespace,
-				Kind:      KindSong,
-			}, s.secret.TasksSecret)
-			if err != nil {
-				return errors.Wrapf(err, "failed to build task")
-			}
-			if _, err := s.tasks.CreateTask(ctx, createReq); err != nil {
-				return errors.Wrapf(err, "failed to add task for %s,%s", namespace, KindSong)
-			}
-		}
 		return nil
 	}); err != nil {
 		log.Errorf("%v", err.Error())
