@@ -9,6 +9,8 @@ cloud.google.com/go/internal/optional
 cloud.google.com/go/internal/trace
 cloud.google.com/go/internal/version
 cloud.google.com/go/storage
+# github.com/RobCherry/vibrant v0.0.0-20160904011657-0680b8cf1c89
+github.com/RobCherry/vibrant
 # github.com/golang/protobuf v1.2.0
 github.com/golang/protobuf/proto
 github.com/golang/protobuf/protoc-gen-go/descriptor
@@ -47,6 +49,9 @@ go.opencensus.io/trace
 go.opencensus.io/trace/internal
 go.opencensus.io/trace/propagation
 go.opencensus.io/trace/tracestate
+# golang.org/x/image v0.0.0-20200430140353-33d19683fad8
+golang.org/x/image/draw
+golang.org/x/image/math/f64
 # golang.org/x/net v0.0.0-20190311183353-d8887717615a
 golang.org/x/net/context
 golang.org/x/net/context/ctxhttp
