@@ -47,24 +47,58 @@ func Closest(c color.Color) Color {
 }
 
 func determineColor(hue, saturation, lightness float64) (Color, bool) {
-	if hue >= 343 || hue < 17 {
+	if hue >= 350 || hue < 3 {
 		if lightness <= 0.34 {
 			return Brown, true
 		}
-		if lightness <= 0.66 {
+		if lightness <= 0.56 {
+			return Red, true
+		}
+		return Pink, true
+	}
+
+	if hue >= 3 && hue < 15 {
+		if lightness <= 0.40 {
+			return Brown, true
+		}
+		if lightness <= 0.70 {
 			return Red, true
 		}
 		return Orange, true
 	}
 
-	if hue >= 17 && hue < 46 {
+	if hue >= 15 && hue < 39 {
 		if lightness <= 0.40 {
 			return Brown, true
 		}
 		return Orange, true
 	}
 
-	if hue >= 46 && hue < 69 {
+	if hue >= 39 && hue < 46 {
+		if lightness <= 0.24 {
+			return Brown, true
+		}
+		if lightness <= 0.75 {
+			return Orange, true
+		}
+		return Yellow, true
+	}
+
+	if hue >= 46 && hue < 51 {
+		if lightness <= 0.22 {
+			return Brown, true
+		}
+		return Yellow, true
+	}
+
+	if hue >= 51 && hue < 66 {
+		return Yellow, true
+	}
+
+	if hue >= 66 && hue < 69 {
+		if lightness <= 0.27 {
+			return Green, true
+		}
 		return Yellow, true
 	}
 
@@ -94,7 +128,7 @@ func determineColor(hue, saturation, lightness float64) (Color, bool) {
 		return Pink, true
 	}
 
-	if hue >= 307 && hue < 343 {
+	if hue >= 307 && hue < 350 {
 		return Pink, true
 	}
 

@@ -43,16 +43,14 @@ func TestClosest_numerical(t *testing.T) {
 		{0, 0, 0.9299, Gray},
 		{307, 0.1, 0.2, Gray},
 
-		{343, 0.4, 0.4, Red},
-		{360, 0.8, 0.8, Orange},
-		{0, 0.9, 0.8, Orange},
+		{343, 0.4, 0.4, Pink},
+		{360, 0.8, 0.8, Pink},
+		{0, 0.9, 0.8, Pink},
 		{7, .84, 0.48, Red},
 		{13.9, 0.9, 0.8, Orange},
-
-		{14, 0.4, 0.4, Red},
+		{14, 0.4, 0.4, Brown},
 		{14, 0.4, 0.34, Brown},
 		{14, 0.4, 0.8, Orange},
-
 		{17, 0.5, 0.4, Brown},
 		{17, 0.5, 0.41, Orange},
 		{30, 0.5, 0.4, Brown},
@@ -112,7 +110,7 @@ func TestClosest_handpicked(t *testing.T) {
 		{289, .19, .45, Violet, "alt-J This is All Yours violet"},
 		{213, .46, .38, Blue, "Josef Salvat In Your Prime background"},
 		{192, .05, .60, Gray, "Dan Deacon Mystic Familiar gray"},
-		{43, .75, .87, Orange, "How To Be a Human Being border"},
+		{43, .75, .87, Yellow, "How To Be a Human Being border"},
 		{360, 1, .40, Red, "Feeling Free block letters"},
 		{175, .09, .27, Gray, "Feeling Free background"},
 		{53, .58, .69, Yellow, "Holy Fire sky yellow"},
@@ -132,7 +130,9 @@ func TestClosest_handpicked(t *testing.T) {
 		{17, .92, .69, Orange, "Exits remix"},
 		{45, .68, .82, Yellow, "Foals Antidotes"},
 		{248, .35, .12, Violet, "Glass Animals EP"},
-		// TODO forest green color
+		{73, .18, .29, Green, "Costello Music green dress"},
+		{7, .72, .58, Red, "Costello Music red dress"},
+		{344, .69, .26, Pink, "Everything Not Saved Will Be Lost Pt. 1"},
 	}
 
 	undesirables := []undesirableResultTestcase{
