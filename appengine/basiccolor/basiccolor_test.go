@@ -41,6 +41,7 @@ func TestClosest_numerical(t *testing.T) {
 		{0, 0.07, 0.8, Gray},
 		{0, 0.05, 0.9, Gray},
 		{0, 0, 0.9299, Gray},
+		{307, 0.1, 0.2, Gray},
 
 		{343, 0.4, 0.4, Red},
 		{360, 0.8, 0.8, Orange},
@@ -69,7 +70,6 @@ func TestClosest_numerical(t *testing.T) {
 		{287, 0.8, 0.8, Pink},
 		{306.9, 0.3, 0.3, Violet},
 		{306.9, 0.7, 0.7, Pink},
-		{307, 0.1, 0.2, Pink},
 	}
 
 	testName := func(tt testcase) string {
@@ -93,6 +93,13 @@ func TestClosest_handpicked(t *testing.T) {
 		desc    string
 	}
 
+	type undesirableResultTestcase struct {
+		h, s, l float64
+		desired Color
+		expect  Color
+		desc    string
+	}
+
 	testcases := []testcase{
 		{46, .96, .49, Yellow, "Buttercup"},
 		{0, 0, .99, White, "XX white"},
@@ -100,10 +107,10 @@ func TestClosest_handpicked(t *testing.T) {
 		{19, .96, .54, Orange, "Autumn Orange flame"},
 		{7, .71, .17, Brown, "All Melody wood"},
 		{342, .97, .86, Pink, "Wolfgang Amadeus Phoenix pink"},
-		{347, .97, .86, Pink, "Wolfgang Amadeus Phoenix pink [handwritten]"},
+		{347, .97, .86, Pink, "Wolfgang Amadeus Phoenix pink [hand modified]"},
 		{179, .73, .53, Blue, "Gorillaz The Now Now cyan"},
 		{289, .19, .45, Violet, "alt-J This is All Yours violet"},
-		{213, .46, .38, Blue, "Josef Salvat In Your Prime backdrop"},
+		{213, .46, .38, Blue, "Josef Salvat In Your Prime background"},
 		{192, .05, .60, Gray, "Dan Deacon Mystic Familiar gray"},
 		{43, .75, .87, Orange, "How To Be a Human Being border"},
 		{360, 1, .40, Red, "Feeling Free block letters"},
@@ -112,7 +119,7 @@ func TestClosest_handpicked(t *testing.T) {
 		{355, .64, .41, Red, "Currents Tame Impala midstreak stark"},
 		{188, .36, .70, Blue, "What Went Down background"}, // looks green wholly, but really is blue
 		{187, .71, .77, Blue, "Dan Deacon bicycle soundtrack"},
-		{240, .32, .13, Violet, "Marks Beauvois"},
+		{240, .32, .13, Blue, "Marks Beauvois"}, // also Violet would work
 		{28, .85, .44, Orange, "Champyons"},
 		{175, .58, .19, Green, "Holy fire special edition sky green"},
 		{0, 0, .73, Gray, "Bone Digger gray"},
@@ -121,17 +128,15 @@ func TestClosest_handpicked(t *testing.T) {
 		{341, .83, .53, Pink, "French 79 pink band"},
 		{241, .96, .09, Blue, "Cupa Cupa blue"},
 		{0, 0, .95, White, "Tailwhip white"},
-		{41, .63, .49, Yellow, "All India Radio Mountain Top yellow"},
+		{41, .63, .49, Orange, "All India Radio Mountain Top yellow"},
 		{17, .92, .69, Orange, "Exits remix"},
-		{175, .58, .19, Gray, "Part Time Glory background"},
 		{45, .68, .82, Yellow, "Foals Antidotes"},
 		{248, .35, .12, Violet, "Glass Animals EP"},
 	}
 
-	// need more grays
-	// pink red interplay
-	// green/blue
-	// yellow/orange
+	undesirables := []undesirableResultTestcase{
+		{182, .20, .71, Green, Blue, "Part Time Glory background"},
+	}
 
 	for _, tt := range testcases {
 		t.Run(tt.desc, func(t *testing.T) {
@@ -141,7 +146,22 @@ func TestClosest_handpicked(t *testing.T) {
 			}
 		})
 	}
+
+	for _, tt := range undesirables {
+		t.Run(tt.desc, func(t *testing.T) {
+			got := Closest(HSL{tt.h, tt.s, tt.l, 1})
+			if tt.desired == got {
+				t.Errorf("now produces desired color: %s", tt.desired)
+				return
+			}
+			if tt.expect != got {
+				t.Errorf("wrong color: expected: %s, got: %s", tt.expect, got)
+				return
+			}
+		})
+	}
 }
 
 func TestClosest_fuzz(t *testing.T) {
+	// TODO
 }

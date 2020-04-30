@@ -72,14 +72,14 @@ func determineColor(hue, saturation, lightness float64) (Color, bool) {
 		return Green, true
 	}
 
-	if hue >= 172 && hue < 177 {
-		if lightness < 0.50 {
+	if hue >= 172 && hue < 185 {
+		if lightness < 0.5 {
 			return Green, true
 		}
 		return Blue, true
 	}
 
-	if hue >= 177 && hue < 244 {
+	if hue >= 185 && hue < 244 {
 		return Blue, true
 	}
 
@@ -88,7 +88,7 @@ func determineColor(hue, saturation, lightness float64) (Color, bool) {
 	}
 
 	if hue >= 286 && hue < 307 {
-		if lightness < 0.50 {
+		if lightness < 0.5 {
 			return Violet, true
 		}
 		return Pink, true
@@ -102,27 +102,12 @@ func determineColor(hue, saturation, lightness float64) (Color, bool) {
 }
 
 func isGray(saturation, lightness float64) bool {
-	// (0.00, 0.20)
-	// (0.08, 0.20) Eqn: y = 0.2
-	// (0.03, 0.50) Eqn of line for above point and this point: y = -6x + 0.68; x = -1/6y + 68/600
-	// (0.06, 0.70) Eqn: y = 20/3x + 0.3; x = 3/20y - 9/200
-	// (0.07, 0.80) Eqn: y = 10x + 0.1; x = y/10 - 1/100
-	// (0.10, 0.93) Eqn: y = 13/3x + 149/300; x = 3/13y - (3*149)/(13*300)
-	// (0.00, 0.93) Eqn: y = 0.93
+	// (0.00, 0.20) // taken care of by isBlack()
+	// (0.12, 0.16)
+	// (0.12, 0.946)
+	// (0.00, 0.93) // taken care of by isWhite()
 
-	if lightness > 0.20 && lightness <= 0.50 {
-		return saturation <= -1./6*lightness+68./600
-	}
-	if lightness > 0.50 && lightness <= 0.70 {
-		return saturation <= 3./20*lightness-9./200
-	}
-	if lightness > 0.70 && lightness <= 0.90 {
-		return saturation <= 1./10*lightness-1./100
-	}
-	if lightness > 0.80 && lightness <= 0.93 {
-		return saturation <= 3./13*lightness-(3.*149)/(13*300)
-	}
-	return false
+	return saturation < 0.12
 }
 
 func isWhite(saturation, lightness float64) bool {
