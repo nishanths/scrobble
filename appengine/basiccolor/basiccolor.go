@@ -102,6 +102,8 @@ func determineColor(hue, saturation, lightness float64) (Color, bool) {
 }
 
 func isGray(saturation, lightness float64) bool {
+	// Based on these (saturation, lightness) points:
+	//
 	// (0.00, 0.20) // taken care of by isBlack()
 	// (0.12, 0.16)
 	// (0.12, 0.946)

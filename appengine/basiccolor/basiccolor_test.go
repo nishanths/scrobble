@@ -132,6 +132,7 @@ func TestClosest_handpicked(t *testing.T) {
 		{17, .92, .69, Orange, "Exits remix"},
 		{45, .68, .82, Yellow, "Foals Antidotes"},
 		{248, .35, .12, Violet, "Glass Animals EP"},
+		// TODO forest green color
 	}
 
 	undesirables := []undesirableResultTestcase{
