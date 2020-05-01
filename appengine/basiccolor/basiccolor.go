@@ -1,3 +1,5 @@
+// Package basiccolor provides functions to determine the closest
+// basic color (e.g., red, white, orange) to a given color.
 package basiccolor
 
 import (
