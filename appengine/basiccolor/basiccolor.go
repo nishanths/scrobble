@@ -143,7 +143,7 @@ func isGray(saturation, lightness float64) bool {
 	// (0.00, 0.20) // taken care of by isBlack()
 	// (0.12, 0.16)
 	// (0.12, 0.946)
-	// (0.00, 0.93) // taken care of by isWhite()
+	// (0.00, 0.88) // taken care of by isWhite()
 
 	return saturation < 0.12
 }
@@ -151,17 +151,17 @@ func isGray(saturation, lightness float64) bool {
 func isWhite(saturation, lightness float64) bool {
 	// Based on these (saturation, lightness) points:
 	//
-	// (0.00, 0.93)
-	// (0.10, 0.93)
+	// (0.00, 0.88)
+	// (0.10, 0.88)
 	// (0.15, 0.97)
 	// (0.30, 0.99)
 	// (1.00, 0.99)
 
 	if saturation < 0.10 {
-		return lightness >= 0.93
+		return lightness >= 0.88
 	}
 	if saturation < 0.15 {
-		return lightness >= (4./5*saturation)+0.85
+		return lightness >= 1.8*saturation+0.7
 	}
 	if saturation < 0.30 {
 		return lightness >= (2./15*saturation)+0.95

@@ -24,6 +24,9 @@ func TestClosest_numerical(t *testing.T) {
 		{180, 0.75, 0.99, White},
 		{180, 1, 0.99, White},
 		{180, 1, 1, White},
+		{0, 0.05, 0.9, White},
+		{0, 0, 0.9299, White},
+		{0, 0, 0.9098039215686274, White},
 
 		{0, 0, 0.05, Black},
 		{0, 0.08, 0.2, Black},
@@ -39,8 +42,6 @@ func TestClosest_numerical(t *testing.T) {
 		{0, 0.04, 0.6, Gray},
 		{0, 0.06, 0.7, Gray},
 		{0, 0.07, 0.8, Gray},
-		{0, 0.05, 0.9, Gray},
-		{0, 0, 0.9299, Gray},
 		{307, 0.1, 0.2, Gray},
 
 		{343, 0.4, 0.4, Pink},
