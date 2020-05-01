@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -35,6 +36,12 @@ func (s *server) artworkColorHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	username := r.FormValue("username")
+	if username == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	// Parse input color.
 	c := r.FormValue("color")
 	if c == "" {
@@ -56,9 +63,46 @@ func (s *server) artworkColorHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO query datastore
-	_ = ctx
-	_ = inputColor
+	acc, accID, ok := fetchAccountForUsername(ctx, username, s.ds, w)
+	if !ok {
+		return
+	}
+
+	if acc.Private && !s.canViewScrobbled(ctx, accID, r) {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	namespace := namespaceID(accID)
+
+	// query datastore for ArtworkRecords matching the input color.
+	q := datastore.NewQuery(artwork.KindArtworkRecord).
+		Namespace(namespace).
+		Limit(350).
+		Order(fmt.Sprintf("-Score.%s", datastoreFieldNameForColor(inputColor))).
+		KeysOnly()
+
+	keys, err := s.ds.GetAll(ctx, q, nil)
+	if err != nil {
+		log.Errorf("failed to get query: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// Prepare response.
+	hashes := make([]string, len(keys))
+	for i, k := range keys {
+		hashes[i] = k.Name
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(hashes); err != nil {
+		log.Errorf("failed to write response: %v", err.Error())
+	}
+}
+
+func datastoreFieldNameForColor(c basiccolor.Color) string {
+	return c.String()
 }
 
 type fillArtworkScoreTask struct {
