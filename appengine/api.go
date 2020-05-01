@@ -9,6 +9,11 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"image"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -17,8 +22,10 @@ import (
 
 	"cloud.google.com/go/datastore"
 	"cloud.google.com/go/storage"
+	"github.com/RobCherry/vibrant"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/google/uuid"
+	"github.com/nishanths/scrobble/appengine/artwork"
 	"github.com/nishanths/scrobble/appengine/log"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
@@ -31,14 +38,15 @@ const (
 )
 
 const (
-	KindAccount       = "Account"
-	KindUsername      = "Username" // stored for uniqueness checking
-	KindAPIKey        = "APIKey"   // stored for uniqueness checking
-	KindSongParent    = "SongParent"
-	KindSong          = "Song"
-	KindArtworkRecord = "ArtworkRecord" // for fast key-only determination of missing artwork
-	KindITunesTrack   = "ITunesTrack"
-	KindSecret        = "Secret"
+	KindAccount     = "Account"     // namespace: [default]
+	KindUsername    = "Username"    // namespace: [default]; stored for uniqueness checking; namespace:
+	KindAPIKey      = "APIKey"      // namespace: [default]; stored for uniqueness checking; namespace:
+	KindITunesTrack = "ITunesTrack" // namespace: [default]
+	KindSecret      = "Secret"      // namespace: [default]
+
+	KindSongParent    = "SongParent"    // namespace: Account
+	KindSong          = "Song"          // namespace: Account
+	KindArtworkRecord = "ArtworkRecord" // namespace: Account; for fast key-only determination of missing artwork
 )
 
 func songparentident(t time.Time, u uuid.UUID) string {
@@ -684,7 +692,7 @@ func (s *server) artworkHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	artwork, err := ioutil.ReadAll(r.Body)
+	artworkBytes, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Errorf("failed to read request body: %v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
@@ -692,12 +700,12 @@ func (s *server) artworkHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	format := r.FormValue("format")
-	hash := artworkHash(artwork, format)
+	hash := artworkHash(artworkBytes, format)
 
 	// upload to GCS
 	wr := s.storage.Bucket(DefaultBucketName).Object(artworkStorageDirectory + "/" + hash).NewWriter(ctx)
 	wr.Metadata = map[string]string{"format": format}
-	if _, err := wr.Write(artwork); err != nil {
+	if _, err := wr.Write(artworkBytes); err != nil {
 		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -706,6 +714,11 @@ func (s *server) artworkHandler(w http.ResponseWriter, r *http.Request) {
 		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
+	}
+
+	if err := savePaletteAndScore(ctx, s.ds, bytes.NewReader(artworkBytes), hash); err != nil {
+		// only log (request still remains successful)
+		log.Errorf("failed to save palette/score: %v", err.Error())
 	}
 
 	log.Infof("saved artwork hash=%s", hash)
@@ -719,6 +732,29 @@ func (s *server) artworkHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(hashJson)
+}
+
+func savePaletteAndScore(ctx context.Context, ds *datastore.Client, artworkContent io.Reader, artworkHash string) error {
+	img, _, err := image.Decode(artworkContent)
+	if err != nil {
+		return errors.Wrapf(err, "failed to decode image")
+	}
+
+	// compute and save palette
+	p := vibrant.NewPaletteBuilder(img).Generate()
+	swatches := artwork.TopSwatches(p.Swatches())
+	a := artwork.Artwork{Palette: swatches}
+	if _, err := ds.Put(ctx, artwork.ArtworkKey(artworkHash), &a); err != nil {
+		return errors.Wrapf(err, "failed to datastore put artwork")
+	}
+
+	// compute and save score
+	as := artwork.ArtworkScoreFromSwatches(swatches)
+	if _, err := ds.Put(ctx, artwork.ArtworkScoreKey(artworkHash), &as); err != nil {
+		return errors.Wrapf(err, "failed to datastore put artwork score")
+	}
+
+	return nil
 }
 
 func (s *server) artworkMissingHandler(w http.ResponseWriter, r *http.Request) {

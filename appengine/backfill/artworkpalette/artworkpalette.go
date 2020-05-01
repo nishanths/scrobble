@@ -9,44 +9,19 @@ import (
 	_ "image/png"
 	"io"
 	"log"
-	"sort"
 	"strings"
 
 	"cloud.google.com/go/datastore"
 	"cloud.google.com/go/storage"
 	"github.com/RobCherry/vibrant"
+	"github.com/nishanths/scrobble/appengine/artwork"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
 
-const credFile = "selective-scrobble-354ed4c58385.json"
+const credFile = "../selective-scrobble-354ed4c58385.json"
 const DefaultBucketName = "selective-scrobble.appspot.com"
-
-const (
-	KindArtwork = "Artwork"
-)
-
-type Palette []Swatch
-
-type HSL struct {
-	H, S, L float64
-}
-
-type Swatch struct {
-	Color      HSL
-	Population int
-}
-
-// Namespace: [default]
-// Key: artwork hash
-type Artwork struct {
-	Palette Palette
-}
-
-func artworkKey(hash string) *datastore.Key {
-	return &datastore.Key{Kind: KindArtwork, Name: hash}
-}
 
 var (
 	fParallel = flag.Int("parallel", 16, "number of worker goroutines")
@@ -134,8 +109,8 @@ func handleOne(ctx context.Context, ds *datastore.Client, bkt *storage.BucketHan
 	}
 
 	hash := strings.TrimPrefix(name, "aw/")
-	entity := &Artwork{Palette: top}
-	if _, err := ds.Put(ctx, artworkKey(hash), entity); err != nil {
+	entity := &artwork.Artwork{Palette: top}
+	if _, err := ds.Put(ctx, artwork.ArtworkKey(hash), entity); err != nil {
 		return fmt.Errorf("datastore put: %s", err)
 	}
 
@@ -143,36 +118,12 @@ func handleOne(ctx context.Context, ds *datastore.Client, bkt *storage.BucketHan
 	return nil
 }
 
-func topSwatchesFromFile(r io.Reader) ([]Swatch, error) {
+func topSwatchesFromFile(r io.Reader) ([]artwork.Swatch, error) {
 	img, _, err := image.Decode(r)
 	if err != nil {
 		return nil, fmt.Errorf("decode image: %s", err)
 	}
 
 	palette := vibrant.NewPaletteBuilder(img).Generate()
-	return topSwatches(palette.Swatches()), nil
-
-}
-
-func topSwatches(swatches []*vibrant.Swatch) []Swatch {
-	var total float64
-	for _, s := range swatches {
-		total += float64(s.Population())
-	}
-
-	sort.Slice(swatches, func(i, j int) bool {
-		return swatches[i].Population() > swatches[j].Population()
-	})
-
-	if len(swatches) > 5 {
-		swatches = swatches[:5]
-	}
-
-	out := make([]Swatch, len(swatches))
-	for i, s := range swatches {
-		perMile := int(float64(s.Population()) / total * 1000) // percentage of total, but using 1000 instead of 100
-		hsl := vibrant.HSLModel.Convert(s.Color()).(vibrant.HSL)
-		out[i] = Swatch{HSL{hsl.H, hsl.S, hsl.L}, perMile}
-	}
-	return out
+	return artwork.TopSwatches(palette.Swatches()), nil
 }
