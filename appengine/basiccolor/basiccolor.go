@@ -114,6 +114,8 @@ func determineColor(hue, saturation, lightness float64) (Color, bool) {
 	}
 
 	if hue >= 185 && hue < 244 {
+		// TODO: carve out space for gray here
+		// e.g., (210, .15, .59)
 		return Blue, true
 	}
 
