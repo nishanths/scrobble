@@ -136,6 +136,10 @@ func run(ctx context.Context) error {
 }
 
 func (s *server) buildCommitHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
 	w.Header().Set("Content-Type", "text/plain")
 	io.WriteString(w, BuildCommit)
 }
