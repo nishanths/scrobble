@@ -121,7 +121,8 @@ func TestClosest_handpicked(t *testing.T) {
 		{187, .71, .77, Blue, "Dan Deacon bicycle soundtrack"},
 		{240, .32, .13, Blue, "Marks Beauvois"}, // also Violet would work
 		{28, .85, .44, Orange, "Champyons"},
-		{175, .58, .19, Green, "Holy fire special edition sky green"},
+		{173, .46, .18, Green, "Holy fire special edition sky green"},
+		{175, .58, .19, Blue, "darkish cyan blue [handwritten]"},
 		{0, 0, .73, Gray, "Bone Digger gray"},
 		{137, .21, .13, Green, "Tourist Wash clothes green"},
 		{0, 0, .06, Black, "Cross of Changes background"},

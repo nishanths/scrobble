@@ -104,11 +104,11 @@ func determineColor(hue, saturation, lightness float64) (Color, bool) {
 		return Yellow, true
 	}
 
-	if hue >= 69 && hue < 172 {
+	if hue >= 69 && hue < 170 {
 		return Green, true
 	}
 
-	if hue >= 172 && hue < 185 {
+	if hue >= 170 && hue < 175 {
 		if lightness < 0.5 {
 			return Green, true
 		}
@@ -138,7 +138,7 @@ func determineColor(hue, saturation, lightness float64) (Color, bool) {
 }
 
 func blueRange() [2]float64 {
-	return [2]float64{185, 244}
+	return [2]float64{175, 244}
 }
 
 func isGray(hue, saturation, lightness float64) bool {
