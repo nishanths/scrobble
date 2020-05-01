@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -16,6 +17,10 @@ import (
 const (
 	DefaultBucketName = "selective-scrobble.appspot.com"
 	DefaultQueueName  = "projects/selective-scrobble/locations/us-east1/queues/default"
+)
+
+var (
+	BuildCommit string // injected at build time
 )
 
 type server struct {
@@ -114,6 +119,8 @@ func run(ctx context.Context) error {
 	http.Handle("/internal/deleteEntities", s.requireTasksSecretHeader(http.HandlerFunc(s.deleteEntitiesHandler)))
 	http.Handle("/internal/fillArtworkScore", s.requireTasksSecretHeader(http.HandlerFunc(s.fillArtworkScoreHandler)))
 
+	http.Handle("/build-commit", http.HandlerFunc(s.buildCommitHandler))
+
 	if isDev() {
 		// in production these are handled by app.yaml
 		http.Handle("/dist/", http.StripPrefix("/dist/", http.FileServer(http.Dir(filepath.Join("web", "dist")))))
@@ -126,6 +133,11 @@ func run(ctx context.Context) error {
 	}
 
 	panic("should not be reachable")
+}
+
+func (s *server) buildCommitHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain")
+	io.WriteString(w, BuildCommit)
 }
 
 func isDev() bool {

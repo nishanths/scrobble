@@ -36,7 +36,7 @@ dev-deps:
 .PHONY: go
 go:
 	@go version
-	cd appengine && go build -mod=vendor -o=main
+	cd appengine && go build -mod=vendor -ldflags "-X main.BuildCommit=$(git rev-list -1 HEAD)" -o=main
 
 .PHONY: web
 web:
