@@ -11,34 +11,20 @@ import (
 )
 
 const (
-	KindArtwork      = "Artwork"      // namespace: [default]
-	KindArtworkScore = "ArtworkScore" // namespace: [default]
+	KindArtworkScore  = "ArtworkScore"  // namespace: [default]
+	KindArtworkRecord = "ArtworkRecord" // namespace: Account
 )
-
-func ArtworkKey(hash string) *datastore.Key {
-	return &datastore.Key{Kind: KindArtwork, Name: hash}
-}
 
 func ArtworkScoreKey(hash string) *datastore.Key {
 	return &datastore.Key{Kind: KindArtworkScore, Name: hash}
 }
 
-type Palette []Swatch
-
-type HSL struct {
-	H, S, L float64
-	A       int
-}
-
-type Swatch struct {
-	Color      HSL
-	Population int
-}
-
-// Namespace: [default]
-// Key: artwork hash
-type Artwork struct {
-	Palette Palette `datastore:",noindex"`
+func ArtworkRecordKey(namespace string, hash string) *datastore.Key {
+	return &datastore.Key{
+		Kind:      KindArtworkRecord,
+		Name:      hash,
+		Namespace: namespace,
+	}
 }
 
 // Namespace: [default]
@@ -57,9 +43,23 @@ type ArtworkScore struct {
 	White int
 }
 
-const maxSwatches = 10
+// Namespace: Account
+// Key: artwork hash
+type ArtworkRecord struct {
+	Score ArtworkScore
+}
 
-func TopSwatches(swatches []*vibrant.Swatch) []Swatch {
+type HSL struct {
+	H, S, L float64
+	A       int
+}
+
+type Swatch struct {
+	Color      HSL
+	Population int
+}
+
+func Swatches(swatches []*vibrant.Swatch) []Swatch {
 	var total float64
 	for _, s := range swatches {
 		total += float64(s.Population())
@@ -68,10 +68,6 @@ func TopSwatches(swatches []*vibrant.Swatch) []Swatch {
 	sort.Slice(swatches, func(i, j int) bool {
 		return swatches[i].Population() > swatches[j].Population()
 	})
-
-	if len(swatches) > maxSwatches {
-		swatches = swatches[:maxSwatches]
-	}
 
 	out := make([]Swatch, len(swatches))
 	for i, s := range swatches {

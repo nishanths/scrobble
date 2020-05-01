@@ -11,3 +11,6 @@ appengine/main
 macos/archive
 
 .DS_Store
+
+# binary sometimes left over during debugging
+appengine/appengine

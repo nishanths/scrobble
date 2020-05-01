@@ -13,7 +13,6 @@ import (
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -44,9 +43,8 @@ const (
 	KindITunesTrack = "ITunesTrack" // namespace: [default]
 	KindSecret      = "Secret"      // namespace: [default]
 
-	KindSongParent    = "SongParent"    // namespace: Account
-	KindSong          = "Song"          // namespace: Account
-	KindArtworkRecord = "ArtworkRecord" // namespace: Account; for fast key-only determination of missing artwork
+	KindSongParent = "SongParent" // namespace: Account
+	KindSong       = "Song"       // namespace: Account
 )
 
 func songparentident(t time.Time, u uuid.UUID) string {
@@ -218,7 +216,7 @@ func (s *server) deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 		// asynchronously delete the namespace's entities
 		// (deletion order should not matter here)
 		namespace := namespaceID(accID)
-		deleteKinds := []string{KindArtworkRecord, KindSongParent, KindSong}
+		deleteKinds := []string{artwork.KindArtworkRecord, KindSongParent, KindSong}
 
 		for _, k := range deleteKinds {
 			createReq, err := jsonPostTask("/internal/deleteEntities", deleteEntitiesTask{
@@ -533,7 +531,7 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Handle de-duplication
 		if _, ok := songIdentsSet[s.Ident()]; ok {
-			// NOTE: This happens in practice; macOS client seems bad.
+			// NOTE: This happens in practice; macOS client seems bad?
 			log.Warningf("duplicate incoming song ident %v; skipping", s.Ident())
 			continue
 		}
@@ -542,11 +540,11 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		songs = append(songs, s)
 	}
 
+	// Create new incomplete SongParent.
 	newParentIdent := songparentident(now, uuid.New())
 	newParentKey := songParentKey(namespace, newParentIdent)
 	newParentCreated := now.Unix()
 
-	// Create new incomplete SongParent.
 	if _, err := svr.ds.Put(ctx, newParentKey, &SongParent{
 		Complete: false,
 		Created:  newParentCreated,
@@ -557,23 +555,18 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var sKeys []*datastore.Key
-	var aKeys []*datastore.Key
-	// for de-duplication (otherwise PutMulti with repeated artwork hashes fails)
-	aKeysSet := make(map[string]struct{})
+	incomingArtworkHashes := make(map[string]struct{})
 	for _, s := range songs {
 		// Create song key.
 		sKeys = append(sKeys, songKey(namespace, s.Ident(), newParentKey))
-		// Create artwork hash key.
+		// Collect incoming artwork hash.
 		if h := s.ArtworkHash; h != "" {
-			if _, ok := aKeysSet[h]; ok {
-				continue
-			}
-			aKeysSet[h] = struct{}{}
-			aKeys = append(aKeys, &datastore.Key{Kind: KindArtworkRecord, Name: h, Namespace: namespace})
+			incomingArtworkHashes[h] = struct{}{}
 		}
 	}
 
 	// Put songs.
+	// (This should serially succeed before we proceed further.)
 	{
 		s := 0
 		e := min(s+datastoreLimitPerOp, len(songs))
@@ -594,26 +587,57 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	var g errgroup.Group // TODO: why is this group not deriving from request context?
+	// Fetch currently existing artwork record hashes.
+	q := datastore.NewQuery(artwork.KindArtworkRecord).Namespace(namespace).KeysOnly()
+	currentArtworkKeys, err := svr.ds.GetAll(ctx, q, nil)
+	if err != nil {
+		log.Errorf("failed to fetch artwork records: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	currentArtworkHashes := make(map[string]struct{}, len(currentArtworkKeys))
+	for _, k := range currentArtworkKeys {
+		currentArtworkHashes[k.Name] = struct{}{}
+	}
 
-	// Put artwork hash keys.
+	// Diff current and incoming artwork hashes.
+	addHashes, removeHashes := diffStringSet(currentArtworkHashes, incomingArtworkHashes)
+
+	var g errgroup.Group
+
+	// Adjust artwork records based on added / removed hashes.
 	g.Go(func() error {
-		s := 0
-		e := min(s+datastoreLimitPerOp, len(aKeys))
-		keysChunk := aKeys[s:e]
-
-		for len(keysChunk) > 0 {
-			if _, err := svr.ds.PutMulti(ctx, keysChunk, make([]struct{}, len(keysChunk))); err != nil {
-				return errors.Wrapf(err, "failed to put artwork records")
-			}
-
-			s = e
-			e = min(s+datastoreLimitPerOp, len(aKeys))
-			keysChunk = aKeys[s:e]
+		keys := make([]*datastore.Key, 0, len(addHashes))
+		for k := range addHashes {
+			keys = append(keys, artwork.ArtworkRecordKey(namespace, k))
 		}
-
-		return nil
+		_, err := svr.ds.PutMulti(ctx, keys, make([]artwork.ArtworkRecord, len(keys)))
+		return err
 	})
+	g.Go(func() error {
+		keys := make([]*datastore.Key, 0, len(removeHashes))
+		for k := range removeHashes {
+			keys = append(keys, artwork.ArtworkRecordKey(namespace, k))
+		}
+		return svr.ds.DeleteMulti(ctx, keys)
+	})
+
+	// Create artwork score fill-in tasks for the newly added hashes.
+	for k := range addHashes {
+		g.Go(func() error {
+			createReq, err := jsonPostTask("/internal/fillArtworkScore", fillArtworkScoreTask{
+				Namespace: namespace,
+				Hash:      k,
+			}, svr.secret.TasksSecret)
+			if err != nil {
+				return errors.Wrapf(err, "failed to build task")
+			}
+			if _, err := svr.tasks.CreateTask(ctx, createReq); err != nil {
+				return errors.Wrapf(err, "failed to add fillArtworkScore tasks for %s,%s", namespaceID(accID), k)
+			}
+			return nil
+		})
+	}
 
 	// Create tasks to fill in iTunes-related fields.
 	for _, s := range songs {
@@ -685,12 +709,13 @@ func (s *server) artworkHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// validate API key
-	// TODO: make this more explicit
-	_, _, ok := fetchAccountForKey(ctx, key, s.ds, w)
+	// validate API key, get account ID
+	_, accID, ok := fetchAccountForKey(ctx, key, s.ds, w)
 	if !ok {
 		return
 	}
+
+	namespace := namespaceID(accID)
 
 	artworkBytes, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -716,9 +741,29 @@ func (s *server) artworkHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := savePaletteAndScore(ctx, s.ds, bytes.NewReader(artworkBytes), hash); err != nil {
-		// only log (request still remains successful)
-		log.Errorf("failed to save palette/score: %v", err.Error())
+	// compute artwork score
+	img, _, err := image.Decode(bytes.NewReader(artworkBytes))
+	if err != nil {
+		log.Errorf("failed to decode image: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	pal := vibrant.NewPaletteBuilder(img).Generate()
+	swatches := artwork.Swatches(pal.Swatches())
+	artworkScore := artwork.ArtworkScoreFromSwatches(swatches)
+
+	// Save score to global and namespaced entities.
+	if _, err := s.ds.Put(ctx, artwork.ArtworkScoreKey(hash), &artworkScore); err != nil {
+		log.Errorf("failed datastore put: %v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if _, err := s.ds.Put(ctx, artwork.ArtworkRecordKey(namespace, hash), &artwork.ArtworkRecord{
+		Score: artworkScore,
+	}); err != nil {
+		log.Errorf("failed datastore put: %v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	log.Infof("saved artwork hash=%s", hash)
@@ -732,29 +777,6 @@ func (s *server) artworkHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(hashJson)
-}
-
-func savePaletteAndScore(ctx context.Context, ds *datastore.Client, artworkContent io.Reader, artworkHash string) error {
-	img, _, err := image.Decode(artworkContent)
-	if err != nil {
-		return errors.Wrapf(err, "failed to decode image")
-	}
-
-	// compute and save palette
-	p := vibrant.NewPaletteBuilder(img).Generate()
-	swatches := artwork.TopSwatches(p.Swatches())
-	a := artwork.Artwork{Palette: swatches}
-	if _, err := ds.Put(ctx, artwork.ArtworkKey(artworkHash), &a); err != nil {
-		return errors.Wrapf(err, "failed to datastore put artwork")
-	}
-
-	// compute and save score
-	as := artwork.ArtworkScoreFromSwatches(swatches)
-	if _, err := ds.Put(ctx, artwork.ArtworkScoreKey(artworkHash), &as); err != nil {
-		return errors.Wrapf(err, "failed to datastore put artwork score")
-	}
-
-	return nil
 }
 
 func (s *server) artworkMissingHandler(w http.ResponseWriter, r *http.Request) {
@@ -791,7 +813,7 @@ func (s *server) artworkMissingHandler(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 			if err != nil {
-				log.Errorf("%v", err.Error()) // only log
+				log.Errorf("failed to iterate artwork bucket: %v", err.Error()) // only log
 				break
 			}
 			have[strings.TrimPrefix(o.Name, artworkStorageDirectory+"/")] = struct{}{}
@@ -800,7 +822,7 @@ func (s *server) artworkMissingHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	g.Go(func() error {
-		q := datastore.NewQuery(KindArtworkRecord).Namespace(namespace).KeysOnly()
+		q := datastore.NewQuery(artwork.KindArtworkRecord).Namespace(namespace).KeysOnly()
 		keys, err := s.ds.GetAll(gctx, q, nil)
 		if err != nil {
 			return errors.Wrapf(err, "failed to fetch artwork records")
@@ -822,7 +844,7 @@ func (s *server) artworkMissingHandler(w http.ResponseWriter, r *http.Request) {
 		want[k.Name] = true
 	}
 
-	log.Infof("%d artwork records with missing data", len(want))
+	log.Infof("missing %d artwork images", len(want))
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(want); err != nil {
@@ -1017,4 +1039,25 @@ func artworkHash(artwork []byte, format string) string {
 		buf.WriteString(fmt.Sprintf("%d", b))
 	}
 	return buf.String()
+}
+
+// Diffs the given sets and returns the elements being added and the elements
+// being removed.
+func diffStringSet(old, new map[string]struct{}) (added, removed map[string]struct{}) {
+	added = make(map[string]struct{})
+	removed = make(map[string]struct{})
+
+	for k := range new {
+		if _, ok := old[k]; !ok {
+			added[k] = struct{}{} // not present in old, so being newly added
+		}
+	}
+
+	for k := range old {
+		if _, ok := new[k]; !ok {
+			removed[k] = struct{}{} // not present in new, so being removed
+		}
+	}
+
+	return
 }
