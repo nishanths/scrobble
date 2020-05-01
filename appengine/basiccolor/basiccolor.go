@@ -35,7 +35,7 @@ func Closest(c color.Color) Color {
 	if isBlack(saturation, lightness) {
 		return Black
 	}
-	if isGray(saturation, lightness) {
+	if isGray(hue, saturation, lightness) {
 		return Gray
 	}
 	if r, ok := determineColor(hue, saturation, lightness); ok {
@@ -113,9 +113,7 @@ func determineColor(hue, saturation, lightness float64) (Color, bool) {
 		return Blue, true
 	}
 
-	if hue >= 185 && hue < 244 {
-		// TODO: carve out space for gray here
-		// e.g., (210, .15, .59)
+	if hue >= blueRange()[0] && hue < blueRange()[1] {
 		return Blue, true
 	}
 
@@ -137,7 +135,16 @@ func determineColor(hue, saturation, lightness float64) (Color, bool) {
 	return Color(-1), false
 }
 
-func isGray(saturation, lightness float64) bool {
+func blueRange() [2]float64 {
+	return [2]float64{185, 244}
+}
+
+func isGray(hue, saturation, lightness float64) bool {
+	if hue >= 205 && hue < blueRange()[1] {
+		// slate gray
+		return saturation < 0.18
+	}
+
 	// Based on these (saturation, lightness) points:
 	//
 	// (0.00, 0.20) // taken care of by isBlack()

@@ -63,6 +63,7 @@ func TestClosest_numerical(t *testing.T) {
 		{70, 0.8, 0.8, Green},
 
 		{175, 0.8, 0.8, Blue},
+		{210, 0.15, 0.59, Gray}, // slate gray
 
 		{250, 0.8, 0.8, Violet},
 		{287, 0.4, 0.4, Violet},
