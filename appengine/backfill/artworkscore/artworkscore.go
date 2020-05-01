@@ -111,8 +111,6 @@ func handleOne(ctx context.Context, name string, bkt *storage.BucketHandle, ds *
 	artworkScore := artwork.ArtworkScoreFromSwatches(swatches)
 	hash := strings.TrimPrefix(name, "aw/")
 
-	log.Printf("%+v", artworkScore)
-
 	// Put global ArtworkScore entity.
 	if _, err := ds.Put(ctx, artwork.ArtworkScoreKey(hash), &artworkScore); err != nil {
 		return fmt.Errorf("datastore put artwork score: %s", err)

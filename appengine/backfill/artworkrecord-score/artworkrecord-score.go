@@ -72,7 +72,7 @@ func run(ctx context.Context) error {
 		})
 	}
 
-	return nil
+	return g.Wait()
 }
 
 func handle(ctx context.Context, ds *datastore.Client, workCh chan work) error {
@@ -110,7 +110,8 @@ func handleOne(ctx context.Context, ds *datastore.Client, w work) error {
 			return fmt.Errorf("datastore put artwork record: %s", err)
 		}
 		return nil
-	}, nil)
+	})
 
+	log.Printf("put %v", w)
 	return err
 }

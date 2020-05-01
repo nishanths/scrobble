@@ -14,3 +14,9 @@ macos/archive
 
 # binary sometimes left over during debugging
 appengine/appengine
+
+# debug images
+*.jpeg
+
+# scratchwork at top-level
+scratch.go

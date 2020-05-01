@@ -1,8 +1,2 @@
 # service account key
 selective-scrobble-*.json
-
-# debug images
-*.jpeg
-
-# debug files
-main.go
