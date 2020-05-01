@@ -24,11 +24,7 @@ var validColors = [...]basiccolor.Color{
 	basiccolor.Pink,
 	basiccolor.Black,
 	basiccolor.Gray,
-
-	// TODO: whites aren't being detected for some reason
-	// in the swatches.
-	//
-	// basiccolor.White,
+	basiccolor.White,
 }
 
 func (s *server) artworkColorHandler(w http.ResponseWriter, r *http.Request) {
