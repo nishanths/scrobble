@@ -249,9 +249,6 @@ func parseLimit(lim string) (int, bool) {
 	if i < 0 {
 		return -1, false
 	}
-	if i > 2000 {
-		i = 2000
-	}
 	return i, true
 }
 
