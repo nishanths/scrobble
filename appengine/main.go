@@ -107,10 +107,12 @@ func run(ctx context.Context) error {
 	http.HandleFunc("/api/v1/account/delete", s.deleteAccountHandler)
 	http.HandleFunc("/api/v1/artwork", s.artworkHandler)
 	http.HandleFunc("/api/v1/artwork/missing", s.artworkMissingHandler)
+	http.HandleFunc("/api/v1/artwork/color", s.artworkColorHandler)
 
 	http.Handle("/internal/fillITunesFields", s.requireTasksSecretHeader(http.HandlerFunc(s.fillITunesFieldsHandler)))
 	http.Handle("/internal/markParentComplete", s.requireTasksSecretHeader(http.HandlerFunc(s.markParentCompleteHandler)))
 	http.Handle("/internal/deleteEntities", s.requireTasksSecretHeader(http.HandlerFunc(s.deleteEntitiesHandler)))
+	http.Handle("/internal/fillArtworkScore", s.requireTasksSecretHeader(http.HandlerFunc(s.fillArtworkScoreHandler)))
 
 	if isDev() {
 		// in production these are handled by app.yaml
