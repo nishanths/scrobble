@@ -252,6 +252,13 @@ func parseLimit(lim string) (int, bool) {
 	return i, true
 }
 
+func clampLimit(lim int, hasLimit bool, max int) int {
+	if !hasLimit || lim > max {
+		return max
+	}
+	return lim
+}
+
 type ScrobbledResponse struct {
 	// Total is the total number of scrobbled songs.
 	// It is valid only if the request wasn't for a specific song (i.e., "song"
