@@ -15,7 +15,7 @@ $colors: (
   black:  #111111,
   gray:   #AAAAAA,
   white:  #DDDDDD,
-  );
+);
 
 .Swatch {
   width: $dim;
@@ -23,32 +23,17 @@ $colors: (
   border-radius: 50%;
   position: relative;
   box-sizing: border-box;
+  transition: 100ms $transition-exit-func all;
 
-  .selection {
-    position: absolute;
-    width: 26px;
-    height: 26px;
-    top: -2px;
-    left: -2px;
-    border-radius: 50%;
-    box-sizing: border-box;
-    box-shadow: 0px 0px 0px 0px #fff;
-    transition: 1000ms $transition-exit-func box-shadow;
-  }
-
-  &:hover, &.selected {
-    .selection {
-      transition: 1250ms $transition-enter-func box-shadow;
-    }
+  &:hover {
+    transition: 250ms $transition-enter-func all;
   }
 
   @each $name, $color in $colors {
     &.color-#{$name} {
       background-color: $color;
-      &:hover, &.selected {
-        .selection {
-          box-shadow: 0px 0px 6px 0px scale-color($color, $lightness: -20%);
-        }
+      &:hover {
+        background-color: scale-color($color, $lightness: 20%);
       }
     }
   }

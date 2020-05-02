@@ -1,15 +1,15 @@
 export const colors = [
+	"gray",
 	"red",
 	"orange",
 	"blue",
 	"yellow",
-	"gray",
-	"black",
 	"white",
+	"green",
 	"violet",
 	"pink",
-	"green",
 	"brown",
+	"black",
 ] as const;
 
 export type Color = typeof colors[number]
