@@ -32,12 +32,11 @@ func (s *server) artworkColorHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	if r.Method != "GET" {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
 	limit, hasLimit := parseLimit(r.FormValue("limit"))
-	limit = clampLimit(limit, hasLimit, 350)
 
 	username := r.FormValue("username")
 	if username == "" {
@@ -81,9 +80,12 @@ func (s *server) artworkColorHandler(w http.ResponseWriter, r *http.Request) {
 	// query datastore for ArtworkRecords matching the input color.
 	q := datastore.NewQuery(artwork.KindArtworkRecord).
 		Namespace(namespace).
-		Limit(limit).
 		Order(fmt.Sprintf("-Score.%s", datastoreFieldNameForColor(inputColor))).
+		Filter(fmt.Sprintf("-Score.%s >=", datastoreFieldNameForColor(inputColor)), 300).
 		KeysOnly()
+	if hasLimit {
+		q = q.Limit(limit)
+	}
 
 	keys, err := s.ds.GetAll(ctx, q, nil)
 	if err != nil {
@@ -117,7 +119,7 @@ func (s *server) fillArtworkScoreHandler(w http.ResponseWriter, r *http.Request)
 	ctx := context.Background()
 
 	if r.Method != "POST" {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 

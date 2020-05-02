@@ -28,6 +28,7 @@ export interface Song {
   totalTime: number
   year: number
   lastPlayed: number
+  playCount: number
   artworkHash: string
   trackViewURL: string
   loved: boolean

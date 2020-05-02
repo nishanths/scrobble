@@ -1,7 +1,7 @@
 web/dist
 web/node_modules
 
-# symlinks
+# symlink
 appengine/web
 
 # binary
@@ -15,8 +15,5 @@ macos/archive
 
 .DS_Store
 
-# debug images
-*.jpeg
-
-# scratchwork at top-level
-scratch.go
+# scratchwork
+appengine/.scratch

@@ -38,8 +38,8 @@ const (
 
 const (
 	KindAccount     = "Account"     // namespace: [default]
-	KindUsername    = "Username"    // namespace: [default]; stored for uniqueness checking; namespace:
-	KindAPIKey      = "APIKey"      // namespace: [default]; stored for uniqueness checking; namespace:
+	KindUsername    = "Username"    // namespace: [default]; stored for uniqueness checking
+	KindAPIKey      = "APIKey"      // namespace: [default]; stored for uniqueness checking
 	KindITunesTrack = "ITunesTrack" // namespace: [default]
 	KindSecret      = "Secret"      // namespace: [default]
 
@@ -96,7 +96,7 @@ type Song struct {
 
 	// play info
 	LastPlayed int64 `json:"lastPlayed"` // unix seconds
-	PlayCount  int   `json:"-"`
+	PlayCount  int   `json:"playCount"`
 
 	ArtworkHash string `datastore:",noindex" json:"artworkHash"`
 
@@ -172,7 +172,7 @@ func (s *server) deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 	if u, err := s.currentUser(r); err != nil {
 		key := r.Header.Get(headerAPIKey)
 		if key == "" {
-			log.Errorf("not signed in and missing API key header")
+			log.Errorf("not signed-in and missing API key header")
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -866,7 +866,7 @@ func (s *server) markParentCompleteHandler(w http.ResponseWriter, r *http.Reques
 	ctx := context.Background()
 
 	if r.Method != "POST" {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 

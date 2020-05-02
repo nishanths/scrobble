@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"net/url"
@@ -27,7 +25,7 @@ func (s *server) fillITunesFieldsHandler(w http.ResponseWriter, r *http.Request)
 	ctx := context.Background()
 
 	if r.Method != "POST" {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -241,9 +239,4 @@ func iTunesSearchSong(ctx context.Context, httpClient *http.Client, searchTerm s
 		}
 	}
 	return ret, false, nil
-}
-
-func drainAndClose(r io.ReadCloser) {
-	io.Copy(ioutil.Discard, r)
-	r.Close()
 }

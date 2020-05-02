@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -150,4 +152,9 @@ func maybeRedirectHTTPS(w http.ResponseWriter, r *http.Request) bool {
 	u.Scheme = "https"
 	http.Redirect(w, r, u.String(), http.StatusTemporaryRedirect)
 	return true
+}
+
+func drainAndClose(r io.ReadCloser) {
+	io.Copy(ioutil.Discard, r)
+	r.Close()
 }

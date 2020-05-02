@@ -112,6 +112,10 @@ func handleOne(ctx context.Context, ds *datastore.Client, w work) error {
 		return nil
 	})
 
+	if err != nil {
+		return err
+	}
+
 	log.Printf("put %v", w)
-	return err
+	return nil
 }
