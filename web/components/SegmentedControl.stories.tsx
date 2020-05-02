@@ -4,11 +4,16 @@ import { SegmentedControl } from './SegmentedControl';
 
 const s = storiesOf("SegmentedControl", module)
 
-s.add("with text", () => {
+s.add("default", () => {
+	const values = ["All", "Loved", "By color"] as const
+	type V = typeof values[number]
+
 	const props = {
-		values: ["All", "Loved", "By color"] as const,
+		values,
 		initialValue: "All" as const,
-		afterChange: () => {},
+		afterChange: (v: V) => {
+			console.log(v)
+		},
 	}
 	return <SegmentedControl {...props}></SegmentedControl>
 })
