@@ -25,4 +25,5 @@ fmt:
 
 .PHONY: sb
 sb:
-	npm run storybook
+	npx start-storybook -p 9001 -c .storybook \
+		-s static # https://storybook.js.org/docs/configurations/serving-static-files/
