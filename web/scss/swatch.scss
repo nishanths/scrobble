@@ -1,0 +1,42 @@
+@import 'vars.scss';
+
+$dim: 22px;
+
+// http://clrs.cc/
+$colors: (
+  red:    #FF4136,
+  orange: #FF851B,
+  brown:  #9F8170,
+  yellow: #FFDC00,
+  green:  #3D9970,
+  blue:   #0074D9,
+  violet: #B10DC9,
+  pink:   #F012BE,
+  black:  #333333,
+  gray:   #AAAAAA,
+  white:  #DDDDDD,
+);
+
+// '.selected' class currently not being used to style the component
+
+.Swatch {
+  width: $dim;
+  height: $dim;
+  border-radius: 50%;
+  position: relative;
+  box-sizing: border-box;
+  transition: 100ms $transition-exit-func all;
+
+  &:hover {
+    transition: 250ms $transition-enter-func all;
+  }
+
+  @each $name, $color in $colors {
+    &.color-#{$name} {
+      background-color: $color;
+      &:hover {
+        background-color: scale-color($color, $lightness: 20%);
+      }
+    }
+  }
+}

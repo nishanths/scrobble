@@ -1,0 +1,24 @@
+@import "vars.scss";
+
+.ColorPicker {
+	display: inline-flex;
+    flex-direction: column;
+
+	.elems {
+		display: inline-flex;
+		.elem {
+			cursor: pointer;
+			margin-right: 10px;
+			&:last-child {
+				margin-right: 0;
+			}
+		}
+	}
+
+	.label {
+		margin-top: 20px;
+		height: 20px;
+		text-align: center;
+		color: $meta-color;
+	}
+}
