@@ -605,7 +605,7 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Diff current and incoming artwork hashes.
-	addHashes, removeHashes := diffStringSet(currentArtworkHashes, incomingArtworkHashes)
+	addHashes, removeHashes := diffStringSets(currentArtworkHashes, incomingArtworkHashes)
 
 	var g errgroup.Group
 
@@ -1047,7 +1047,7 @@ func artworkHash(artwork []byte, format string) string {
 
 // Diffs the given sets and returns the elements being added and the elements
 // being removed.
-func diffStringSet(old, new map[string]struct{}) (added, removed map[string]struct{}) {
+func diffStringSets(old, new map[string]struct{}) (added, removed map[string]struct{}) {
 	added = make(map[string]struct{})
 	removed = make(map[string]struct{})
 

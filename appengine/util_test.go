@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestDiffStringSet(t *testing.T) {
+func TestDiffStringSets(t *testing.T) {
 	type testcase struct {
 		old, new, add, remove map[string]struct{}
 	}
@@ -19,7 +19,7 @@ func TestDiffStringSet(t *testing.T) {
 
 	for i, tt := range testcases {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			gota, gotr := diffStringSet(tt.old, tt.new)
+			gota, gotr := diffStringSets(tt.old, tt.new)
 			if !equalSet(tt.add, gota) {
 				t.Errorf("add sets unequal: expected=%v got=%v", tt.add, gota)
 				return
