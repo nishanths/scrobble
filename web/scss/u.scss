@@ -58,7 +58,8 @@ body {
 
 .control {
   margin: 60px auto 55px;
-  max-width: $segmented-control-w;
+  display: flex;
+  justify-content: center;
 }
 
 .info {
