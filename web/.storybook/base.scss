@@ -1,0 +1,9 @@
+// base styles
+
+@import '../scss/vars.scss';
+@import '../static/font/font.css';
+
+body {
+  font-family: $font-family;
+  margin: $body-margin-w;
+}

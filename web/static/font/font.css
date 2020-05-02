@@ -30,25 +30,25 @@
 @font-face {
   font-family: cooper-hewitt;
   font-weight: 400;
-  src: url("/static/font/cooper-hewitt/CooperHewitt-Book.otf") format("opentype");
+  src: url("cooper-hewitt/CooperHewitt-Book.otf") format("opentype");
 }
 
 @font-face {
   font-family: cooper-hewitt;
   font-weight: 500;
-  src: url("/static/font/cooper-hewitt/CooperHewitt-Medium.otf") format("opentype");
+  src: url("cooper-hewitt/CooperHewitt-Medium.otf") format("opentype");
 }
 
 @font-face {
   font-family: cooper-hewitt;
   font-weight: 600;
-  src: url("/static/font/cooper-hewitt/CooperHewitt-Semibold.otf") format("opentype");
+  src: url("cooper-hewitt/CooperHewitt-Semibold.otf") format("opentype");
 }
 
 @font-face {
   font-family: cooper-hewitt;
   font-weight: 700;
-  src: url("/static/font/cooper-hewitt/CooperHewitt-Bold.otf") format("opentype");
+  src: url("cooper-hewitt/CooperHewitt-Bold.otf") format("opentype");
 }
 
 
@@ -56,12 +56,12 @@
   font-family: 'proxima-nova';
   font-weight: normal;
   font-style: normal;
-  src: url("/static/font/proxima-nova/2F00B2_0_0.woff2") format("woff2"), url("/static/font/proxima-nova/2F00B2_0_0.woff") format("woff"), url("/static/font/proxima-nova/2F00B2_0_0.ttf") format("truetype");
+  src: url("proxima-nova/2F00B2_0_0.woff2") format("woff2"), url("proxima-nova/2F00B2_0_0.woff") format("woff"), url("proxima-nova/2F00B2_0_0.ttf") format("truetype");
 }
 
 @font-face {
   font-family: 'proxima-nova';
   font-weight: bold;
   font-style: normal;
-  src: url("/static/font/proxima-nova/2F00B2_1_0.woff2") format("woff2"), url("/static/font/proxima-nova/2F00B2_1_0.woff") format("woff"), url("/static/font/proxima-nova/2F00B2_1_0.ttf") format("truetype");
+  src: url("proxima-nova/2F00B2_1_0.woff2") format("woff2"), url("proxima-nova/2F00B2_1_0.woff") format("woff"), url("proxima-nova/2F00B2_1_0.ttf") format("truetype");
 }
