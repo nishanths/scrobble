@@ -5,5 +5,5 @@ import { ColorPicker } from './ColorPicker';
 const s = storiesOf("ColorPicker", module)
 
 s.add("default", () => {
-	return <ColorPicker />
+	return <ColorPicker prompt="Pick a color." />
 })

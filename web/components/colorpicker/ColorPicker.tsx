@@ -6,9 +6,10 @@ import "../../scss/color-picker.scss"
 
 type ColorPickerProps = {
 	afterSelect?: (c: Color) => void
+	prompt?: string;
 }
 
-export const ColorPicker: React.FC<ColorPickerProps> = ({ afterSelect }) => {
+export const ColorPicker: React.FC<ColorPickerProps> = ({ afterSelect, prompt }) => {
 	const [selected, setSelected] = useState<Color|undefined>(undefined)
 
 	const elems = colors.map(c => {
@@ -19,6 +20,6 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({ afterSelect }) => {
 
 	return <div className="ColorPicker">
 		<div className="elems">{elems}</div>
-		<div className="label">{selected === undefined ? "Pick a color." : capitalize(selected)}</div>
+		<div className="label">{selected === undefined ? prompt : capitalize(selected)}</div>
 	</div>
 }
