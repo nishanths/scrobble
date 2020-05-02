@@ -18,7 +18,7 @@ import (
 	"google.golang.org/api/option"
 )
 
-const credFile = "../selective-scrobble-354ed4c58385.json"
+const credFile = "../selective-scrobble-8033d812577b.json"
 const DefaultBucketName = "selective-scrobble.appspot.com"
 
 var (
