@@ -22,3 +22,7 @@ fmt:
 		! -name '*.d.ts' \
 		! -regex '.*/node_modules/.*' | \
 		xargs $(TSFMT) --replace --
+
+.PHONY: sb
+sb:
+	npm run storybook
