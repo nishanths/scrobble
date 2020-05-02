@@ -7,7 +7,6 @@ interface SegmentedControlProps<V extends readonly string[]> {
   values: V
 }
 
-// TODO: this only properly supports two item controls in terms of styling.
 // TODO: support for React.FC with generic props?
 
 export const SegmentedControl = <V extends readonly string[]>(props: (SegmentedControlProps<V> & { children?: ReactNode })) => {
@@ -18,7 +17,7 @@ export const SegmentedControl = <V extends readonly string[]>(props: (SegmentedC
     setSelected(initialValue)
   }, [initialValue])
 
-  const className = (selected: boolean, idx: number) => selected ? `c c${idx} selected` : `c c${idx}`
+  const className = (selected: boolean) => selected ? `c selected` : `c`
   const onControlClick = (v: string) => {
     const old = selected
     if (v != old) {
@@ -29,7 +28,7 @@ export const SegmentedControl = <V extends readonly string[]>(props: (SegmentedC
 
   return <div className="SegmentedControl">
     {values.map((v, i) => {
-      return <Item key={v} className={className(selected === v, i)} onClick={() => onControlClick(v)} content={v} />
+      return <Item key={v} className={className(selected === v)} onClick={() => onControlClick(v)} content={v} />
     })}
   </div>
 }

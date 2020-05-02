@@ -15,5 +15,6 @@ s.add("default", () => {
 			console.log(v)
 		},
 	}
+
 	return <SegmentedControl {...props}></SegmentedControl>
 })
