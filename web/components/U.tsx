@@ -83,7 +83,10 @@ export const U: React.FC<UProps> = ({
   const [endIdx, endIdxRef, setEndIdx] = useStateRef(0)
   const [color, colorRef, setColor] = useStateRef<Color | undefined>(undefined)
 
-  const onControlChange = (newMode: Mode) => { history.push("/u/" + profileUsername + pathForMode(newMode)) }
+  const onControlChange = (newMode: Mode) => {
+    NProgress.done()
+    history.push("/u/" + profileUsername + pathForMode(newMode))
+  }
 
   const scrobbles = useSelector((s: State) => {
     switch (mode) {
