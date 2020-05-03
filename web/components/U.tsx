@@ -85,7 +85,7 @@ export const U: React.FC<UProps> = ({
     switch (mode) {
       case Mode.All: return s.allScrobbles
       case Mode.Loved: return s.lovedScrobbles
-      case Mode.Color: return color === undefined ? null : s.colorScrobbles.get(color)
+      case Mode.Color: return color === undefined ? null : s.colorScrobbles.get(color)!
     }
     throw assertExhaustive(mode)
   })
