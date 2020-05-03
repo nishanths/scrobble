@@ -19,6 +19,7 @@ export interface UArgs {
   logoutURL: string
   account: Account
   self: boolean
+  private: boolean
 }
 
 export type ArtworkHash = string

@@ -1,6 +1,6 @@
 @import 'vars.scss';
 
-$dim: 22px;
+$dim: 20px;
 
 // http://clrs.cc/
 $colors: (
@@ -23,7 +23,6 @@ $colors: (
   width: $dim;
   height: $dim;
   border-radius: 50%;
-  position: relative;
   box-sizing: border-box;
   transition: 100ms $transition-exit-func all;
 

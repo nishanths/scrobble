@@ -69,6 +69,13 @@ body {
   color: $muted-color;
 }
 
+.colorPicker {
+  margin: 0 auto 55px auto;
+  padding: 0 5px;
+  display: flex;
+  justify-content: center;
+}
+
 .songs {
   display: flex;
   flex-wrap: wrap;

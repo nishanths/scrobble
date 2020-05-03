@@ -7,10 +7,14 @@ import "../../scss/color-picker.scss"
 type ColorPickerProps = {
   afterSelect?: (c: Color) => void
   prompt?: string;
+  initialSelection?: Color;
 }
 
-export const ColorPicker: React.FC<ColorPickerProps> = ({ afterSelect, prompt }) => {
-  const [selected, setSelected] = useState<Color | undefined>(undefined)
+export const ColorPicker: React.FC<ColorPickerProps> = ({ afterSelect, prompt, initialSelection }) => {
+  const [selected, setSelected] = useState<Color | undefined>(initialSelection)
+  useEffect(() => {
+    setSelected(initialSelection)
+  }, [initialSelection])
 
   const label = () => {
     if (selected !== undefined) {
@@ -20,7 +24,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({ afterSelect, prompt })
   }
 
   const elems = colors.map(c => {
-    return <div className="elem">
+    return <div key={c} className="elem">
       <Swatch
         color={c}
         selected={selected === c}

@@ -6,7 +6,7 @@ import { trimPrefix, assertExhaustive, pathComponents } from "../shared/util"
 import { Header } from "./Header"
 import { Songs } from "./Songs"
 import { SegmentedControl } from "./SegmentedControl"
-import { Color } from "./colorpicker"
+import { Color, ColorPicker } from "./colorpicker"
 import { State } from "../redux/types/u"
 import { fetchAllScrobbles, fetchLovedScrobbles, fetchColorScrobbles } from "../redux/actions/scrobbles"
 import { useStateRef } from "../shared/hooks"
@@ -67,6 +67,7 @@ export const U: React.FC<UProps> = ({
   logoutURL,
   account,
   self,
+  private: priv,
   wnd,
   mode,
   history,
@@ -81,20 +82,18 @@ export const U: React.FC<UProps> = ({
   const [endIdx, endIdxRef, setEndIdx] = useStateRef(0)
   const [color, colorRef, setColor] = useStateRef<Color | undefined>(undefined)
 
+  const onControlChange = (newMode: Mode) => { history.push("/u/" + profileUsername + pathForMode(newMode)) }
+
   const scrobbles = useSelector((s: State) => {
     switch (mode) {
       case Mode.All: return s.allScrobbles
       case Mode.Loved: return s.lovedScrobbles
-      case Mode.Color: return colorRef.current === undefined ? null : s.colorScrobbles.get(colorRef.current)!
+      case Mode.Color: return color !== undefined ? s.colorScrobbles.get(color)! : null
     }
     throw assertExhaustive(mode)
   })
   const scrobblesRef = useRef(scrobbles)
   useEffect(() => { scrobblesRef.current = scrobbles }, [scrobbles])
-
-  const onControlChange = (newMode: Mode): void => {
-    history.push("/u/" + profileUsername + pathForMode(newMode))
-  }
 
   const nextEndIdx = (currentEndIdx: number, total: number): number => {
     // increment, but don't go over the number of items itself
@@ -104,113 +103,175 @@ export const U: React.FC<UProps> = ({
   }
 
   useEffect(() => {
-    const e = scrobbles.error === false ? nextEndIdx(0, scrobblesRef.current.items.length) : 0
+    const s = scrobblesRef.current
+    if (s === null) {
+      return
+    }
+    const e = s.error === false ? nextEndIdx(0, s.items.length) : 0
     setEndIdx(e)
   }, [scrobbles, mode])
 
   useEffect(() => {
+    const s = scrobblesRef.current
+
     switch (mode) {
       case Mode.All: {
-        if (scrobblesRef.current!.done === false || scrobblesRef.current!.error === true) {
+        if ((s!.done === false && s!.fetching === false) || s!.error === true) {
           dispatch(fetchAllScrobbles(profileUsername, limit))
         }
         break
       }
       case Mode.Loved: {
-        if (scrobblesRef.current!.done === false || scrobblesRef.current!.error === true) {
+        if ((s!.done === false && s!.fetching === false) || s!.error === true) {
           dispatch(fetchLovedScrobbles(profileUsername, limit))
         }
         break
       }
       case Mode.Color: {
-        const c = colorRef.current
-        if (c === undefined) {
+        if (colorRef.current === undefined) {
           break
         }
-        if (scrobblesRef.current!.done === false || scrobblesRef.current!.error === true) {
-          dispatch(fetchColorScrobbles(c, profileUsername))
+        if (s === null || (s!.done === false && s!.fetching === false) || s!.error === true) {
+          dispatch(fetchColorScrobbles(colorRef.current, profileUsername))
         }
         break
       }
-      default:
+      default: {
         throw assertExhaustive(mode)
+      }
     }
-  }, [profileUsername, mode])
+  }, [profileUsername, mode, color])
 
   useEffect(() => {
     const f = () => {
+      const s = scrobblesRef.current
+      if (s === null) {
+        return
+      }
+
       const leeway = 250
+
       if ((wnd.innerHeight + wnd.pageYOffset) >= (wnd.document.body.offsetHeight - leeway)) {
-        const newEnd = nextEndIdx(endIdxRef.current, scrobblesRef.current.items.length)
+        const newEnd = nextEndIdx(endIdxRef.current, s.items.length)
         const e = Math.max(newEnd, endIdxRef.current)
         setEndIdx(e)
       }
     }
+
     wnd.addEventListener("scroll", f)
     return () => { wnd.removeEventListener("scroll", f) }
   }, [scrobbles, mode])
 
-  const header = <Header username={profileUsername} signedIn={!!logoutURL} />
-
-  const top = <>
-    {header}
-    <div className="control">
-      <SegmentedControl
-        afterChange={(v) => { onControlChange(modeFromControlValue(v)) }}
-        values={controlValues}
-        initialValue={controlValueForMode(mode)}
-      />
-    </div>
-  </>
-
   // ... render ...
+
+  // Easy case. For private accounts that aren't yourself, render the
+  // private info-message.
+  if (priv === true && self === false) {
+    return <>
+      {header(profileUsername, !!logoutURL)}
+      <div className="info">(This user's scrobbles are private.)</div>
+    </>
+  }
+
+  // If in the Color mode and no color is selected, render the top area and
+  // the color picker, and we're done.
+  if (mode === Mode.Color && color === undefined) {
+    return <>
+      {top(profileUsername, !!logoutURL, mode, onControlChange)}
+      <div className="colorPicker">
+        <ColorPicker prompt="Pick a color to see artwork of that color." afterSelect={(c) => { setColor(c) }} />
+      </div>
+    </>
+  }
 
   NProgress.configure({ showSpinner: false, minimum: 0.1, trickleSpeed: 150, speed: 500 })
 
-  if (scrobbles.done === false) {
+  const s = scrobbles!
+
+  if (s.done === false) {
     NProgress.start()
-    return <>{top}</>
+    return <>{top(profileUsername, !!logoutURL, mode, onControlChange)}</>
   }
 
-  if (scrobbles.error === true) {
+  if (s.error === true) {
     NProgress.done()
     return <>
-      {header}
+      {header(profileUsername, !!logoutURL)}
       <div className="info">(Failed to fetch scrobbles.)</div>
     </>
   }
 
   NProgress.done()
 
-  if (scrobbles.private) {
+  // can happen if the privacy was changed after the initial server page load
+  if (s.private) {
     return <>
-      {header}
+      {header(profileUsername, !!logoutURL)}
       <div className="info">(This user's scrobbles are private.)</div>
     </>
   }
 
-  if (scrobbles.items.length === 0) {
+  if (s.items.length === 0) {
     return <>
-      {header}
+      {header(profileUsername, !!logoutURL)}
       <div className="info">({self ? "You haven't" : "This user hasn't"} scrobbled yet.)</div>
     </>
   }
 
-  // TODO different rendering paths for song vs. artwork hash based on Mode
+  const itemsToShow = s.items.slice(0, endIdx);
 
-  const itemsToShow = scrobbles.items.slice(0, endIdx);
+  switch (mode) {
+    case Mode.All:
+    case Mode.Loved: {
+      return <>
+        {top(profileUsername, !!logoutURL, mode, onControlChange)}
+        <div className="songs">
+          <Songs
+            songs={itemsToShow as Song[]}
+            more={s.total! - itemsToShow.length}
+            // "showing all songs that are available on the client" && "more number of songs present for the user "
+            showMore={(itemsToShow.length === s.items.length) && (s.total! > s.items.length)}
+            artworkBaseURL={artworkBaseURL}
+            now={() => new Date()}
+          />
+        </div>
+      </>
+    }
 
-  return <>
-    {top}
-    <div className="songs">
-      <Songs
-        songs={itemsToShow}
-        more={scrobbles.total - itemsToShow.length}
-        // "showing all songs that are available on the client" && "more number of songs present for the user "
-        showMore={(itemsToShow.length === scrobbles.items.length) && (scrobbles.total > scrobbles.items.length)}
-        artworkBaseURL={artworkBaseURL}
-        now={() => new Date()}
-      />
-    </div>
-  </>
+    case Mode.Color: {
+      return <>
+        {top(profileUsername, !!logoutURL, mode, onControlChange)}
+        <div className="colorPicker">
+          <ColorPicker initialSelection={color!} afterSelect={(c) => { setColor(c) }} />
+        </div>
+        <div className="songs">
+          <Songs
+            songs={itemsToShow as Song[]}
+            more={s.total! - itemsToShow.length}
+            // "showing all songs that are available on the client" && "more number of songs present for the user "
+            showMore={(itemsToShow.length === s.items.length) && (s.total! > s.items.length)}
+            artworkBaseURL={artworkBaseURL}
+            now={() => new Date()}
+          />
+        </div>
+      </>
+    }
+
+    default: {
+      assertExhaustive(mode)
+    }
+  }
 }
+
+const header = (profileUsername: string, signedIn: boolean) => <Header username={profileUsername} signedIn={signedIn} />
+
+const top = (profileUsername: string, signedIn: boolean, mode: Mode, onControlChange: (m: Mode) => void) => <>
+  {header(profileUsername, signedIn)}
+  <div className="control">
+    <SegmentedControl
+      afterChange={(v) => { onControlChange(modeFromControlValue(v)) }}
+      values={controlValues}
+      initialValue={controlValueForMode(mode)}
+    />
+  </div>
+</>

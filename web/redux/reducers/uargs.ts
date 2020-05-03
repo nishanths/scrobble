@@ -12,5 +12,6 @@ export const uargsReducer = (s: UArgs | undefined): UArgs => {
       username: "",
       private: false,
     },
+    private: false,
   }
 }
