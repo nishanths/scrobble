@@ -15,16 +15,9 @@ import (
 	"github.com/pkg/errors"
 )
 
-// TODO: WTF is this monstrosity
 var (
-	rootTmpl = template.Must(
-		template.Must(template.New("").Parse(string(MustAsset("appengine/template/fs-snippet.tmpl")))).
-			Parse(string(MustAsset("appengine/template/root.tmpl"))),
-	)
-	uTmpl = template.Must(
-		template.Must(template.New("").Parse(string(MustAsset("appengine/template/fs-snippet.tmpl")))).
-			Parse(string(MustAsset("appengine/template/u.tmpl"))),
-	)
+	rootTmpl = template.Must(template.New("").Parse(string(MustAsset("appengine/template/root.html"))))
+	uTmpl    = template.Must(template.New("").Parse(string(MustAsset("appengine/template/u.html"))))
 )
 
 type BootstrapArgs struct {
