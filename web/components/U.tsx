@@ -6,6 +6,7 @@ import { trimPrefix, assertExhaustive, pathComponents } from "../shared/util"
 import { Header } from "./Header"
 import { Songs } from "./Songs"
 import { SegmentedControl } from "./SegmentedControl"
+import { Color } from "./colorpicker"
 import { State } from "../redux/types/u"
 import { fetchAllScrobbles, fetchLovedScrobbles } from "../redux/actions/scrobbles"
 import { useStateRef } from "../shared/hooks"
@@ -78,12 +79,13 @@ export const U: React.FC<UProps> = ({
 
   const dispatch = useDispatch()
   const [endIdx, endIdxRef, setEndIdx] = useStateRef(0)
+  const [color, colorRef, setColor] = useStateRef<Color | undefined>(undefined)
 
   const scrobbles = useSelector((s: State) => {
     switch (mode) {
       case Mode.All: return s.allScrobbles
       case Mode.Loved: return s.lovedScrobbles
-      case Mode.Color: return s.colorScrobbles
+      case Mode.Color: return color === undefined ? null : s.colorScrobbles.get(color)
     }
     throw assertExhaustive(mode)
   })
@@ -109,12 +111,12 @@ export const U: React.FC<UProps> = ({
   useEffect(() => {
     switch (mode) {
       case Mode.All:
-        if (scrobblesRef.current.done === false || scrobblesRef.current.error === true) {
+        if (scrobblesRef.current!.done === false || scrobblesRef.current!.error === true) {
           dispatch(fetchAllScrobbles(profileUsername, limit))
         }
         break
       case Mode.Loved:
-        if (scrobblesRef.current.done === false || scrobblesRef.current.error === true) {
+        if (scrobblesRef.current!.done === false || scrobblesRef.current!.error === true) {
           dispatch(fetchLovedScrobbles(profileUsername, limit))
         }
         break
@@ -193,9 +195,9 @@ export const U: React.FC<UProps> = ({
     <div className="songs">
       <Songs
         songs={itemsToShow}
-        more={scrobbles.total! - itemsToShow.length}
+        more={scrobbles.total - itemsToShow.length}
         // "showing all songs that are available on the client" && "more number of songs present for the user "
-        showMore={(itemsToShow.length === scrobbles.items.length) && (scrobbles.total! > scrobbles.items.length)}
+        showMore={(itemsToShow.length === scrobbles.items.length) && (scrobbles.total > scrobbles.items.length)}
         artworkBaseURL={artworkBaseURL}
         now={() => new Date()}
       />
