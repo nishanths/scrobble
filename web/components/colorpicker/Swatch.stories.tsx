@@ -5,9 +5,9 @@ import { Swatch } from './Swatch';
 const s = storiesOf("Swatch", module)
 
 s.add("default", () => {
-	return <Swatch selected={false} color="orange" />
+  return <Swatch selected={false} color="orange" />
 })
 
 s.add("selected", () => {
-	return <Swatch selected={true} color="violet" />
+  return <Swatch selected={true} color="violet" />
 })
