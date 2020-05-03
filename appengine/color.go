@@ -81,7 +81,7 @@ func (s *server) artworkColorHandler(w http.ResponseWriter, r *http.Request) {
 	q := datastore.NewQuery(artwork.KindArtworkRecord).
 		Namespace(namespace).
 		Order(fmt.Sprintf("-Score.%s", datastoreFieldNameForColor(inputColor))).
-		Filter(fmt.Sprintf("Score.%s >=", datastoreFieldNameForColor(inputColor)), 400).
+		Filter(fmt.Sprintf("Score.%s >=", datastoreFieldNameForColor(inputColor)), 300).
 		KeysOnly()
 	if hasLimit {
 		q = q.Limit(limit)

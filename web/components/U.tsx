@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux";
 import { RouteComponentProps, Redirect } from "react-router-dom";
 import { UArgs, Song } from "../shared/types"
-import { trimPrefix, assertExhaustive, pathComponents } from "../shared/util"
+import { trimPrefix, assertExhaustive, pathComponents, assert } from "../shared/util"
 import { Header } from "./Header"
 import { Songs } from "./Songs"
 import { Artworks } from "./Artworks"
@@ -167,6 +167,10 @@ export const U: React.FC<UProps> = ({
 
   const header = <Header username={profileUsername} signedIn={!!logoutURL} />
 
+  const colorPicker = <div className="colorPicker">
+    <ColorPicker initialSelection={color} prompt="Pick a color to see artwork of that color." afterSelect={(c) => { setColor(c) }} />
+  </div>
+
   const top = <>
     {header}
     <div className="control">
@@ -176,12 +180,8 @@ export const U: React.FC<UProps> = ({
         initialValue={controlValueForMode(mode)}
       />
     </div>
+    {mode === Mode.Color && colorPicker}
   </>
-
-  const colorPicker = <div className="colorPicker">
-    <ColorPicker initialSelection={color} prompt="Pick a color to see artwork of that color." afterSelect={(c) => { setColor(c) }} />
-  </div>
-
 
   // Easy case. For private accounts that aren't the current user, render the
   // private info-message.
@@ -197,20 +197,19 @@ export const U: React.FC<UProps> = ({
   if (mode === Mode.Color && color === undefined) {
     return <>
       {top}
-      {colorPicker}
     </>
   }
 
-  const s = scrobbles!
+  assert(scrobbles !== null, "scrobbles unexpectedly null")
 
   NProgress.configure({ showSpinner: false, minimum: 0.1, trickleSpeed: 150, speed: 500 })
 
-  if (s.done === false) {
+  if (scrobbles.fetching === true) {
     NProgress.start()
     return <>{top}</>
   }
 
-  if (s.error === true) {
+  if (scrobbles.error === true) {
     NProgress.done()
     return <>
       {header}
@@ -218,24 +217,29 @@ export const U: React.FC<UProps> = ({
     </>
   }
 
+  // handle initial redux state
+  if (scrobbles.done === false) {
+    return null
+  }
+
   NProgress.done()
 
   // can happen if the privacy was changed after the initial server page load
-  if (s.private) {
+  if (scrobbles.private) {
     return <>
       {header}
       <div className="info">(This user's scrobbles are private.)</div>
     </>
   }
 
-  if (s.items.length === 0) {
+  if (scrobbles.items.length === 0) {
     return <>
       {header}
       <div className="info">({self ? "You haven't" : "This user hasn't"} scrobbled yet.)</div>
     </>
   }
 
-  const itemsToShow = s.items.slice(0, endIdx);
+  const itemsToShow = scrobbles.items.slice(0, endIdx);
 
   switch (mode) {
     case Mode.All:
@@ -245,9 +249,9 @@ export const U: React.FC<UProps> = ({
         <div className="songs">
           <Songs
             songs={itemsToShow as Song[]}
-            more={s.total! - itemsToShow.length}
+            more={scrobbles.total! - itemsToShow.length}
             // "showing all songs that are available on the client" && "more number of songs present for the user "
-            showMore={(itemsToShow.length === s.items.length) && (s.total! > s.items.length)}
+            showMore={(itemsToShow.length === scrobbles.items.length) && (scrobbles.total! > scrobbles.items.length)}
             artworkBaseURL={artworkBaseURL}
             now={() => new Date()}
           />
@@ -258,7 +262,6 @@ export const U: React.FC<UProps> = ({
     case Mode.Color: {
       return <>
         {top}
-        {colorPicker}
         <div className="songs">
           <Artworks
             hashes={itemsToShow as string[]}

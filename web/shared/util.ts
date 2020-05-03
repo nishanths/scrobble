@@ -40,3 +40,9 @@ export function base64Decode(s: string): string {
 export function pathComponents(p: string): string[] {
   return p.split("/").filter(s => s != "")
 }
+
+export function assert(cond: boolean, message: string = "assertion failed"): asserts cond {
+  if (!cond) {
+    throw new Error(message)
+  }
+}

@@ -45,7 +45,7 @@ func Closest(c color.Color) Color {
 	}
 
 	// should not be reached
-	panic(fmt.Sprintf("basiccolor: internal error: %+v", hsl))
+	panic(fmt.Sprintf("basiccolor: no matching basic color: %+v", hsl))
 }
 
 func determineColor(hue, saturation, lightness float64) (Color, bool) {

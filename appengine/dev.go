@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
+	"time"
 
 	"github.com/nishanths/scrobble/appengine/log"
 )
@@ -70,6 +71,8 @@ func devScrobbledHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func devArtworkColorHandler(w http.ResponseWriter, r *http.Request) {
+	time.Sleep(1 * time.Second)
+
 	data := func() string {
 		b, err := ioutil.ReadFile(filepath.Join(".devdata", "scrobbled_color.json"))
 		if err != nil {
