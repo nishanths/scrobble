@@ -1,6 +1,6 @@
 import { ThunkAction, ThunkDispatch } from "redux-thunk"
 import { Dispatch } from "redux"
-import { Song, ScrobbledResponse } from "../../shared/types"
+import { Song, ScrobbledResponse, ArtworkHash } from "../../shared/types"
 import { PartialState } from "../types/u"
 
 export type AllScrobblesAction =
@@ -72,7 +72,7 @@ export const fetchAllScrobbles = (username: string, limit: number): AllScrobbles
     dispatch(allScrobblesStart(username))
 
     try {
-      const result = await _fetchScrobbles(username, limit, false)
+      const result = await _fetchScrobbledSongs(username, limit, false)
       dispatch(allScrobblesSuccess(username, result.songs, result.total, result.private))
     } catch (e) {
       dispatch(allScrobblesFail(e))
@@ -85,7 +85,7 @@ export const fetchLovedScrobbles = (username: string, limit: number): LovedScrob
     dispatch(lovedScrobblesStart(username))
 
     try {
-      const result = await _fetchScrobbles(username, limit, true)
+      const result = await _fetchScrobbledSongs(username, limit, true)
       dispatch(lovedScrobblesSuccess(username, result.songs, result.total, result.private))
     } catch (e) {
       dispatch(lovedScrobblesFail(e))
@@ -93,14 +93,14 @@ export const fetchLovedScrobbles = (username: string, limit: number): LovedScrob
   }
 }
 
-type FetchScrobblesResult = {
+type FetchSongsResult = {
   songs: Song[]
   total: number
   private: boolean
   err: any | null
 }
 
-const _fetchScrobbles = async (username: string, limit: number, loved: boolean): Promise<FetchScrobblesResult> => {
+const _fetchScrobbledSongs = async (username: string, limit: number, loved: boolean): Promise<FetchSongsResult> => {
   let url = "/api/v1/scrobbled?username=" + username + "&limit=" + limit;
   if (loved === true) {
     url += "&loved=true"
@@ -117,4 +117,20 @@ const _fetchScrobbles = async (username: string, limit: number, loved: boolean):
     default:
       throw "bad status: " + r.status
   }
+}
+
+// TODO
+
+export const colorScrobblesStart = (color: string, username: string) => {
+  return {
+    type: "COLOR_SCROBBLES_START" as const,
+    color,
+    username,
+  }
+}
+
+type FetchColorResult = {
+  hashes: ArtworkHash[]
+  private: boolean
+  err: any | null
 }

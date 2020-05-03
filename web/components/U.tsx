@@ -18,10 +18,10 @@ declare var NProgress: {
 }
 
 export enum Mode {
-  All, Loved
+  All, Loved, Color
 }
 
-const controlValues = ["All", "Loved"] as const
+const controlValues = ["All", "Loved", "By color"] as const
 
 type ControlValue = typeof controlValues[number]
 
@@ -29,6 +29,7 @@ const controlValueForMode = (m: Mode): ControlValue => {
   switch (m) {
     case Mode.All: return "All"
     case Mode.Loved: return "Loved"
+    case Mode.Color: return "By color"
     default: assertExhaustive(m)
   }
 }
@@ -37,6 +38,7 @@ const modeFromControlValue = (v: ControlValue): Mode => {
   switch (v) {
     case "All": return Mode.All
     case "Loved": return Mode.Loved
+    case "By color": return Mode.Color
     default: assertExhaustive(v)
   }
 }
@@ -45,6 +47,7 @@ const pathForMode = (m: Mode): string => {
   switch (m) {
     case Mode.All: return ""
     case Mode.Loved: return "/loved"
+    case Mode.Color: return "/color"
   }
   assertExhaustive(m)
 }
@@ -80,6 +83,7 @@ export const U: React.FC<UProps> = ({
     switch (mode) {
       case Mode.All: return s.allScrobbles
       case Mode.Loved: return s.lovedScrobbles
+      case Mode.Color: throw "no color scrobbles"
     }
     throw assertExhaustive(mode)
   })
@@ -90,15 +94,15 @@ export const U: React.FC<UProps> = ({
     history.push("/u/" + profileUsername + pathForMode(newMode))
   }
 
-  const nextEndIdx = (currentEndIdx: number, totalSongs: number): number => {
-    // increment, but don't go over the number of songs itself
-    const b = Math.min(currentEndIdx + moreIncrement, totalSongs)
-    // if there aren't sufficient songs left for the next time, just include them now
-    return totalSongs - b < moreIncrement ? totalSongs : b;
+  const nextEndIdx = (currentEndIdx: number, total: number): number => {
+    // increment, but don't go over the number of items itself
+    const b = Math.min(currentEndIdx + moreIncrement, total)
+    // if there aren't sufficient items left for the next time, just include them now
+    return total - b < moreIncrement ? total : b;
   }
 
   useEffect(() => {
-    const e = scrobbles.error === false ? nextEndIdx(0, scrobblesRef.current.songs.length) : 0
+    const e = scrobbles.error === false ? nextEndIdx(0, scrobblesRef.current.items.length) : 0
     setEndIdx(e)
   }, [scrobbles, mode])
 
@@ -114,6 +118,8 @@ export const U: React.FC<UProps> = ({
           dispatch(fetchLovedScrobbles(profileUsername, limit))
         }
         break
+      case Mode.Color:
+        throw "no color fetch"
       default:
         throw assertExhaustive(mode)
     }
@@ -123,7 +129,7 @@ export const U: React.FC<UProps> = ({
     const f = () => {
       const leeway = 250
       if ((wnd.innerHeight + wnd.pageYOffset) >= (wnd.document.body.offsetHeight - leeway)) {
-        const newEnd = nextEndIdx(endIdxRef.current, scrobblesRef.current.songs.length)
+        const newEnd = nextEndIdx(endIdxRef.current, scrobblesRef.current.items.length)
         const e = Math.max(newEnd, endIdxRef.current)
         setEndIdx(e)
       }
@@ -171,23 +177,25 @@ export const U: React.FC<UProps> = ({
     </>
   }
 
-  if (scrobbles.songs.length === 0) {
+  if (scrobbles.items.length === 0) {
     return <>
       {header}
       <div className="info">({self ? "You haven't" : "This user hasn't"} scrobbled yet.)</div>
     </>
   }
 
-  const songsToShow = scrobbles.songs.slice(0, endIdx);
+  // TODO different rendering paths for song vs. artwork hash based on Mode
+
+  const itemsToShow = scrobbles.items.slice(0, endIdx);
 
   return <>
     {top}
     <div className="songs">
       <Songs
-        songs={songsToShow}
-        more={scrobbles.total - songsToShow.length}
+        songs={itemsToShow}
+        more={scrobbles.total! - itemsToShow.length}
         // "showing all songs that are available on the client" && "more number of songs present for the user "
-        showMore={(songsToShow.length === scrobbles.songs.length) && (scrobbles.total > scrobbles.songs.length)}
+        showMore={(itemsToShow.length === scrobbles.items.length) && (scrobbles.total! > scrobbles.items.length)}
         artworkBaseURL={artworkBaseURL}
         now={() => new Date()}
       />

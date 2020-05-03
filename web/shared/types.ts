@@ -21,6 +21,8 @@ export interface UArgs {
   self: boolean
 }
 
+export type ArtworkHash = string
+
 export interface Song {
   albumTitle: string
   artistName: string
@@ -29,7 +31,7 @@ export interface Song {
   year: number
   lastPlayed: number
   playCount: number
-  artworkHash: string
+  artworkHash: ArtworkHash
   trackViewURL: string
   loved: boolean
 
