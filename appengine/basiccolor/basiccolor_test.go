@@ -136,6 +136,7 @@ func TestClosest_handpicked(t *testing.T) {
 		{73, .18, .29, Green, "Costello Music green dress"},
 		{7, .72, .58, Red, "Costello Music red dress"},
 		{344, .69, .26, Pink, "Everything Not Saved Will Be Lost Pt. 1"},
+		{357, .70, .32, Red, "Animal Collective Sung Tongs"},
 	}
 
 	undesirables := []undesirableResultTestcase{

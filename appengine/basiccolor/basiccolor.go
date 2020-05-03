@@ -50,7 +50,7 @@ func Closest(c color.Color) Color {
 
 func determineColor(hue, saturation, lightness float64) (Color, bool) {
 	if hue >= 350 || hue < 3 {
-		if lightness <= 0.34 {
+		if lightness <= 0.28 {
 			return Brown, true
 		}
 		if lightness <= 0.56 {
