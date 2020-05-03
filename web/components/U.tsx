@@ -77,7 +77,7 @@ export const U: React.FC<UProps> = ({
   const limit = 504; // moreIncrement * 14
 
   const dispatch = useDispatch()
-  const [, endIdxRef, setEndIdx] = useStateRef(0)
+  const [endIdx, endIdxRef, setEndIdx] = useStateRef(0)
 
   const scrobbles = useSelector((s: State) => {
     switch (mode) {
@@ -186,7 +186,7 @@ export const U: React.FC<UProps> = ({
 
   // TODO different rendering paths for song vs. artwork hash based on Mode
 
-  const itemsToShow = scrobbles.items.slice(0, endIdxRef.current);
+  const itemsToShow = scrobbles.items.slice(0, endIdx);
 
   return <>
     {top}
