@@ -8,7 +8,7 @@ import { Songs } from "./Songs"
 import { SegmentedControl } from "./SegmentedControl"
 import { Color } from "./colorpicker"
 import { State } from "../redux/types/u"
-import { fetchAllScrobbles, fetchLovedScrobbles } from "../redux/actions/scrobbles"
+import { fetchAllScrobbles, fetchLovedScrobbles, fetchColorScrobbles } from "../redux/actions/scrobbles"
 import { useStateRef } from "../shared/hooks"
 import "../scss/u.scss"
 
@@ -85,7 +85,7 @@ export const U: React.FC<UProps> = ({
     switch (mode) {
       case Mode.All: return s.allScrobbles
       case Mode.Loved: return s.lovedScrobbles
-      case Mode.Color: return color === undefined ? null : s.colorScrobbles.get(color)!
+      case Mode.Color: return colorRef.current === undefined ? null : s.colorScrobbles.get(colorRef.current)!
     }
     throw assertExhaustive(mode)
   })
@@ -110,18 +110,28 @@ export const U: React.FC<UProps> = ({
 
   useEffect(() => {
     switch (mode) {
-      case Mode.All:
+      case Mode.All: {
         if (scrobblesRef.current!.done === false || scrobblesRef.current!.error === true) {
           dispatch(fetchAllScrobbles(profileUsername, limit))
         }
         break
-      case Mode.Loved:
+      }
+      case Mode.Loved: {
         if (scrobblesRef.current!.done === false || scrobblesRef.current!.error === true) {
           dispatch(fetchLovedScrobbles(profileUsername, limit))
         }
         break
-      case Mode.Color:
-        throw "no color fetch"
+      }
+      case Mode.Color: {
+        const c = colorRef.current
+        if (c === undefined) {
+          break
+        }
+        if (scrobblesRef.current!.done === false || scrobblesRef.current!.error === true) {
+          dispatch(fetchColorScrobbles(c, profileUsername))
+        }
+        break
+      }
       default:
         throw assertExhaustive(mode)
     }
