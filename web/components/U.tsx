@@ -5,6 +5,7 @@ import { UArgs, Song } from "../shared/types"
 import { trimPrefix, assertExhaustive, pathComponents } from "../shared/util"
 import { Header } from "./Header"
 import { Songs } from "./Songs"
+import { Artworks } from "./Artworks"
 import { SegmentedControl } from "./SegmentedControl"
 import { Color, ColorPicker } from "./colorpicker"
 import { State } from "../redux/types/u"
@@ -164,11 +165,29 @@ export const U: React.FC<UProps> = ({
 
   // ... render ...
 
-  // Easy case. For private accounts that aren't yourself, render the
+  const header = <Header username={profileUsername} signedIn={!!logoutURL} />
+
+  const top = <>
+    {header}
+    <div className="control">
+      <SegmentedControl
+        afterChange={(v) => { onControlChange(modeFromControlValue(v)) }}
+        values={controlValues}
+        initialValue={controlValueForMode(mode)}
+      />
+    </div>
+  </>
+
+  const colorPicker = <div className="colorPicker">
+    <ColorPicker initialSelection={color} prompt="Pick a color to see artwork of that color." afterSelect={(c) => { setColor(c) }} />
+  </div>
+
+
+  // Easy case. For private accounts that aren't the current user, render the
   // private info-message.
   if (priv === true && self === false) {
     return <>
-      {header(profileUsername, !!logoutURL)}
+      {header}
       <div className="info">(This user's scrobbles are private.)</div>
     </>
   }
@@ -177,26 +196,24 @@ export const U: React.FC<UProps> = ({
   // the color picker, and we're done.
   if (mode === Mode.Color && color === undefined) {
     return <>
-      {top(profileUsername, !!logoutURL, mode, onControlChange)}
-      <div className="colorPicker">
-        <ColorPicker prompt="Pick a color to see artwork of that color." afterSelect={(c) => { setColor(c) }} />
-      </div>
+      {top}
+      {colorPicker}
     </>
   }
 
-  NProgress.configure({ showSpinner: false, minimum: 0.1, trickleSpeed: 150, speed: 500 })
-
   const s = scrobbles!
+
+  NProgress.configure({ showSpinner: false, minimum: 0.1, trickleSpeed: 150, speed: 500 })
 
   if (s.done === false) {
     NProgress.start()
-    return <>{top(profileUsername, !!logoutURL, mode, onControlChange)}</>
+    return <>{top}</>
   }
 
   if (s.error === true) {
     NProgress.done()
     return <>
-      {header(profileUsername, !!logoutURL)}
+      {header}
       <div className="info">(Failed to fetch scrobbles.)</div>
     </>
   }
@@ -206,14 +223,14 @@ export const U: React.FC<UProps> = ({
   // can happen if the privacy was changed after the initial server page load
   if (s.private) {
     return <>
-      {header(profileUsername, !!logoutURL)}
+      {header}
       <div className="info">(This user's scrobbles are private.)</div>
     </>
   }
 
   if (s.items.length === 0) {
     return <>
-      {header(profileUsername, !!logoutURL)}
+      {header}
       <div className="info">({self ? "You haven't" : "This user hasn't"} scrobbled yet.)</div>
     </>
   }
@@ -224,7 +241,7 @@ export const U: React.FC<UProps> = ({
     case Mode.All:
     case Mode.Loved: {
       return <>
-        {top(profileUsername, !!logoutURL, mode, onControlChange)}
+        {top}
         <div className="songs">
           <Songs
             songs={itemsToShow as Song[]}
@@ -240,18 +257,12 @@ export const U: React.FC<UProps> = ({
 
     case Mode.Color: {
       return <>
-        {top(profileUsername, !!logoutURL, mode, onControlChange)}
-        <div className="colorPicker">
-          <ColorPicker initialSelection={color!} afterSelect={(c) => { setColor(c) }} />
-        </div>
+        {top}
+        {colorPicker}
         <div className="songs">
-          <Songs
-            songs={itemsToShow as Song[]}
-            more={s.total! - itemsToShow.length}
-            // "showing all songs that are available on the client" && "more number of songs present for the user "
-            showMore={(itemsToShow.length === s.items.length) && (s.total! > s.items.length)}
+          <Artworks
+            hashes={itemsToShow as string[]}
             artworkBaseURL={artworkBaseURL}
-            now={() => new Date()}
           />
         </div>
       </>
@@ -263,15 +274,3 @@ export const U: React.FC<UProps> = ({
   }
 }
 
-const header = (profileUsername: string, signedIn: boolean) => <Header username={profileUsername} signedIn={signedIn} />
-
-const top = (profileUsername: string, signedIn: boolean, mode: Mode, onControlChange: (m: Mode) => void) => <>
-  {header(profileUsername, signedIn)}
-  <div className="control">
-    <SegmentedControl
-      afterChange={(v) => { onControlChange(modeFromControlValue(v)) }}
-      values={controlValues}
-      initialValue={controlValueForMode(mode)}
-    />
-  </div>
-</>
