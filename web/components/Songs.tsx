@@ -13,7 +13,7 @@ interface SongsProps {
 
 const debug = false;
 
-export const Songs: React.StatelessComponent<SongsProps> = ({ songs, more, showMore, artworkBaseURL, now }) => {
+export const Songs: React.SFC<SongsProps> = ({ songs, more, showMore, artworkBaseURL, now }) => {
   return <>
     {debug && <MoreSongCard more={more} />}
     {songs.map(s => <SongCard key={s.ident} song={s} artworkBaseURL={artworkBaseURL} now={now} />)}

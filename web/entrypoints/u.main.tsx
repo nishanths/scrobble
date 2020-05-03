@@ -19,6 +19,7 @@ ReactDOM.render(
         <Route exact path="/u/:username" render={p => <U {...uargs} wnd={window} mode={Mode.All} {...p} />} />
         <Route exact path="/u/:username/all" render={p => <U {...uargs} wnd={window} mode={Mode.All} {...p} />} />
         <Route exact path="/u/:username/loved" render={p => <U {...uargs} wnd={window} mode={Mode.Loved} {...p} />} />
+        <Route exact path="/u/:username/color" render={p => <U {...uargs} wnd={window} mode={Mode.Color} {...p} />} />
       </Switch>
     </Router>
   </Provider>,

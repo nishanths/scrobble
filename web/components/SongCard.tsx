@@ -3,7 +3,7 @@ import { Song } from "../shared/types"
 import { dateDisplay } from "../shared/time"
 
 interface SongCardProps {
-  song: Song;
+  song: Song; // rendering degrades gracefully if properties are missing
   artworkBaseURL: string;
   now: () => Date;
 }

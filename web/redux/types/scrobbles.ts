@@ -1,9 +1,9 @@
-import { Song } from "../../shared/types"
+import { Song, ArtworkHash } from "../../shared/types"
 
-export type ScrobblesState = {
+export type ScrobblesState<T extends Song | ArtworkHash> = {
   fetching: boolean
-  songs: Song[]
-  total: number
+  items: T[]
+  total?: number
   private: boolean
   error: boolean
   done: boolean

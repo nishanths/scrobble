@@ -68,3 +68,15 @@ func devScrobbledHandler(w http.ResponseWriter, r *http.Request) {
 
 	io.WriteString(w, data)
 }
+
+func devArtworkColorHandler(w http.ResponseWriter, r *http.Request) {
+	data := func() string {
+		b, err := ioutil.ReadFile(filepath.Join(".devdata", "scrobbled_color.json"))
+		if err != nil {
+			panic(err)
+		}
+		return string(b)
+	}()
+
+	io.WriteString(w, data)
+}

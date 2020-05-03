@@ -5,21 +5,36 @@ import { capitalize } from "../../shared/util"
 import "../../scss/color-picker.scss"
 
 type ColorPickerProps = {
-	afterSelect?: (c: Color) => void
-	prompt?: string;
+  afterSelect?: (c: Color) => void
+  prompt?: string;
+  initialSelection?: Color;
 }
 
-export const ColorPicker: React.FC<ColorPickerProps> = ({ afterSelect, prompt }) => {
-	const [selected, setSelected] = useState<Color|undefined>(undefined)
+export const ColorPicker: React.FC<ColorPickerProps> = ({ afterSelect, prompt, initialSelection }) => {
+  const [selected, setSelected] = useState<Color | undefined>(initialSelection)
+  useEffect(() => {
+    setSelected(initialSelection)
+  }, [initialSelection])
 
-	const elems = colors.map(c => {
-		return <div className="elem">
-			<Swatch color={c} selected={selected === c} onSelect={() => { setSelected(c); afterSelect?.(c) }}/>
-		</div>
-	})
+  const label = () => {
+    if (selected !== undefined) {
+      return capitalize(selected)
+    }
+    return prompt
+  }
 
-	return <div className="ColorPicker">
-		<div className="elems">{elems}</div>
-		<div className="label">{selected === undefined ? prompt : capitalize(selected)}</div>
-	</div>
+  const elems = colors.map(c => {
+    return <div key={c} className="elem">
+      <Swatch
+        color={c}
+        selected={selected === c}
+        onSelect={() => { setSelected(c); afterSelect?.(c) }}
+      />
+    </div>
+  })
+
+  return <div className="ColorPicker">
+    <div className="elems">{elems}</div>
+    <div className="label">{label()}</div>
+  </div>
 }
