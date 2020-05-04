@@ -44,7 +44,7 @@ func devUHandler(w http.ResponseWriter, r *http.Request) {
 	const bucketName = "selective-scrobble.appspot.com"
 
 	if err := uTmpl.Execute(w, UArgs{
-		Title:           profileUsername,
+		Title:           profileUsername + "'s scrobbles",
 		Host:            r.Host,
 		ArtworkBaseURL:  "https://storage.googleapis.com/" + bucketName + "/" + artworkStorageDirectory,
 		ProfileUsername: profileUsername,

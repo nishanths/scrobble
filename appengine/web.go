@@ -5,19 +5,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
-	"io"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"cloud.google.com/go/datastore"
+	"github.com/gomarkdown/markdown"
+	"github.com/gomarkdown/markdown/html"
+	"github.com/gomarkdown/markdown/parser"
 	"github.com/nishanths/scrobble/appengine/log"
 	"github.com/pkg/errors"
 )
 
 var (
-	rootTmpl = template.Must(template.New("").Parse(string(MustAsset("appengine/template/root.html"))))
-	uTmpl    = template.Must(template.New("").Parse(string(MustAsset("appengine/template/u.html"))))
+	rootTmpl        = template.Must(template.New("").Parse(string(MustAsset("appengine/template/root.html"))))
+	uTmpl           = template.Must(template.New("").Parse(string(MustAsset("appengine/template/u.html"))))
+	contentPageTmpl = template.Must(template.New("").Parse(string(MustAsset("appengine/template/content.html"))))
 )
 
 type BootstrapArgs struct {
@@ -164,7 +167,7 @@ func (s *server) uHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := uTmpl.Execute(w, UArgs{
-		Title:           profileUsername,
+		Title:           profileUsername + "'s scrobbles",
 		Host:            r.Host,
 		ArtworkBaseURL:  "https://storage.googleapis.com/" + DefaultBucketName + "/" + artworkStorageDirectory,
 		ProfileUsername: profileUsername,
@@ -406,10 +409,7 @@ func ptrStruct() *struct{} {
 	return &struct{}{}
 }
 
-const privacyPolicy = `Privacy Policy
---------------
-
-Your privacy is important to us. It is allele's policy to respect your
+const privacyPolicy = `Your privacy is important to us. It is allele's policy to respect your
 privacy regarding any information we may collect from you across our
 website, https://scrobble.allele.cc, and other sites we own and operate.
 
@@ -445,11 +445,55 @@ This policy is effective as of 12 April 2020.
 [Privacy Policy created with GetTerms.](https://getterms.io/)
 `
 
+const helpGuide = ``
+
 func (s *server) privacyPolicyHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-	w.Header().Set("Content-Type", "text/plain")
-	io.WriteString(w, privacyPolicy)
+
+	args := ContentPageArgs{
+		Title:   "Scrobble · Privacy policy",
+		Heading: template.HTML("scrobble · <strong>privacy policy</strong>"),
+		Content: template.HTML(markdownToHTML([]byte(privacyPolicy))),
+	}
+
+	if err := contentPageTmpl.Execute(w, args); err != nil {
+		log.Errorf("failed to execute template: %v", err.Error())
+	}
+}
+
+func (s *server) helpGuideHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	args := ContentPageArgs{
+		Title:   "Scrobble · Guide",
+		Heading: template.HTML("scrobble · <strong>guide</strong>"),
+		Content: template.HTML(markdownToHTML([]byte(helpGuide))),
+	}
+
+	if err := contentPageTmpl.Execute(w, args); err != nil {
+		log.Errorf("failed to execute template: %v", err.Error())
+	}
+}
+
+type ContentPageArgs struct {
+	Title   string
+	Heading template.HTML
+	Content template.HTML
+}
+
+func markdownToHTML(md []byte) []byte {
+	extensions := parser.CommonExtensions | parser.AutoHeadingIDs
+	p := parser.NewWithExtensions(extensions)
+
+	htmlFlags := html.CommonFlags | html.HrefTargetBlank
+	opts := html.RendererOptions{Flags: htmlFlags}
+	renderer := html.NewRenderer(opts)
+
+	return markdown.ToHTML(md, p, renderer)
 }

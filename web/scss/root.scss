@@ -1,10 +1,9 @@
 @import "common.scss";
 @import "vars.scss";
-@import "u-mixin.scss";
 
-$focus-link-color: $meta-color;
+$focus-link-color: #0074D9;
 $unfocus-link-color: $meta-color;
-$hover-link-color: #3F8CBF;
+$hover-link-color: #0074D9;
 
 body {
   font-family: $font-family;
@@ -27,29 +26,34 @@ a {
   color: $meta-color;
 }
 
+.dark {
+  color: #001f3f;
+}
+
 .hidden {
   display: none !important;
 }
 
 .Root {
   margin: 0 auto;
-  color: #111;
-  padding: 0 10px;
+  color: $muted-color;
+  padding: 0 12px;
 }
 
 .content {
-  margin: 20px auto 55px;
+  margin: 0 auto 55px;
+  line-height: 1.6rem;
 }
 
-.tagline {
+.heading {
+  margin-top: 30px;
   margin-bottom: 60px;
   text-align: center;
 }
 
 h1 {
   font-size: 24px;
-  margin: 30px auto 0;
-  text-align: center;
+  font-weight: normal;
 }
 
 h2 {

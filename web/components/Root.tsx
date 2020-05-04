@@ -78,8 +78,10 @@ export class Root extends React.Component<RootProps, { account: Account }> {
 
   render() {
     return <div className="Root">
-      <h1>scrobble</h1>
-      <p className="tagline">Music scrobbling for Apple Music.</p>
+      <div className="heading">
+        <h1><strong>scrobble</strong></h1>
+        <p>Music scrobbling for Apple Music.</p>
+      </div>
 
       <div className="content">
         {this.state.account.username && <section>
@@ -107,7 +109,7 @@ export class Root extends React.Component<RootProps, { account: Account }> {
 
         <section>
           <h2>Helpful Links</h2>
-          {<p><a href="/help">How do I use this?</a> (upcoming)</p>}
+          {<p><a href="/guide">How do I use this?</a> (upcoming)</p>}
           {this.download()}
           {this.privacyPolicy()}
         </section>

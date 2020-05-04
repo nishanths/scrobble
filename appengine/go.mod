@@ -4,6 +4,7 @@ require (
 	cloud.google.com/go v0.38.0
 	github.com/RobCherry/vibrant v0.0.0-20160904011657-0680b8cf1c89
 	github.com/golang/protobuf v1.2.0
+	github.com/gomarkdown/markdown v0.0.0-20200504064842-79b2cdd7e9e6
 	github.com/google/uuid v1.1.0
 	github.com/gorilla/securecookie v1.1.1
 	github.com/pkg/errors v0.8.0

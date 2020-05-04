@@ -97,6 +97,7 @@ func run(ctx context.Context) error {
 	http.Handle("/login", withHTTPS(http.HandlerFunc(s.loginHandler)))
 	http.Handle("/googleAuth", withHTTPS(http.HandlerFunc(s.googleAuthHandler)))
 	http.Handle("/logout", withHTTPS(http.HandlerFunc(s.logoutHandler)))
+	http.Handle("/guide", withHTTPS(http.HandlerFunc(s.helpGuideHandler)))
 	http.Handle("/privacy-policy", withHTTPS(http.HandlerFunc(s.privacyPolicyHandler)))
 
 	if isDev() {

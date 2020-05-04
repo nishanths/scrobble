@@ -21,6 +21,11 @@ github.com/golang/protobuf/ptypes/empty
 github.com/golang/protobuf/ptypes/struct
 github.com/golang/protobuf/ptypes/timestamp
 github.com/golang/protobuf/ptypes/wrappers
+# github.com/gomarkdown/markdown v0.0.0-20200504064842-79b2cdd7e9e6
+github.com/gomarkdown/markdown
+github.com/gomarkdown/markdown/ast
+github.com/gomarkdown/markdown/html
+github.com/gomarkdown/markdown/parser
 # github.com/google/uuid v1.1.0
 github.com/google/uuid
 # github.com/googleapis/gax-go/v2 v2.0.4
