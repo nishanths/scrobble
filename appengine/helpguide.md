@@ -41,7 +41,7 @@ Click on the app icon in the menu bar, and choose "Start scrobbling...". Enter y
 
 There is no easy way currently to scrobble your songs without a macOS computer. Please [create an issue][issues] to add scrobbling support to non-macOS computers.
 
-You may, however, use the HTTP API to scrobble your songs. The API is not documented yet (!), but the [source code][source] is on GitHub.
+You may, however, use the HTTP API to scrobble your songs. The API is not documented yet (!), but the [source code][source] is available.
 
 You may still use the web application to browse songs that your friends have scrobbled.
 
