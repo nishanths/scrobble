@@ -1,5 +1,13 @@
+@import "vars.scss";
+
 input[type=text] {
   margin-left: 5px;
+  border: 1px solid $meta-color;
+  background-image: none;
+  background-color: transparent;
+  box-shadow: none;
+  border-radius: 3px;
+  padding: 0 5px;
 }
 
 input[type=submit] {

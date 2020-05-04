@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Account } from "../shared/types"
+import { Account, Notie } from "../shared/types"
 import { cookieAuthErrorMessage } from "../shared/util"
 import "../scss/set-username.scss";
 
@@ -7,14 +7,19 @@ interface SetUsernameProps {
   accountChange: (a: Account) => void
 }
 
+declare var notie: Notie
+
 export const SetUsername: React.FC<SetUsernameProps> = ({ accountChange }) => {
   const [username, setUsername] = useState("")
-  const [error, setError] = useState("")
   let input: HTMLInputElement | null = null
 
   useEffect(() => {
     if (input !== null) { input.focus() }
   }, [])
+
+  const showError = (text: string) => {
+    notie.alert({ type: "error", text })
+  }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -24,11 +29,11 @@ export const SetUsername: React.FC<SetUsernameProps> = ({ accountChange }) => {
   const initializeAccount = (u: string): void => {
     let { reason, ok } = validateUsername(u)
     if (!ok) {
-      setError(reason)
+      showError(reason)
       return
     }
 
-    setError("")
+    showError("")
     const genericError = "Something went wrong. Try again?"
 
     // TODO: clean up the control flow
@@ -40,14 +45,14 @@ export const SetUsername: React.FC<SetUsernameProps> = ({ accountChange }) => {
           return res.json()
         }
         if (res.status == 406) {
-          setError("The username is already taken")
+          showError("The username is already taken")
           return res.text()
         }
         if (res.status == 401) {
-          setError(cookieAuthErrorMessage)
+          showError(cookieAuthErrorMessage)
           return res.text()
         }
-        setError(genericError)
+        showError(genericError)
         return res.blob()
       })
       .then(r => {
@@ -55,7 +60,7 @@ export const SetUsername: React.FC<SetUsernameProps> = ({ accountChange }) => {
         accountChange(r as Account)
       }, err => {
         console.error(err)
-        setError(genericError)
+        showError(genericError)
       })
   }
 
@@ -63,11 +68,10 @@ export const SetUsername: React.FC<SetUsernameProps> = ({ accountChange }) => {
     <form onSubmit={(e) => { handleSubmit(e) }}>
       <label>
         Set your username:
-        <input type="text" value={username} onChange={() => { setUsername(input!.value) }}
+        <input type="text" size={15} value={username} onChange={() => { setUsername(input!.value) }}
           ref={r => { input = r }}></input>
       </label>
       <input type="submit" value="OK" />
-      {error !== "" && <span className="error">{error}</span>}
     </form>
   </>
 }
