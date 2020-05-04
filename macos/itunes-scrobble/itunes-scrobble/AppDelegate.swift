@@ -340,6 +340,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
     
     @objc private func pauseAction(_ sender: Any?) {
         state.running = false
+        state.error = nil // clear error on hitting pause
         UserDefaults.standard.set(state.running, forKey: AppDelegate.keyRunning)
         render()
     }
