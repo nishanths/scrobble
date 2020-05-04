@@ -5,12 +5,17 @@ import { dateDisplay } from "../shared/time"
 interface SongCardProps {
   song: Song; // rendering degrades gracefully if properties are missing
   artworkBaseURL: string;
-  now: () => Date;
+  useAlbumAsTitle: boolean; // use album instead of song title in the title areas when rendering
+
+  showDate: boolean
+  now?: () => Date // required if showDates is true
 }
 
 export const SongCard: React.StatelessComponent<SongCardProps> = ({
   song,
   artworkBaseURL,
+  useAlbumAsTitle,
+  showDate,
   now
 }) => {
   let trackLinkAreaElem: HTMLDivElement | null = null
@@ -29,11 +34,22 @@ export const SongCard: React.StatelessComponent<SongCardProps> = ({
 
   const tooltip = (() => {
     const s = song
+
+    if (useAlbumAsTitle) {
+      let tooltip = ""
+      if (s.artistName || s.albumTitle) {
+        if (s.artistName) { tooltip += s.artistName }
+        if (s.artistName && s.albumTitle) { tooltip += " — " }
+        if (s.albumTitle) { tooltip += s.albumTitle }
+      }
+      return tooltip
+    }
+
     let tooltip = s.title
     if (s.artistName || s.albumTitle) {
       tooltip += "\n"
       if (s.artistName) { tooltip += s.artistName }
-      if (s.artistName && s.artistName) { tooltip += " — " }
+      if (s.artistName && s.albumTitle) { tooltip += " — " }
       if (s.albumTitle) { tooltip += s.albumTitle }
     }
     return tooltip
@@ -48,13 +64,13 @@ export const SongCard: React.StatelessComponent<SongCardProps> = ({
     const s = song
     return <div className="meta" title={tooltip}>
       <div className="title">
-        <span className="titleContent">{s.title}</span>
+        <span className="titleContent">{useAlbumAsTitle ? s.albumTitle : s.title}</span>
         {s.loved && <span className="love"></span>}
       </div>
       <div className="other">
         {s.artistName && <span className="artist">{s.artistName}</span>}
       </div>
-      {s.lastPlayed && <time className="date">{dateDisplay(new Date(s.lastPlayed * 1000), now())}</time>}
+      {showDate && s.lastPlayed && <time className="date">{dateDisplay(new Date(s.lastPlayed * 1000), now!())}</time>}
     </div>
   })()
 

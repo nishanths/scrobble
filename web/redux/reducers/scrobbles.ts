@@ -2,7 +2,7 @@ import { AllScrobblesAction, LovedScrobblesAction, ColorScrobblesAction } from "
 import { ScrobblesState } from "../types/scrobbles"
 import { Song, ArtworkHash } from "../../shared/types"
 
-const defaultState = <T extends Song | ArtworkHash>(): ScrobblesState<T> => {
+const defaultState = (): ScrobblesState => {
   return {
     fetching: false,
     items: [],
@@ -13,10 +13,10 @@ const defaultState = <T extends Song | ArtworkHash>(): ScrobblesState<T> => {
   }
 }
 
-const defaultAllScrobblesState = defaultState<Song>()
-const defaultLovedScrobblesState = defaultState<Song>()
+const defaultAllScrobblesState = defaultState()
+const defaultLovedScrobblesState = defaultState()
 
-export const allScrobblesReducer = (state = defaultAllScrobblesState, action: AllScrobblesAction): ScrobblesState<Song> => {
+export const allScrobblesReducer = (state = defaultAllScrobblesState, action: AllScrobblesAction): ScrobblesState => {
   switch (action.type) {
     case "ALL_SCROBBLES_START":
       return { ...state, fetching: true, done: false }
@@ -29,7 +29,7 @@ export const allScrobblesReducer = (state = defaultAllScrobblesState, action: Al
   }
 }
 
-export const lovedScrobblesReducer = (state = defaultLovedScrobblesState, action: LovedScrobblesAction): ScrobblesState<Song> => {
+export const lovedScrobblesReducer = (state = defaultLovedScrobblesState, action: LovedScrobblesAction): ScrobblesState => {
   switch (action.type) {
     case "LOVED_SCROBBLES_START":
       return { ...state, fetching: true, done: false }
@@ -58,8 +58,8 @@ const colors = [
 
 const defaultColorScrobblesState = (() => {
   // create a map that maps each color to a default scrobbles state for that color
-  const m: Map<string, ScrobblesState<ArtworkHash>> = new Map()
-  colors.forEach(c => { m.set(c, defaultState<ArtworkHash>()) })
+  const m: Map<string, ScrobblesState> = new Map()
+  colors.forEach(c => { m.set(c, defaultState()) })
   return m
 })()
 
@@ -76,7 +76,7 @@ export const colorScrobblesReducer = (state = defaultColorScrobblesState, action
     }
     case "COLOR_SCROBBLES_SUCCESS": {
       const s = copy(state)
-      s.set(color, { items: action.hashes, private: action.private, fetching: false, error: false, done: true })
+      s.set(color, { items: action.songs, private: action.private, fetching: false, error: false, done: true })
       return s
     }
     case "COLOR_SCROBBLES_FAIL": {
