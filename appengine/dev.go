@@ -14,8 +14,8 @@ const devSignedInUsername = "devuser"
 
 var devFakeAccount = Account{
 	Username: devSignedInUsername,
-	APIKey:   "FAKE",
-	Private:  true,
+	APIKey:   "FAKEAPIKEY",
+	Private:  false,
 }
 
 func devRootHandler(w http.ResponseWriter, r *http.Request) {
@@ -28,8 +28,8 @@ func devRootHandler(w http.ResponseWriter, r *http.Request) {
 		Title: "Dev Scrobble",
 		Bootstrap: BootstrapArgs{
 			Host:      r.Host,
-			Email:     "fake@gmail.com",
-			LogoutURL: "/fake",
+			Email:     "localdev@gmail.com",
+			LogoutURL: "/fakelogouturl",
 			Account:   devFakeAccount,
 		},
 	}
@@ -48,7 +48,7 @@ func devUHandler(w http.ResponseWriter, r *http.Request) {
 		Host:            r.Host,
 		ArtworkBaseURL:  "https://storage.googleapis.com/" + bucketName + "/" + artworkStorageDirectory,
 		ProfileUsername: profileUsername,
-		LogoutURL:       "/fake",
+		LogoutURL:       "/fakelogouturl",
 		Account:         devFakeAccount,
 		Self:            profileUsername == devSignedInUsername,
 	}); err != nil {

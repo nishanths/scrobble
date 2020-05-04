@@ -92,13 +92,13 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
 
   private privacyOn() {
     return <>
-      <p>Your profile is private. You can <a href="" onClick={(e) => { e.preventDefault(); this.setPrivacy(false) }}>make it publicly viewable.</a></p>
+      <p>Your profile is private. You can <a href="" onClick={(e) => { e.preventDefault(); this.setPrivacy(false) }}>make your profile publicly viewable.</a></p>
     </>
   }
 
   private privacyOff() {
     return <>
-      <p>Your profile is publicly viewable. You can <a href="" onClick={(e) => { e.preventDefault(); this.setPrivacy(true) }}>make it private.</a></p>
+      <p>Your profile is publicly viewable. You can <a href="" onClick={(e) => { e.preventDefault(); this.setPrivacy(true) }}>make your profile private.</a></p>
     </>
   }
 
