@@ -46,7 +46,8 @@ type ArtworkScore struct {
 // Namespace: Account
 // Key: artwork hash
 type ArtworkRecord struct {
-	Score ArtworkScore
+	Score     ArtworkScore
+	SongIdent string
 }
 
 type HSL struct {

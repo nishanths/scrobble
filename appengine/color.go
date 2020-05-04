@@ -29,6 +29,13 @@ var validColors = [...]basiccolor.Color{
 }
 
 func (s *server) artworkColorHandler(w http.ResponseWriter, r *http.Request) {
+	writeSuccessRsp := func(s []SongResponse) {
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(s); err != nil {
+			log.Errorf("failed to write response: %v", err.Error())
+		}
+	}
+
 	ctx := r.Context()
 
 	if r.Method != "GET" {
@@ -82,28 +89,100 @@ func (s *server) artworkColorHandler(w http.ResponseWriter, r *http.Request) {
 		Namespace(namespace).
 		Order(fmt.Sprintf("-Score.%s", datastoreFieldNameForColor(inputColor))).
 		Filter(fmt.Sprintf("Score.%s >=", datastoreFieldNameForColor(inputColor)), 300).
-		KeysOnly()
+		Project("SongIdent")
+
 	if hasLimit {
 		q = q.Limit(limit)
 	}
 
-	keys, err := s.ds.GetAll(ctx, q, nil)
+	var artworkRecords []artwork.ArtworkRecord
+	_, err := s.ds.GetAll(ctx, q, &artworkRecords)
 	if err != nil {
 		log.Errorf("failed to get query: %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	// Prepare response.
-	hashes := make([]string, len(keys))
-	for i, k := range keys {
-		hashes[i] = k.Name
+	// Get the latest complete parent (required to construct Song keys
+	// for fetching).
+	q = datastore.NewQuery(KindSongParent).
+		Namespace(namespace).
+		Order("-Created").Filter("Complete=", true).
+		Limit(1).KeysOnly()
+
+	parentKeys, err := s.ds.GetAll(ctx, q, nil)
+	if err != nil {
+		log.Errorf("%v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if len(parentKeys) == 0 {
+		// WTF?
+		log.Warningf("unexpectedly found 0 SongParent keys")
+		writeSuccessRsp(make([]SongResponse, 0))
+		return
+	}
+
+	// construct SongKeys.
+	songKeys := make([]*datastore.Key, len(artworkRecords))
+	for i, ar := range artworkRecords {
+		songKeys[i] = songKey(namespace, ar.SongIdent, parentKeys[0])
+	}
+
+	// Fetch songs by SongKeys.
+	// Some of the songs may not be found if the artwork is from a newer generation.
+	// Ignore such errors.
+	songs := make([]Song, len(songKeys))
+	err = s.ds.GetMulti(ctx, songKeys, songs)
+	if err != nil && !isAllErrNoSuchEntity(err) {
+		log.Errorf("failed to songs: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// if there was a ErrNoSuchEntity we need to omit those songs.
+	var foundSongs []Song
+	if err != nil {
+		merr, _ := err.(datastore.MultiError)
+		for i, e := range merr {
+			if e == nil {
+				foundSongs = append(foundSongs, songs[i])
+			}
+		}
+	} else {
+		foundSongs = songs
+	}
+
+	// construct response
+	rsp := make([]SongResponse, len(foundSongs))
+	for i, s := range foundSongs {
+		rsp[i] = SongResponse{
+			Song:  s,
+			Ident: songident(s.AlbumTitle, s.ArtistName, s.Title, s.Year),
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(hashes); err != nil {
+	if err := json.NewEncoder(w).Encode(rsp); err != nil {
 		log.Errorf("failed to write response: %v", err.Error())
 	}
+}
+
+func isAllErrNoSuchEntity(err error) bool {
+	if err == nil {
+		panic("err must be non-nil")
+	}
+	merr, ok := err.(datastore.MultiError)
+	if !ok {
+		return err == datastore.ErrNoSuchEntity
+	}
+	for _, e := range merr {
+		if e == nil || e == datastore.ErrNoSuchEntity {
+			continue
+		}
+		return false
+	}
+	return true
 }
 
 func datastoreFieldNameForColor(c basiccolor.Color) string {

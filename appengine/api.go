@@ -559,13 +559,15 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var sKeys []*datastore.Key
-	incomingArtworkHashes := make(map[string]struct{})
+	incomingArtworkHashes := make(map[string]string)
 	for _, s := range songs {
 		// Create song key.
 		sKeys = append(sKeys, songKey(namespace, s.Ident(), newParentKey))
 		// Collect incoming artwork hash.
 		if h := s.ArtworkHash; h != "" {
-			incomingArtworkHashes[h] = struct{}{}
+			// the same artwork hash can be there for >1 songs; any one of those
+			// songs' idents will do here
+			incomingArtworkHashes[h] = s.Ident()
 		}
 	}
 
@@ -605,17 +607,19 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Diff current and incoming artwork hashes.
-	addHashes, removeHashes := diffStringSets(currentArtworkHashes, incomingArtworkHashes)
+	addHashes, removeHashes := diffStringMaps(currentArtworkHashes, incomingArtworkHashes)
 
 	var g errgroup.Group
 
 	// Adjust artwork records based on added / removed hashes.
 	g.Go(func() error {
 		keys := make([]*datastore.Key, 0, len(addHashes))
-		for k := range addHashes {
+		entities := make([]artwork.ArtworkRecord, 0, len(addHashes))
+		for k, v := range addHashes {
 			keys = append(keys, artwork.ArtworkRecordKey(namespace, k))
+			entities = append(entities, artwork.ArtworkRecord{SongIdent: v})
 		}
-		_, err := svr.ds.PutMulti(ctx, keys, make([]artwork.ArtworkRecord, len(keys)))
+		_, err := svr.ds.PutMulti(ctx, keys, entities)
 		return err
 	})
 	g.Go(func() error {
@@ -1047,13 +1051,13 @@ func artworkHash(artwork []byte, format string) string {
 
 // Diffs the given sets and returns the elements being added and the elements
 // being removed.
-func diffStringSets(old, new map[string]struct{}) (added, removed map[string]struct{}) {
-	added = make(map[string]struct{})
+func diffStringMaps(old map[string]struct{}, new map[string]string) (added map[string]string, removed map[string]struct{}) {
+	added = make(map[string]string)
 	removed = make(map[string]struct{})
 
-	for k := range new {
+	for k, v := range new {
 		if _, ok := old[k]; !ok {
-			added[k] = struct{}{} // not present in old, so being newly added
+			added[k] = v // not present in old, so being newly added
 		}
 	}
 
