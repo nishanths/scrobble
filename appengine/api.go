@@ -609,9 +609,8 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 	// Diff current and incoming artwork hashes.
 	addHashes, removeHashes := diffStringMaps(currentArtworkHashes, incomingArtworkHashes)
 
-	var g errgroup.Group
-
 	// Adjust artwork records based on added / removed hashes.
+	var g errgroup.Group
 	g.Go(func() error {
 		keys := make([]*datastore.Key, 0, len(addHashes))
 		entities := make([]artwork.ArtworkRecord, 0, len(addHashes))
@@ -646,8 +645,18 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return svr.ds.DeleteMulti(ctx, keys)
 	})
+	if err := g.Wait(); err != nil {
+		log.Errorf("%v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	g = errgroup.Group{}
 
 	// Create artwork score fill-in tasks for the newly added hashes.
+	//
+	// (These tasks need to wait for artwork record puts above to complete,
+	// to ensure they're present during access in the task handler.)
 	for k := range addHashes {
 		g.Go(func() error {
 			createReq, err := jsonPostTask("/internal/fillArtworkScore", fillArtworkScoreTask{
