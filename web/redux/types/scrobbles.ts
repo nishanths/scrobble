@@ -1,8 +1,8 @@
 import { Song, ArtworkHash } from "../../shared/types"
 
-export type ScrobblesState<T extends Song | ArtworkHash> = {
+export type ScrobblesState = {
   fetching: boolean
-  items: T[]
+  items: Song[]
   total?: number
   private: boolean
   error: boolean

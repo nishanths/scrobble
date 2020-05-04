@@ -135,12 +135,12 @@ const colorScrobblesStart = (color: string, username: string) => {
   }
 }
 
-const colorScrobblesSuccess = (color: string, username: string, hashes: ArtworkHash[], priv: boolean) => {
+const colorScrobblesSuccess = (color: string, username: string, songs: Song[], priv: boolean) => {
   return {
     type: "COLOR_SCROBBLES_SUCCESS" as const,
     color,
     username,
-    hashes,
+    songs,
     private: priv,
   }
 }
@@ -159,7 +159,7 @@ export const fetchColorScrobbles = (color: string, username: string): ColorScrob
 
     try {
       const result = await _fetchColorScrobbles(color, username)
-      dispatch(colorScrobblesSuccess(color, username, result.hashes, result.private))
+      dispatch(colorScrobblesSuccess(color, username, result.songs, result.private))
     } catch (e) {
       dispatch(colorScrobblesFail(e, color))
     }
@@ -167,7 +167,7 @@ export const fetchColorScrobbles = (color: string, username: string): ColorScrob
 }
 
 type FetchColorResult = {
-  hashes: ArtworkHash[]
+  songs: Song[]
   private: boolean
   err: any | null
 }
@@ -178,10 +178,10 @@ const _fetchColorScrobbles = async (color: string, username: string): Promise<Fe
   const r = await fetch(url)
   switch (r.status) {
     case 200:
-      const hashes: string[] = await r.json()
-      return { hashes, private: false, err: null }
+      const songs: Song[] = await r.json()
+      return { songs, private: false, err: null }
     case 404:
-      return { hashes: [], private: true, err: null }
+      return { songs: [], private: true, err: null }
     // TODO: if we had the ability to display toast notifications, we could show
     // "please sign in again" for 401 status
     default:

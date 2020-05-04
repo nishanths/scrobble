@@ -27,3 +27,77 @@ indexes:
   - name: Complete
   - name: Created
     direction: desc
+
+# ArtworkRecord score sorting
+# GET /artwork/color
+- kind: ArtworkRecord
+  properties:
+  - name: Score.Red
+    direction: desc
+  - name: SongIdent
+
+- kind: ArtworkRecord
+  properties:
+  - name: Score.Orange
+    direction: desc
+  - name: SongIdent
+
+- kind: ArtworkRecord
+  properties:
+  - name: Score.Brown
+    direction: desc
+  - name: SongIdent
+
+- kind: ArtworkRecord
+  properties:
+  - name: Score.Yellow
+    direction: desc
+  - name: SongIdent
+
+- kind: ArtworkRecord
+  properties:
+  - name: Score.Green
+    direction: desc
+  - name: SongIdent
+
+- kind: ArtworkRecord
+  properties:
+  - name: Score.Green
+    direction: desc
+  - name: SongIdent
+
+- kind: ArtworkRecord
+  properties:
+  - name: Score.Blue
+    direction: desc
+  - name: SongIdent
+
+- kind: ArtworkRecord
+  properties:
+  - name: Score.Violet
+    direction: desc
+  - name: SongIdent
+
+- kind: ArtworkRecord
+  properties:
+  - name: Score.Pink
+    direction: desc
+  - name: SongIdent
+
+- kind: ArtworkRecord
+  properties:
+  - name: Score.Black
+    direction: desc
+  - name: SongIdent
+
+- kind: ArtworkRecord
+  properties:
+  - name: Score.Gray
+    direction: desc
+  - name: SongIdent
+
+- kind: ArtworkRecord
+  properties:
+  - name: Score.White
+    direction: desc
+  - name: SongIdent

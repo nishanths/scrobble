@@ -559,13 +559,15 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var sKeys []*datastore.Key
-	incomingArtworkHashes := make(map[string]struct{})
+	incomingArtworkHashes := make(map[string]string)
 	for _, s := range songs {
 		// Create song key.
 		sKeys = append(sKeys, songKey(namespace, s.Ident(), newParentKey))
 		// Collect incoming artwork hash.
 		if h := s.ArtworkHash; h != "" {
-			incomingArtworkHashes[h] = struct{}{}
+			// the same artwork hash can be there for >1 songs; any one of those
+			// songs' idents will do here
+			incomingArtworkHashes[h] = s.Ident()
 		}
 	}
 
@@ -605,18 +607,36 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Diff current and incoming artwork hashes.
-	addHashes, removeHashes := diffStringSets(currentArtworkHashes, incomingArtworkHashes)
-
-	var g errgroup.Group
+	addHashes, removeHashes := diffStringMaps(currentArtworkHashes, incomingArtworkHashes)
 
 	// Adjust artwork records based on added / removed hashes.
+	var g errgroup.Group
 	g.Go(func() error {
 		keys := make([]*datastore.Key, 0, len(addHashes))
-		for k := range addHashes {
+		entities := make([]artwork.ArtworkRecord, 0, len(addHashes))
+		for k, v := range addHashes {
 			keys = append(keys, artwork.ArtworkRecordKey(namespace, k))
+			entities = append(entities, artwork.ArtworkRecord{SongIdent: v})
 		}
-		_, err := svr.ds.PutMulti(ctx, keys, make([]artwork.ArtworkRecord, len(keys)))
-		return err
+		// Put artwork records.
+		{
+			s := 0
+			e := min(s+datastoreLimitPerOp, len(entities))
+			chunk := entities[s:e]
+			keysChunk := keys[s:e]
+
+			for len(chunk) > 0 {
+				if _, err := svr.ds.PutMulti(ctx, keysChunk, chunk); err != nil {
+					return err
+				}
+
+				s = e
+				e = min(s+datastoreLimitPerOp, len(entities))
+				chunk = entities[s:e]
+				keysChunk = keys[s:e]
+			}
+		}
+		return nil
 	})
 	g.Go(func() error {
 		keys := make([]*datastore.Key, 0, len(removeHashes))
@@ -625,9 +645,20 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return svr.ds.DeleteMulti(ctx, keys)
 	})
+	if err := g.Wait(); err != nil {
+		log.Errorf("%v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	g = errgroup.Group{}
 
 	// Create artwork score fill-in tasks for the newly added hashes.
+	//
+	// (These tasks need to wait for artwork record puts above to complete,
+	// to ensure they're present during access in the task handler.)
 	for k := range addHashes {
+		k := k // capture for closure
 		g.Go(func() error {
 			createReq, err := jsonPostTask("/internal/fillArtworkScore", fillArtworkScoreTask{
 				Namespace: namespace,
@@ -1047,13 +1078,13 @@ func artworkHash(artwork []byte, format string) string {
 
 // Diffs the given sets and returns the elements being added and the elements
 // being removed.
-func diffStringSets(old, new map[string]struct{}) (added, removed map[string]struct{}) {
-	added = make(map[string]struct{})
+func diffStringMaps(old map[string]struct{}, new map[string]string) (added map[string]string, removed map[string]struct{}) {
+	added = make(map[string]string)
 	removed = make(map[string]struct{})
 
-	for k := range new {
+	for k, v := range new {
 		if _, ok := old[k]; !ok {
-			added[k] = struct{}{} // not present in old, so being newly added
+			added[k] = v // not present in old, so being newly added
 		}
 	}
 

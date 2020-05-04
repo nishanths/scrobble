@@ -5,7 +5,6 @@ import { UArgs, Song, NProgress } from "../shared/types"
 import { trimPrefix, assertExhaustive, pathComponents, assert } from "../shared/util"
 import { Header } from "./Header"
 import { Songs } from "./Songs"
-import { Artworks } from "./Artworks"
 import { SegmentedControl } from "./SegmentedControl"
 import { Color, ColorPicker } from "./colorpicker"
 import { State } from "../redux/types/u"
@@ -233,8 +232,8 @@ export const U: React.FC<UProps> = ({
 
   if (scrobbles.items.length === 0) {
     return <>
-      {header}
-      <div className="info">({self ? "You haven't" : "This user hasn't"} scrobbled yet.)</div>
+      {top}
+      <div className="info">({self ? "You haven't" : "This user hasn't"} scrobbled {mode != Mode.All ? "matching " : ""}songs yet.)</div>
     </>
   }
 
@@ -247,11 +246,13 @@ export const U: React.FC<UProps> = ({
         {top}
         <div className="songs">
           <Songs
-            songs={itemsToShow as Song[]}
+            songs={itemsToShow}
+            artworkBaseURL={artworkBaseURL}
+            useAlbumAsTitle={false}
             more={scrobbles.total! - itemsToShow.length}
             // "showing all songs that are available on the client" && "more number of songs present for the user "
-            showMore={(itemsToShow.length === scrobbles.items.length) && (scrobbles.total! > scrobbles.items.length)}
-            artworkBaseURL={artworkBaseURL}
+            showMoreCard={(itemsToShow.length === scrobbles.items.length) && (scrobbles.total! > scrobbles.items.length)}
+            showDates={true}
             now={() => new Date()}
           />
         </div>
@@ -262,9 +263,12 @@ export const U: React.FC<UProps> = ({
       return <>
         {top}
         <div className="songs">
-          <Artworks
-            hashes={itemsToShow as string[]}
+          <Songs
+            songs={itemsToShow}
             artworkBaseURL={artworkBaseURL}
+            useAlbumAsTitle={true}
+            showMoreCard={false}
+            showDates={false}
           />
         </div>
       </>
