@@ -619,8 +619,25 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 			keys = append(keys, artwork.ArtworkRecordKey(namespace, k))
 			entities = append(entities, artwork.ArtworkRecord{SongIdent: v})
 		}
-		_, err := svr.ds.PutMulti(ctx, keys, entities)
-		return err
+		// Put artwork records.
+		{
+			s := 0
+			e := min(s+datastoreLimitPerOp, len(entities))
+			chunk := entities[s:e]
+			keysChunk := keys[s:e]
+
+			for len(chunk) > 0 {
+				if _, err := svr.ds.PutMulti(ctx, keysChunk, chunk); err != nil {
+					return err
+				}
+
+				s = e
+				e = min(s+datastoreLimitPerOp, len(entities))
+				chunk = entities[s:e]
+				keysChunk = keys[s:e]
+			}
+		}
+		return nil
 	})
 	g.Go(func() error {
 		keys := make([]*datastore.Key, 0, len(removeHashes))
