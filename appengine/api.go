@@ -658,6 +658,7 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 	// (These tasks need to wait for artwork record puts above to complete,
 	// to ensure they're present during access in the task handler.)
 	for k := range addHashes {
+		k := k // capture for closure
 		g.Go(func() error {
 			createReq, err := jsonPostTask("/internal/fillArtworkScore", fillArtworkScoreTask{
 				Namespace: namespace,
