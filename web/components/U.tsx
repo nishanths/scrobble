@@ -232,8 +232,8 @@ export const U: React.FC<UProps> = ({
 
   if (scrobbles.items.length === 0) {
     return <>
-      {header}
-      <div className="info">({self ? "You haven't" : "This user hasn't"} scrobbled yet.)</div>
+      {top}
+      <div className="info">({self ? "You haven't" : "This user hasn't"} scrobbled matching songs yet.)</div>
     </>
   }
 
