@@ -7,7 +7,7 @@ import "../scss/account"
 
 interface AccountDetailProps {
   account: Account
-  host: string
+  accountChange: (a: Account) => void
 }
 
 interface AccountDetailState {
@@ -58,7 +58,9 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
       .then(
         r => {
           if (!success) { return }
-          this.setState({ apiKey: r as string })
+          const apiKey = r as string
+          this.props.accountChange({ ...this.props.account, apiKey })
+          this.setState({ apiKey })
         },
         err => {
           console.error(err)
@@ -85,6 +87,7 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
             }, 1000)
           } else {
             console.log("failed to update privacy: status=%d", r.status)
+            this.props.accountChange({ ...this.props.account, private: !v })
             this.setState({
               private: !v, // revert
               setPrivacyErr: (r.status == 401) ? cookieAuthErrorMessage : genericErr,
@@ -93,6 +96,7 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
         },
         err => {
           console.error(err)
+          this.props.accountChange({ ...this.props.account, private: !v })
           this.setState({
             private: !v, // revert
             setPrivacyErr: genericErr,
@@ -109,6 +113,7 @@ export class AccountDetail extends React.Component<AccountDetailProps, AccountDe
 
   private onPrivacyClick(e: React.MouseEvent<HTMLInputElement, MouseEvent>) {
     let v = this.privacyCheckbox!.checked
+    this.props.accountChange({ ...this.props.account, private: v })
     this.setState({ private: v })
     this.setPrivacy(v)
   }

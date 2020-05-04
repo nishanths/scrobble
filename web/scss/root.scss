@@ -1,7 +1,26 @@
 @import "common.scss";
+@import "vars.scss";
+@import "u-mixin.scss";
+
+$focus-link-color: $meta-color;
+$unfocus-link-color: $meta-color;
+$hover-link-color: #3F8CBF;
+
+body {
+  font-family: $font-family;
+  margin: $body-margin-w;
+}
 
 a {
-  color: blue;
+  color: $focus-link-color;
+  &:hover {
+  	color: $hover-link-color;
+  }
+  &.danger {
+		&:hover {
+			color: #FF4136;
+		}
+	}
 }
 
 .error {
@@ -12,6 +31,44 @@ a {
   color: green;
 }
 
+.meta {
+	color: $meta-color;
+}
+
 .hidden {
   display: none !important;
 }
+
+.Root {
+	margin: 0 auto;
+	width: 50%;
+	color: #111;
+	padding: 0 10px;
+}
+
+.content {
+  margin: 20px auto 55px;
+}
+
+.tagline {
+	margin-bottom: 60px;
+	text-align: center;
+}
+
+h1 {
+	font-size: 24px;
+	margin: 30px auto 0;
+	text-align: center;
+}
+
+h2 {
+	text-transform: uppercase;
+	font-size: 15px;
+	letter-spacing: .5px;
+	color: #555;
+}
+
+section {
+	margin-bottom: 50px;
+}
+

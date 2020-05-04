@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux";
 import { RouteComponentProps, Redirect } from "react-router-dom";
-import { UArgs, Song } from "../shared/types"
+import { UArgs, Song, NProgress } from "../shared/types"
 import { trimPrefix, assertExhaustive, pathComponents, assert } from "../shared/util"
 import { Header } from "./Header"
 import { Songs } from "./Songs"
@@ -12,12 +12,6 @@ import { State } from "../redux/types/u"
 import { fetchAllScrobbles, fetchLovedScrobbles, fetchColorScrobbles } from "../redux/actions/scrobbles"
 import { useStateRef } from "../shared/hooks"
 import "../scss/u.scss"
-
-declare var NProgress: {
-  start(): void
-  done(): void
-  configure(opts: { [k: string]: any }): void
-}
 
 export enum Mode {
   All, Loved, Color
@@ -58,6 +52,8 @@ type UProps = UArgs & {
   wnd: Window
   mode: Mode
 } & RouteComponentProps;
+
+declare var NProgress: NProgress
 
 // U is the root component for the username page, e.g.,
 // https://scrobble.allele.cc/u/whatever.

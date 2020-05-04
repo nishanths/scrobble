@@ -19,6 +19,11 @@ var devFakeAccount = Account{
 }
 
 func devRootHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+
 	a := RootArgs{
 		Title: "Dev Scrobble",
 		Bootstrap: BootstrapArgs{
@@ -52,6 +57,7 @@ func devUHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func devScrobbledHandler(w http.ResponseWriter, r *http.Request) {
+	time.Sleep(1 * time.Second)
 	file := "scrobbled_all.json"
 
 	if r.FormValue("loved") == "true" {
@@ -74,7 +80,7 @@ func devArtworkColorHandler(w http.ResponseWriter, r *http.Request) {
 	time.Sleep(1 * time.Second)
 
 	data := func() string {
-		b, err := ioutil.ReadFile(filepath.Join(".devdata", "scrobbled_color.json"))
+		b, err := ioutil.ReadFile(filepath.Join(".devdata", "scrobbled_color_blue.json"))
 		if err != nil {
 			panic(err)
 		}

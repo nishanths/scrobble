@@ -1,5 +1,5 @@
 import React from "react";
-import { BootstrapArgs, Account } from "../shared/types";
+import { BootstrapArgs, Account, Notie } from "../shared/types";
 import { SetUsername } from "./SetUsername";
 import { AccountDetail } from "./AccountDetail";
 import "../scss/root.scss";
@@ -10,14 +10,15 @@ Delete account?`
 
 type RootProps = BootstrapArgs
 
-export class Root extends React.Component<RootProps, { account: Account, deleteFail: boolean }> {
+declare var notie: Notie
+
+export class Root extends React.Component<RootProps, { account: Account }> {
   private static readonly downloadURL = "https://github.com/nishanths/scrobble/releases/latest"
 
   constructor(props: RootProps) {
     super(props)
     this.state = {
       account: this.props.account,
-      deleteFail: false,
     }
   }
 
@@ -34,72 +35,78 @@ export class Root extends React.Component<RootProps, { account: Account, deleteF
             return
           }
           console.log("failed to delete: status=%d", r.status)
-          this.setState({ deleteFail: true })
+          notie.alert({ type: "error", text: "Failed to delete account.", stay: true })
         },
         err => {
           console.error(err)
-          this.setState({ deleteFail: true })
+          notie.alert({ type: "error", text: "Failed to delete account.", stay: true })
         }
       )
   }
 
   private onDeleteAccountClick(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
     e.preventDefault()
-    let ok = confirm(deleteMessage)
+    let ok = window.confirm(deleteMessage)
     if (!ok) {
       return
     }
     this.doDelete()
   }
 
-  private signIn() {
-    if (this.props.email && this.props.logoutURL) {
-      return <p><a href={this.props.logoutURL}>Sign out</a> ({this.props.email})</p>
-    }
-    if (this.props.loginURL) {
-      return <p><a href={this.props.loginURL}>Sign in with Google</a> to get started</p>
-    }
-    return null;
-  }
-
-  private visit() {
-    return <p>Profiles can be found at <i>/u/username</i>, e.g., <a href="/u/nishanth">/u/nishanth</a>, <a href="/u/888">/u/888</a></p>
+  private getStarted() {
+    return <>
+      <p>To get started with your own profile, <a href={this.props.loginURL}>sign in with Google</a>.</p>
+      <p>Browse an <a href="/u/nishanth">example user profile</a>.</p>
+    </>
   }
 
   private profile() {
-    return this.state.account && <p><a href={"/u/" + this.state.account.username}>Your scrobbles</a></p>
+    return <p><a href={"/u/" + this.state.account.username}>Your profile.</a></p>
   }
 
   private download() {
-    return <p><a href={Root.downloadURL}>Download</a> menu bar scrobble client for iTunes (macOS 10.14+)</p>
+    return <p><a href={Root.downloadURL}>Menu bar application</a> for macOS.</p>
   }
 
   private privacyPolicy() {
-    return <p><a href="/privacy-policy">Privacy policy</a></p>
+    return <p><a href="/privacy-policy">Privacy.</a></p>
   }
 
   render() {
-    let errClass = (b: boolean) => b ? "error" : "error hidden"
+    return <div className="Root">
+      <h1>scrobble</h1>
+      <p className="tagline">Music scrobbling for Apple Music.</p>
 
-    return <div>
-      <h1>{this.props.host}</h1>
-      {this.props.email && !this.state.account.username &&
-        <SetUsername accountChange={this.updateAccount.bind(this)} />}
-      {this.props.email && this.state.account.username &&
-        <AccountDetail account={this.state.account} host={this.props.host} />}
-      {this.signIn()}
-      {this.state.account.username ? this.profile() : this.visit()}
+      <div className="content">
+        {this.state.account.username && <section>
+          {this.profile()}
+        </section>}
 
-      {/* TODO: a little gross that we're relying on logoutURL to indicate "existence of account" */}
-      {this.props.logoutURL &&
-        <p>
-          <a href="" onClick={this.onDeleteAccountClick.bind(this)}>Delete account…</a>
-          <span className={errClass(this.state.deleteFail)}>&nbsp;Failed to delete. Try again?</span>
-        </p>
-      }
+        {this.props.loginURL && <section>
+          <h2>Getting Started</h2>
+          {this.getStarted()}
+        </section>}
 
-      {this.download()}
-      {this.privacyPolicy()}
+        {this.props.email && <section>
+          <h2>Account</h2>
+          <p><a href={this.props.logoutURL}>Sign out.</a> (You are signed in using Google as <span className="meta">{this.props.email}</span>.)</p>
+          {this.state.account.username && <>
+            <AccountDetail account={this.state.account} accountChange={this.updateAccount.bind(this)} />
+            <p>Your username is <a href={"/u/" + this.state.account.username}>{this.state.account.username}</a>.</p>
+            <p><a href="" className="danger" onClick={this.onDeleteAccountClick.bind(this)}>Delete account…</a></p>
+          </>}
+          {!this.state.account.username && <>
+            <SetUsername accountChange={this.updateAccount.bind(this)} />}
+          </>}
+        </section>}
+
+        <section>
+          <h2>Helpful Links</h2>
+          {<p><a href="/help">How do I use this?</a></p>}
+          {this.download()}
+          {this.privacyPolicy()}
+        </section>
+      </div>
     </div>
   }
 }

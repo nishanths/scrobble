@@ -43,3 +43,19 @@ export interface ScrobbledResponse {
   total: number
   songs: Song[]
 }
+
+export type NProgress = {
+  start(): void
+  done(): void
+  configure(opts: { [k: string]: any }): void
+}
+
+export type Notie = {
+  alert(options: {
+    type?: 'success' | 'warning' | 'error' | 'info' | 'neutral', // optional, default = 'info'
+    text: string,
+    stay?: boolean, // optional, default = false
+    time?: number, // optional, default = 3, minimum = 1
+    position?: 'top' | 'bottom' // optional, default = 'top'
+  }): void
+}
