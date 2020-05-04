@@ -63,6 +63,18 @@ section {
   margin-bottom: 50px;
 }
 
+@media screen and (min-width: 500px) {
+  .Root {
+    width: 90%;
+  }
+}
+
+@media screen and (min-width: 570px) {
+  .Root {
+    width: 80%;
+  }
+}
+
 @media screen and (min-width: 640px) {
   .Root {
     width: 70%;
