@@ -27,12 +27,16 @@ export const SongCard: React.StatelessComponent<SongCardProps> = ({
   const artworkURL = song.artworkHash ? artworkBaseURL + "/" + song.artworkHash : "";
 
   const trackViewURL = (() => {
-    if (useAlbumAsTitle) {
+    if (useAlbumAsTitle && song.trackViewURL != "") {
       // clear song portion (aka query string), so that link goes to album
       // e.g. https://music.apple.com/us/album/crystalised/329481191?i=329481203&uo=4
-      const u = new URL(song.trackViewURL)
-      u.search = ""
-      return u.toString()
+      try {
+        const u = new URL(song.trackViewURL)
+        u.search = ""
+        return u.toString()
+      } catch (e) {
+        return song.trackViewURL
+      }
     }
     return song.trackViewURL
   })()
