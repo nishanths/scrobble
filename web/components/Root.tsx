@@ -56,12 +56,8 @@ export class Root extends React.Component<RootProps, { account: Account }> {
   private getStarted() {
     return <>
       <p>To get started with your own profile, <a href={this.props.loginURL}>sign in with Google</a>.</p>
-      {this.exampleProfile()}
+      <p>See an <a href="/u/nishanth">example user profile</a>.</p>
     </>
-  }
-
-  private exampleProfile() {
-    return <p>Browse an <a href="/u/nishanth">example user profile</a>.</p>
   }
 
   private profile() {

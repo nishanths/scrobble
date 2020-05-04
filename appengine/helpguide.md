@@ -6,7 +6,7 @@ The term scrobbling refers to the act of publishing the songs you listen to to a
 
 The service consists of two parts:
 
-1. a macOS application which uploads your Apple Music history; and
+1. a macOS application which uploads your Apple Music listening history; and
 2. this web application which displays your list of scrobbled songs.
 
 ## How do you get started?
