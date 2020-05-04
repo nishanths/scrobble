@@ -33,7 +33,6 @@ export const SetUsername: React.FC<SetUsernameProps> = ({ accountChange }) => {
       return
     }
 
-    showError("")
     const genericError = "Something went wrong. Try again?"
 
     // TODO: clean up the control flow
@@ -57,6 +56,7 @@ export const SetUsername: React.FC<SetUsernameProps> = ({ accountChange }) => {
       })
       .then(r => {
         if (!success) { return }
+        notie.alert({ type: "success", text: "Username set!" })
         accountChange(r as Account)
       }, err => {
         console.error(err)
