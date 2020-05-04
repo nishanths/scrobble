@@ -109,7 +109,7 @@ export class Root extends React.Component<RootProps, { account: Account }> {
 
         <section>
           <h2>Helpful Links</h2>
-          {<p><a href="/guide">How do I use this?</a> (upcoming)</p>}
+          {<p><a href="/guide">How do I use this?</a></p>}
           {this.download()}
           {this.privacyPolicy()}
         </section>
