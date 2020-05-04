@@ -65,7 +65,7 @@ export class Root extends React.Component<RootProps, { account: Account }> {
   }
 
   private profile() {
-    return <p><a href={"/u/" + this.state.account.username}>See your profile.</a></p>
+    return <p><a href={"/u/" + this.state.account.username}>See your scrobbles.</a></p>
   }
 
   private download() {
@@ -89,7 +89,7 @@ export class Root extends React.Component<RootProps, { account: Account }> {
         </section>}
 
         {this.props.loginURL && <section>
-          <h2>Getting Started</h2>
+          <h2>Get Started</h2>
           {this.getStarted()}
         </section>}
 

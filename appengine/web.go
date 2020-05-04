@@ -18,9 +18,10 @@ import (
 )
 
 var (
-	rootTmpl        = template.Must(template.New("").Parse(string(MustAsset("appengine/template/root.html"))))
-	uTmpl           = template.Must(template.New("").Parse(string(MustAsset("appengine/template/u.html"))))
-	contentPageTmpl = template.Must(template.New("").Parse(string(MustAsset("appengine/template/content.html"))))
+	rootTmpl          = template.Must(template.New("").Parse(MustAssetString("appengine/template/root.html")))
+	uTmpl             = template.Must(template.New("").Parse(MustAssetString("appengine/template/u.html")))
+	contentPageTmpl   = template.Must(template.New("").Parse(MustAssetString("appengine/template/content.html")))
+	helpGuideMarkdown = MustAsset("appengine/helpguide.md")
 )
 
 type BootstrapArgs struct {
@@ -445,18 +446,23 @@ This policy is effective as of 12 April 2020.
 [Privacy Policy created with GetTerms.](https://getterms.io/)
 `
 
-const helpGuide = ``
-
 func (s *server) privacyPolicyHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
+	extensions := parser.CommonExtensions | parser.AutoHeadingIDs
+	p := parser.NewWithExtensions(extensions)
+	htmlFlags := html.CommonFlags | html.HrefTargetBlank
+	opts := html.RendererOptions{Flags: htmlFlags}
+	renderer := html.NewRenderer(opts)
+	content := markdown.ToHTML([]byte(privacyPolicy), p, renderer)
+
 	args := ContentPageArgs{
 		Title:   "Scrobble · Privacy policy",
 		Heading: template.HTML("scrobble · <strong>privacy policy</strong>"),
-		Content: template.HTML(markdownToHTML([]byte(privacyPolicy))),
+		Content: template.HTML(content),
 	}
 
 	if err := contentPageTmpl.Execute(w, args); err != nil {
@@ -470,10 +476,17 @@ func (s *server) helpGuideHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	extensions := parser.CommonExtensions | parser.AutoHeadingIDs
+	p := parser.NewWithExtensions(extensions)
+	htmlFlags := html.CommonFlags | html.HrefTargetBlank
+	opts := html.RendererOptions{Flags: htmlFlags}
+	renderer := html.NewRenderer(opts)
+	content := markdown.ToHTML(helpGuideMarkdown, p, renderer)
+
 	args := ContentPageArgs{
 		Title:   "Scrobble · Guide",
 		Heading: template.HTML("scrobble · <strong>guide</strong>"),
-		Content: template.HTML(markdownToHTML([]byte(helpGuide))),
+		Content: template.HTML(content),
 	}
 
 	if err := contentPageTmpl.Execute(w, args); err != nil {
@@ -485,15 +498,4 @@ type ContentPageArgs struct {
 	Title   string
 	Heading template.HTML
 	Content template.HTML
-}
-
-func markdownToHTML(md []byte) []byte {
-	extensions := parser.CommonExtensions | parser.AutoHeadingIDs
-	p := parser.NewWithExtensions(extensions)
-
-	htmlFlags := html.CommonFlags | html.HrefTargetBlank
-	opts := html.RendererOptions{Flags: htmlFlags}
-	renderer := html.NewRenderer(opts)
-
-	return markdown.ToHTML(md, p, renderer)
 }
