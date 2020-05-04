@@ -4,12 +4,12 @@ TSFMT := npx tsfmt
 default:
 	@echo "the default target does nothing!"
 
-.PHONY: sass dev
-dev:
+.PHONY: dev
+dev: sass
 	$(WEBPACK) --mode=development --watch
 
-.PHONY: sass dist
-dist:
+.PHONY: dist
+dist: sass
 	$(WEBPACK) --no-color --mode=production
 
 .PHONY: clean

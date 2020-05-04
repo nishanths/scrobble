@@ -64,6 +64,10 @@ section {
   margin-bottom: 50px;
 }
 
+img {
+  max-width: 100%;
+}
+
 @media screen and (min-width: 500px) {
   .Root {
     width: 90%;
