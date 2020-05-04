@@ -33,7 +33,6 @@ a {
 
 .Root {
   margin: 0 auto;
-  width: 50%;
   color: #111;
   padding: 0 10px;
 }
@@ -62,4 +61,16 @@ h2 {
 
 section {
   margin-bottom: 50px;
+}
+
+@media screen and (min-width: 640px) {
+  .Root {
+    width: 70%;
+  }
+}
+
+@media screen and (min-width: 915px) {
+  .Root {
+    width: 60%;
+  }
 }
