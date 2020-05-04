@@ -25,7 +25,7 @@ Your scrobbled songs can be seen at `https://scrobble.allele.cc/u/username`.
 
 The profile page displays scrobbled songs.
 
-You can filter by "All" (which sees all scrobbled songs), "Loved" (which sees songs liked on Apple Music), or "By color" (which browse scrobbled songs by artwork color).
+You can filter by "All" (which displays all scrobbled songs), "Loved" (which displays songs liked on Apple Music), or "By color" (which displays scrobbled songs by artwork color).
 
 ![segmented control](http://imgur.com/Cz2v327l.png)
 
