@@ -82,7 +82,7 @@ export const SongCard: React.StatelessComponent<SongCardProps> = ({
     return <div className="meta" title={tooltip}>
       <div className="title">
         <span className="titleContent">{albumCentric ? s.albumTitle : s.title}</span>
-        {s.loved && <span className="love"></span>}
+        {(s.loved && !albumCentric) && <span className="love"></span>}
       </div>
       <div className="other">
         {s.artistName && <span className="artist">{s.artistName}</span>}
