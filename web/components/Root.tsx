@@ -73,7 +73,7 @@ export class Root extends React.Component<RootProps, { account: Account }> {
   }
 
   render() {
-    return <div className="Root">
+    return <div className="Root theme-black">
       <div className="heading">
         <h1><strong>scrobble</strong></h1>
         <p className="larger">Music scrobbling for Apple Music.</p>

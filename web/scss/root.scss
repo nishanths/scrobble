@@ -4,6 +4,7 @@
 $focus-link-color: #0073AA;
 $unfocus-link-color: $meta-color;
 $hover-link-color: #0073AA;
+$danger-link-color: #FF4136;
 $text-font-size-larger: 17px;
 
 body {
@@ -18,7 +19,20 @@ a {
   }
   &.danger {
     &:hover {
-      color: #FF4136;
+      color: $danger-link-color;
+    }
+  }
+}
+
+body.theme-black {
+  a {
+  color: black;
+  &:hover {
+    color: black;
+  }
+  &.danger {
+    &:hover {
+      color: $danger-link-color;
     }
   }
 }
