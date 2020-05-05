@@ -36,6 +36,11 @@ a.danger:hover {
   padding: 0 12px;
 }
 
+.larger {
+  font-size: 17px;
+  line-height: 1.4rem;
+}
+
 .content {
   margin: 0 auto 55px;
   line-height: 1.6rem;
@@ -82,8 +87,8 @@ img {
 @media screen and (min-width: 915px) {
   .Root {
     width: 60%;
-    max-width: 590px;
+    max-width: 650px;
   }
 }
 
-/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22../../scss/common.scss%22,%22../../scss/root.scss%22,%22../../scss/vars.scss%22%5D,%22names%22:%5B%5D,%22mappings%22:%22AAAA;EACE;AAAgC;;;ACMlC;EACE,aCIY;EDHZ,QCNc;;;ADShB;EACE,OAViB;;AAWjB;EACE,OAVe;;AAaf;EACE;;;AAKN;EACE,OCvBW;;;AD0Bb;EACE;;;AAGF;EACE;;;AAGF;EACE;EACA,OCtCY;EDuCZ;;;AAGF;EACE;EACA;;;AAGF;EACE;EACA;EACA;;;AAGF;EACE;EACA;;;AAGF;EACE;;;AAGF;EACE;;;AAGF;EACE;;;AAGF;EACE;IACE;;;AAIJ;EACE;IACE;;;AAIJ;EACE;IACE;;;AAIJ;EACE;IACE;IACA%22,%22file%22:%22root.css%22%7D */
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22../../scss/common.scss%22,%22../../scss/root.scss%22,%22../../scss/vars.scss%22%5D,%22names%22:%5B%5D,%22mappings%22:%22AAAA;EACE;AAAgC;;;ACOlC;EACE,aCGY;EDFZ,QCPc;;;ADUhB;EACE,OAXiB;;AAYjB;EACE,OAXe;;AAcf;EACE;;;AAKN;EACE,OCxBW;;;AD2Bb;EACE;;;AAGF;EACE;;;AAGF;EACE;EACA,OCvCY;EDwCZ;;;AAGF;EACE,WAtCsB;EAuCtB;;;AAGF;EACE;EACA;;;AAGF;EACE;EACA;EACA;;;AAGF;EACE;EACA;;;AAGF;EACE;;;AAGF;EACE;;;AAGF;EACE;;;AAGF;EACE;IACE;;;AAIJ;EACE;IACE;;;AAIJ;EACE;IACE;;;AAIJ;EACE;IACE;IACA%22,%22file%22:%22root.css%22%7D */

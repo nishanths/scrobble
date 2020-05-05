@@ -4,6 +4,7 @@
 $focus-link-color: #0073AA;
 $unfocus-link-color: $meta-color;
 $hover-link-color: #0073AA;
+$text-font-size-larger: 17px;
 
 body {
   font-family: $font-family;
@@ -38,6 +39,11 @@ a {
   margin: 0 auto;
   color: $muted-color;
   padding: 0 12px;
+}
+
+.larger {
+  font-size: $text-font-size-larger;
+  line-height: 1.4rem;
 }
 
 .content {
@@ -89,6 +95,6 @@ img {
 @media screen and (min-width: 915px) {
   .Root {
     width: 60%;
-    max-width: 590px;
+    max-width: 650px;
   }
 }

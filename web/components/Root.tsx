@@ -76,10 +76,10 @@ export class Root extends React.Component<RootProps, { account: Account }> {
     return <div className="Root">
       <div className="heading">
         <h1><strong>scrobble</strong></h1>
-        <p>Music scrobbling for Apple Music.</p>
+        <p className="larger">Music scrobbling for Apple Music.</p>
       </div>
 
-      <div className="content">
+      <div className="content larger">
         {this.state.account.username && <section>
           {this.profile()}
         </section>}
