@@ -27,7 +27,7 @@ The profile page displays scrobbled songs.
 
 You can filter by "All" (which displays all scrobbled songs), "Loved" (which displays songs liked on Apple Music), or "By color" (which displays scrobbled songs by artwork color).
 
-![segmented control](http://imgur.com/Cz2v327l.png)
+![segmented control](https://imgur.com/Cz2v327l.png)
 
 ## The macOS menu bar application
 
