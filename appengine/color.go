@@ -139,11 +139,10 @@ func (s *server) artworkColorHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	// if there was a ErrNoSuchEntity we need to omit those songs.
+	// omit items that correspond to ErrNoSuchEntity.
 	var foundSongs []Song
 	if err != nil {
-		merr, _ := err.(datastore.MultiError)
+		merr := err.(datastore.MultiError)
 		for i, e := range merr {
 			if e == nil {
 				foundSongs = append(foundSongs, songs[i])
