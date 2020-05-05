@@ -161,10 +161,7 @@ func (s *server) artworkColorHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(rsp); err != nil {
-		log.Errorf("failed to write response: %v", err.Error())
-	}
+	writeSuccessRsp(rsp)
 }
 
 func isAllErrNoSuchEntity(err error) bool {

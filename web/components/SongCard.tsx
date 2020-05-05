@@ -5,7 +5,9 @@ import { dateDisplay } from "../shared/time"
 interface SongCardProps {
   song: Song; // rendering degrades gracefully if properties are missing
   artworkBaseURL: string;
-  useAlbumAsTitle: boolean; // use album instead of song title in the title areas when rendering
+  // album-centric instead of song-centric
+  // e.g. use album instead of song title in the title areas
+  albumCentric: boolean;
 
   showDate: boolean
   now?: () => Date // required if showDates is true
@@ -14,7 +16,7 @@ interface SongCardProps {
 export const SongCard: React.StatelessComponent<SongCardProps> = ({
   song,
   artworkBaseURL,
-  useAlbumAsTitle,
+  albumCentric,
   showDate,
   now
 }) => {
@@ -27,7 +29,7 @@ export const SongCard: React.StatelessComponent<SongCardProps> = ({
   const artworkURL = song.artworkHash ? artworkBaseURL + "/" + song.artworkHash : "";
 
   const trackViewURL = (() => {
-    if (useAlbumAsTitle && song.trackViewURL != "") {
+    if (albumCentric && song.trackViewURL != "") {
       // clear song portion (aka query string), so that link goes to album
       // e.g. https://music.apple.com/us/album/crystalised/329481191?i=329481203&uo=4
       try {
@@ -50,7 +52,7 @@ export const SongCard: React.StatelessComponent<SongCardProps> = ({
   const tooltip = (() => {
     const s = song
 
-    if (useAlbumAsTitle) {
+    if (albumCentric) {
       let tooltip = ""
       if (s.artistName || s.albumTitle) {
         if (s.artistName) { tooltip += s.artistName }
@@ -79,7 +81,7 @@ export const SongCard: React.StatelessComponent<SongCardProps> = ({
     const s = song
     return <div className="meta" title={tooltip}>
       <div className="title">
-        <span className="titleContent">{useAlbumAsTitle ? s.albumTitle : s.title}</span>
+        <span className="titleContent">{albumCentric ? s.albumTitle : s.title}</span>
         {s.loved && <span className="love"></span>}
       </div>
       <div className="other">

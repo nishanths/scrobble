@@ -24,13 +24,13 @@ a.danger:hover {
   padding: 0 12px;
 }
 
-Root.theme-black a {
+.Root.theme-black a {
   color: black;
 }
-Root.theme-black a:hover {
+.Root.theme-black a:hover {
   color: black;
 }
-Root.theme-black a.danger:hover {
+.Root.theme-black a.danger:hover {
   color: #FF4136;
 }
 

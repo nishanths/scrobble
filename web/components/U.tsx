@@ -248,7 +248,7 @@ export const U: React.FC<UProps> = ({
           <Songs
             songs={itemsToShow}
             artworkBaseURL={artworkBaseURL}
-            useAlbumAsTitle={false}
+            albumCentric={false}
             more={scrobbles.total! - itemsToShow.length}
             // "showing all songs that are available on the client" && "more number of songs present for the user "
             showMoreCard={(itemsToShow.length === scrobbles.items.length) && (scrobbles.total! > scrobbles.items.length)}
@@ -266,7 +266,7 @@ export const U: React.FC<UProps> = ({
           <Songs
             songs={itemsToShow}
             artworkBaseURL={artworkBaseURL}
-            useAlbumAsTitle={true}
+            albumCentric={true}
             showMoreCard={false}
             showDates={false}
           />
