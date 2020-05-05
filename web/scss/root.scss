@@ -26,13 +26,14 @@ a {
 
 body.theme-black {
   a {
-  color: black;
-  &:hover {
     color: black;
-  }
-  &.danger {
     &:hover {
-      color: $danger-link-color;
+      color: black;
+    }
+    &.danger {
+      &:hover {
+        color: $danger-link-color;
+      }
     }
   }
 }
