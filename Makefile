@@ -64,3 +64,10 @@ _bootstrap:
 .PHONY: dev
 dev: bindata go
 	cd appengine && ./main
+
+.PHONY: test
+test: go-test
+
+.PHONY: go-test
+go-test:
+	cd appengine && go test -race ./...
