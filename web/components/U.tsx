@@ -166,7 +166,7 @@ export const U: React.FC<UProps> = ({
   const header = <Header username={profileUsername} signedIn={!!logoutURL} />
 
   const colorPicker = <div className="colorPicker">
-    <ColorPicker initialSelection={color} prompt="Pick a color to see artwork of that color." afterSelect={(c) => { setColor(c) }} />
+    <ColorPicker initialSelection={color} prompt="Pick a color to see scrobbled artwork of that color." afterSelect={(c) => { setColor(c) }} />
   </div>
 
   const top = <>
