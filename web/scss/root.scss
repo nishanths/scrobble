@@ -24,7 +24,13 @@ a {
   }
 }
 
-body.theme-black {
+.Root {
+  margin: 0 auto;
+  color: $muted-color;
+  padding: 0 12px;
+}
+
+Root.theme-black {
   a {
     color: black;
     &:hover {
@@ -48,12 +54,6 @@ body.theme-black {
 
 .hidden {
   display: none !important;
-}
-
-.Root {
-  margin: 0 auto;
-  color: $muted-color;
-  padding: 0 12px;
 }
 
 .larger {

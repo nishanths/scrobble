@@ -18,13 +18,19 @@ a.danger:hover {
   color: #FF4136;
 }
 
-body.theme-black a {
+.Root {
+  margin: 0 auto;
+  color: #333;
+  padding: 0 12px;
+}
+
+Root.theme-black a {
   color: black;
 }
-body.theme-black a:hover {
+Root.theme-black a:hover {
   color: black;
 }
-body.theme-black a.danger:hover {
+Root.theme-black a.danger:hover {
   color: #FF4136;
 }
 
@@ -38,12 +44,6 @@ body.theme-black a.danger:hover {
 
 .hidden {
   display: none !important;
-}
-
-.Root {
-  margin: 0 auto;
-  color: #333;
-  padding: 0 12px;
 }
 
 .larger {
@@ -101,4 +101,4 @@ img {
   }
 }
 
-/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22../../scss/common.scss%22,%22../../scss/root.scss%22,%22../../scss/vars.scss%22%5D,%22names%22:%5B%5D,%22mappings%22:%22AAAA;EACE;AAAgC;;;ACQlC;EACE,aCEY;EDDZ,QCRc;;;ADWhB;EACE,OAZiB;;AAajB;EACE,OAZe;;AAef;EACE,OAfc;;;AAqBlB;EACE;;AACA;EACE;;AAGA;EACE,OA5BY;;;AAkCpB;EACE,OCvCW;;;AD0Cb;EACE;;;AAGF;EACE;;;AAGF;EACE;EACA,OCtDY;EDuDZ;;;AAGF;EACE,WApDsB;EAqDtB;;;AAGF;EACE;EACA;;;AAGF;EACE;EACA;EACA;;;AAGF;EACE;EACA;;;AAGF;EACE;;;AAGF;EACE;;;AAGF;EACE;;;AAGF;EACE;IACE;;;AAIJ;EACE;IACE;;;AAIJ;EACE;IACE;;;AAIJ;EACE;IACE;IACA%22,%22file%22:%22root.css%22%7D */
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22../../scss/common.scss%22,%22../../scss/root.scss%22,%22../../scss/vars.scss%22%5D,%22names%22:%5B%5D,%22mappings%22:%22AAAA;EACE;AAAgC;;;ACQlC;EACE,aCEY;EDDZ,QCRc;;;ADWhB;EACE,OAZiB;;AAajB;EACE,OAZe;;AAef;EACE,OAfc;;;AAoBpB;EACE;EACA,OC5BY;ED6BZ;;;AAIA;EACE;;AACA;EACE;;AAGA;EACE,OAlCY;;;AAwCpB;EACE,OC7CW;;;ADgDb;EACE;;;AAGF;EACE;;;AAGF;EACE,WApDsB;EAqDtB;;;AAGF;EACE;EACA;;;AAGF;EACE;EACA;EACA;;;AAGF;EACE;EACA;;;AAGF;EACE;;;AAGF;EACE;;;AAGF;EACE;;;AAGF;EACE;IACE;;;AAIJ;EACE;IACE;;;AAIJ;EACE;IACE;;;AAIJ;EACE;IACE;IACA%22,%22file%22:%22root.css%22%7D */
