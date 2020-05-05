@@ -27,7 +27,7 @@ deploy:
 
 .PHONY: bindata
 bindata:
-	go-bindata -pkg=main -o=appengine/gen-template.go appengine/template appengine/helpguide.md
+	go-bindata -pkg=main -o=appengine/gen-bindata.go appengine/template appengine/helpguide.md
 
 .PHONY: dev-deps
 dev-deps:
