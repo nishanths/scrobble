@@ -410,7 +410,7 @@ func ptrStruct() *struct{} {
 	return &struct{}{}
 }
 
-const privacyPolicy = `Your privacy is important to us. It is allele's policy to respect your
+const privacyPolicy = `Your privacy is important to us. It is littleroot's policy to respect your
 privacy regarding any information we may collect from you across our
 website, https://scrobble.littleroot.org, and other sites we own and operate.
 
