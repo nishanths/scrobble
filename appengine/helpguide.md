@@ -13,13 +13,13 @@ The service consists of two parts:
 
 To begin scrobbling songs:
 
-1. visit the web app at https://scrobble.allele.cc;
+1. visit the web app at https://scrobble.littleroot.org;
 1. sign in with Google and pick your username;
 1. copy the API key;
 1. download the [macOS app][macos];
 1. enter the copied API key in the macOS app.
 
-Your scrobbled songs can be seen at `https://scrobble.allele.cc/u/username`.
+Your scrobbled songs can be seen at `https://scrobble.littleroot.org/u/username`.
 
 ## The profile page
 

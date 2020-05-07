@@ -43,11 +43,11 @@ struct State {
 
 struct Constants {
     static let BaseUrl = "selective-scrobble.appspot.com"
-    static let HelpLink = "https://scrobble.allele.cc"
+    static let HelpLink = "https://scrobble.littleroot.org"
 }
 
 func profileLink(_ username: String) -> String {
-    return String(format: "https://scrobble.allele.cc/u/%@", username)
+    return String(format: "https://scrobble.littleroot.org/u/%@", username)
 }
 
 @NSApplicationMain

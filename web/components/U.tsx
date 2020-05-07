@@ -55,7 +55,7 @@ type UProps = UArgs & {
 declare var NProgress: NProgress
 
 // U is the root component for the username page, e.g.,
-// https://scrobble.allele.cc/u/whatever.
+// https://scrobble.littleroot.org/u/whatever.
 export const U: React.FC<UProps> = ({
   host,
   artworkBaseURL,
