@@ -809,10 +809,18 @@ func (s *server) artworkHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	if _, err := s.ds.Put(ctx, artwork.ArtworkRecordKey(namespace, hash), &artwork.ArtworkRecord{
-		Score: artworkScore,
+	if _, err := s.ds.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
+		var ar artwork.ArtworkRecord
+		if err := tx.Get(artwork.ArtworkRecordKey(namespace, hash), &ar); err != nil {
+			return errors.Wrapf(err, "failed datastore get")
+		}
+		ar.Score = artworkScore
+		if _, err := tx.Put(artwork.ArtworkRecordKey(namespace, hash), &ar); err != nil {
+			return errors.Wrapf(err, "failed datastore put")
+		}
+		return nil
 	}); err != nil {
-		log.Errorf("failed datastore put: %v", err.Error())
+		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
