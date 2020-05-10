@@ -388,37 +388,38 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         }
     }
     
-    private var alert: NSAlert? = nil
-    private var textField: NSTextField? = nil
+    private var alert: NSAlert! = nil
+    private var textField: NSTextField! = nil
     private var oldOkButtonTarget: AnyObject? = nil
     private var oldOkButtonAction: Selector? = nil
     
     @objc private func enterAPIKeyAction(_ sender: Any?) {
         alert = NSAlert()
-        alert!.alertStyle = .informational
-        alert!.messageText = "Enter API Key"
-        alert!.showsSuppressionButton = false
-        alert!.showsHelp = true
-        alert!.delegate = self
+        alert.alertStyle = .informational
+        alert.messageText = "Enter API Key"
+        alert.showsSuppressionButton = false
+        alert.showsHelp = true
+        alert.delegate = self
         
-        let okButton = alert!.addButton(withTitle: "OK")
+        let okButton = alert.addButton(withTitle: "OK")
         oldOkButtonTarget = okButton.target
         oldOkButtonAction = okButton.action
         okButton.target = self
         okButton.action = #selector(okButtonAction(_:))
-        alert!.addButton(withTitle: "Cancel")
+        alert.addButton(withTitle: "Cancel")
         
         textField = NSTextField(frame: NSMakeRect(0, 0, 250, NSFont.systemFontSize * 1.8))
-        textField!.usesSingleLineMode = true
-        textField!.cell?.wraps = false
-        textField!.cell?.isScrollable = false
-        textField!.delegate = self
-        textField!.font = NSFont(name: "Menlo", size: NSFont.systemFontSize)
-        textField!.placeholderString = "D1A3903GB"
-        alert!.accessoryView = textField
-        alert!.window.initialFirstResponder = alert!.accessoryView
+        textField.usesSingleLineMode = true
+        textField.cell?.wraps = false
+        textField.cell?.isScrollable = false
+        textField.delegate = self
+        textField.font = NSFont(name: "Menlo", size: NSFont.systemFontSize)
+        textField.placeholderString = "D1A3903GB"
+        alert.accessoryView = textField
+        alert.window.initialFirstResponder = alert.accessoryView
+        alert.window.makeKey()
         
-        alert!.runModal()
+        alert.runModal()
     }
     
     func alertShowHelp(_ alert: NSAlert) -> Bool {
@@ -435,7 +436,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
     }
     
     @objc private func okButtonAction(_ sender: Any?) {
-        let key = textField!.stringValue
+        let key = textField.stringValue
         if key.isEmpty {
             return
         }
@@ -461,19 +462,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                         return
                     } else if rr.statusCode == 404 {
                         DispatchQueue.main.async {
-                            self.alert!.informativeText = String(format: "Invalid API Key.")
+                            self.alert.informativeText = String(format: "Invalid API Key.")
                         }
                         return
                     }
                     // any other status code
                     DispatchQueue.main.async {
-                        self.alert!.informativeText = String(format: "Something went wrong but not on your end.")
+                        self.alert.informativeText = String(format: "Something went wrong but not on your end.")
                     }
                 }
             }
             
             DispatchQueue.main.async {
-                self.alert!.informativeText = String(format: "Something went wrong. Try again?")
+                self.alert.informativeText = String(format: "Something went wrong. Try again?")
             }
         }
         task.resume()
