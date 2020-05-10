@@ -643,6 +643,22 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		for k := range removeHashes {
 			keys = append(keys, artwork.ArtworkRecordKey(namespace, k))
 		}
+		// Delete artwork records.
+		{
+			s := 0
+			e := min(s+datastoreLimitPerOp, len(keys))
+			keysChunk := keys[s:e]
+
+			for len(keysChunk) > 0 {
+				if err := svr.ds.DeleteMulti(ctx, keysChunk); err != nil {
+					return err
+				}
+
+				s = e
+				e = min(s+datastoreLimitPerOp, len(keys))
+				keysChunk = keys[s:e]
+			}
+		}
 		return svr.ds.DeleteMulti(ctx, keys)
 	})
 	if err := g.Wait(); err != nil {
