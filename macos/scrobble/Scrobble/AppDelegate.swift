@@ -131,7 +131,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
     private func makeMenu() -> NSMenu {
         let m = NSMenu()
         
-        let v = NSMenuItem(title: String(format: "itunes-scrobble v%@", AppDelegate.shortVersion), action: nil, keyEquivalent: "")
+        let v = NSMenuItem(title: String(format: "Scrobble version %@", AppDelegate.shortVersion), action: nil, keyEquivalent: "")
         v.isEnabled = false
         
         m.addItem(pauseItem)
