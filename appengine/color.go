@@ -135,7 +135,7 @@ func (s *server) artworkColorHandler(w http.ResponseWriter, r *http.Request) {
 	songs := make([]Song, len(songKeys))
 	err = s.ds.GetMulti(ctx, songKeys, songs)
 	if err != nil && !isAllErrNoSuchEntity(err) {
-		log.Errorf("failed to songs: %s", err)
+		log.Errorf("failed to get songs: %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
