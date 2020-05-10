@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:itunes-scrobble.xcodeproj">
+      location = "self:/Users/nishanthshanmugham/src/scrobble/macos/itunes-scrobble/Scrobble.xcodeproj">
    </FileRef>
 </Workspace>

@@ -1,6 +1,6 @@
 //
 //  API.swift
-//  itunes-scrobble
+//  Scrobble
 //
 //  Created by Nishanth Shanmugham on 8/28/18.
 //  Copyright © 2018 Nishanth Shanmugham. All rights reserved.

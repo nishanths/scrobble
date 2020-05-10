@@ -1,6 +1,6 @@
 //
 //  AppDelegate.swift
-//  itunes-scrobble
+//  Scrobble
 //
 //  Created by Nishanth Shanmugham on 8/26/18.
 //  Copyright © 2018 Nishanth Shanmugham. All rights reserved.
@@ -52,7 +52,7 @@ func profileLink(_ username: String) -> String {
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlertDelegate {
-    private static let menuIconName = "itunes-scrobble-18x18" // size from https://stackoverflow.com/a/33708433
+    private static let menuIconName = "scrobble-18x18" // size from https://stackoverflow.com/a/33708433
     private static let shortVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     
     // Keys for information saved to UserDefaults.
