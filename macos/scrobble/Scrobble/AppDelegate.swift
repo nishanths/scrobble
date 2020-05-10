@@ -80,7 +80,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                               scrobbling: false,
                               error: nil)
     
-    private var lib: ITLibrary? = nil
+    private var lib: ITLibrary! = nil
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         if let l = try? ITLibrary.init(apiVersion: "1.0") {
@@ -237,11 +237,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         }
     
         state.scrobbling = true
-        lib!.reloadData()
+        lib.reloadData()
         render()
         
-        var (items, latest) = scrobblableItems(from: lib!.allMediaItems)
-        let loved = lovedItems(in: lib!)
+        var (items, latest) = scrobblableItems(from: lib.allMediaItems)
+        let loved = lovedItems(in: lib)
         for idx in 0..<items.count {
             if loved.contains(items[idx]) {
                 items[idx].loved = true
@@ -276,7 +276,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                     self.state.error = nil
                     self.render()
                 }
-                self.handleArtwork(self.lib!)
+                self.handleArtwork(self.lib)
                 return
             }
             // any other status code
