@@ -83,22 +83,26 @@ func run(ctx context.Context) error {
 		secret:     secret,
 	}
 
+	webMiddleware := func(h http.Handler) http.Handler {
+		return withHTTPS(withAlleleRedirect(h))
+	}
+
 	// Register handlers.
 	if isDev() {
 		http.HandleFunc("/", devRootHandler)
 		http.HandleFunc("/u/", devUHandler)
 	} else {
-		http.Handle("/", withHTTPS(http.HandlerFunc(s.rootHandler)))
-		http.Handle("/u/", withHTTPS(http.HandlerFunc(s.uHandler)))
+		http.Handle("/", webMiddleware(http.HandlerFunc(s.rootHandler)))
+		http.Handle("/u/", webMiddleware(http.HandlerFunc(s.uHandler)))
 	}
-	http.Handle("/initializeAccount", withHTTPS(http.HandlerFunc(s.initializeAccountHandler)))
-	http.Handle("/newAPIKey", withHTTPS(http.HandlerFunc(s.newAPIKeyHandler)))
-	http.Handle("/setPrivacy", withHTTPS(http.HandlerFunc(s.setPrivacyHandler)))
-	http.Handle("/login", withHTTPS(http.HandlerFunc(s.loginHandler)))
-	http.Handle("/googleAuth", withHTTPS(http.HandlerFunc(s.googleAuthHandler)))
-	http.Handle("/logout", withHTTPS(http.HandlerFunc(s.logoutHandler)))
-	http.Handle("/guide", withHTTPS(http.HandlerFunc(s.helpGuideHandler)))
-	http.Handle("/privacy-policy", withHTTPS(http.HandlerFunc(s.privacyPolicyHandler)))
+	http.Handle("/initializeAccount", webMiddleware(http.HandlerFunc(s.initializeAccountHandler)))
+	http.Handle("/newAPIKey", webMiddleware(http.HandlerFunc(s.newAPIKeyHandler)))
+	http.Handle("/setPrivacy", webMiddleware(http.HandlerFunc(s.setPrivacyHandler)))
+	http.Handle("/login", webMiddleware(http.HandlerFunc(s.loginHandler)))
+	http.Handle("/googleAuth", webMiddleware(http.HandlerFunc(s.googleAuthHandler)))
+	http.Handle("/logout", webMiddleware(http.HandlerFunc(s.logoutHandler)))
+	http.Handle("/guide", webMiddleware(http.HandlerFunc(s.helpGuideHandler)))
+	http.Handle("/privacy-policy", webMiddleware(http.HandlerFunc(s.privacyPolicyHandler)))
 
 	if isDev() {
 		http.HandleFunc("/api/v1/scrobbled", devScrobbledHandler)
@@ -154,6 +158,18 @@ func maybeRedirectHTTPS(w http.ResponseWriter, r *http.Request) bool {
 	u.Scheme = "https"
 	http.Redirect(w, r, u.String(), http.StatusTemporaryRedirect)
 	return true
+}
+
+func withAlleleRedirect(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Host == "scrobble.allele.cc" {
+			u := *r.URL
+			u.Host = "scrobble.littleroot.org"
+			http.Redirect(w, r, u.String(), http.StatusFound)
+			return
+		}
+		h.ServeHTTP(w, r)
+	})
 }
 
 func drainAndClose(r io.ReadCloser) {
