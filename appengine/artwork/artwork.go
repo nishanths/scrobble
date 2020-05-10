@@ -72,7 +72,7 @@ func Swatches(swatches []*vibrant.Swatch) []Swatch {
 
 	out := make([]Swatch, len(swatches))
 	for i, s := range swatches {
-		perMile := int(float64(s.Population()) / total * 1000) // percentage of total, but using 1000 instead of 100
+		perMile := int(float64(s.Population()) * 1000 / total) // percentage of total, but using 1000 instead of 100
 		hsl := vibrant.HSLModel.Convert(s.Color()).(vibrant.HSL)
 		out[i] = Swatch{
 			Color:      HSL{hsl.H, hsl.S, hsl.L, int(hsl.A)},
