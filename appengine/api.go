@@ -659,7 +659,6 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 				keysChunk = keys[s:e]
 			}
 		}
-		return svr.ds.DeleteMulti(ctx, keys)
 	})
 	if err := g.Wait(); err != nil {
 		log.Errorf("%v", err.Error())
