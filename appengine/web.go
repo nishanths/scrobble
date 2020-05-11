@@ -141,7 +141,7 @@ func (s *server) uHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c := pathComponents(r.URL.Path)
-	if len(c) < 2 || len(c) > 4 {
+	if len(c) < 2 || len(c) > 6 {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
