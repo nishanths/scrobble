@@ -11,6 +11,9 @@ import { State } from "../redux/types/u"
 import { fetchAllScrobbles, fetchLovedScrobbles, fetchColorScrobbles } from "../redux/actions/scrobbles"
 import { useStateRef } from "../shared/hooks"
 import "../scss/u.scss"
+import "../scss/detail-modal.scss"
+import 'react-responsive-modal/styles.css';
+import { Modal } from 'react-responsive-modal';
 
 export enum DetailKind {
   Song, Album
@@ -93,6 +96,7 @@ export const U: React.FC<UProps> = ({
   const limit = 504; // moreIncrement * 14
 
   const dispatch = useDispatch()
+  const detailPresent = detail !== undefined
   const [endIdx, endIdxRef, setEndIdx] = useStateRef(0)
   const [lastColor, setLastColor] = useState(color) // save latest color when switching between other modes
   useEffect(() => {
@@ -153,6 +157,10 @@ export const U: React.FC<UProps> = ({
   }, [scrobbles, mode])
 
   useEffect(() => {
+    if (detailPresent) {
+      return
+    }
+
     const s = scrobblesRef.current
 
     switch (mode) {
@@ -181,7 +189,7 @@ export const U: React.FC<UProps> = ({
         assertExhaustive(mode)
       }
     }
-  }, [profileUsername, mode, color])
+  }, [profileUsername, mode, color, detail])
 
   useEffect(() => {
     const f = () => {
@@ -223,6 +231,16 @@ export const U: React.FC<UProps> = ({
     {mode === Mode.Color && colorPicker}
   </>
 
+  const detailModal =  <Modal
+    open={detailPresent}
+    onClose={() => { history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(color)) }}
+    center
+    classNames={{ modal: "detailModal", overlay: "detailOverlay", closeIcon: "detailCloseIcon" }}
+    closeOnEsc={true}
+    animationDuration={500}>
+    <div>foo</div>
+  </Modal>
+
   // Easy case. For private accounts that aren't the current user, render the
   // private info-message.
   if (priv === true && self === false) {
@@ -230,6 +248,10 @@ export const U: React.FC<UProps> = ({
       {header}
       <div className="info">(This user's scrobbles are private.)</div>
     </>
+  }
+
+  if (detailPresent) {
+    return <>{detailModal}</>
   }
 
   // If in the Color mode and no color is selected, render the top area and
@@ -284,10 +306,6 @@ export const U: React.FC<UProps> = ({
   switch (mode) {
     case Mode.All:
     case Mode.Loved: {
-      if (detail !== undefined) {
-        console.log(detail)
-        return <>{top}</>
-      }
       return <>
         {top}
         <div className="songs">
@@ -306,10 +324,6 @@ export const U: React.FC<UProps> = ({
     }
 
     case Mode.Color: {
-      if (detail !== undefined) {
-        console.log(detail)
-        return <>{top}</>
-      }
       return <>
         {top}
         <div className="songs">

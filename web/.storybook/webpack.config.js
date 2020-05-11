@@ -24,6 +24,14 @@ module.exports = ({ config }) => {
       { loader: "sass-loader", options: { sourceMap: true }} // compiles Sass to CSS
     ]
   });
+  config.module.rules.push({
+    test: /\.css$/,
+    use: [
+      // creates style nodes from JS strings
+      { loader: "style-loader" },
+      { loader: "css-loader", options: { sourceMap: true }}, // translates CSS into CommonJS
+    ]
+  });
   config.resolve.extensions.push('.ts', '.tsx');
   return config;
 };

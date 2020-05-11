@@ -32,6 +32,14 @@ module.exports = {
           { loader: "css-loader", options: { sourceMap: true }}, // translates CSS into CommonJS
           { loader: "sass-loader", options: { sourceMap: true }} // compiles Sass to CSS
         ]
+      },
+      {
+        test: /\.css$/,
+        use: [
+          // creates style nodes from JS strings
+          { loader: process.env.NODE_ENV !== "production" ? "style-loader" : MiniCssExtractPlugin.loader },
+          { loader: "css-loader", options: { sourceMap: true }}, // translates CSS into CommonJS
+        ]
       }
     ]
   },
