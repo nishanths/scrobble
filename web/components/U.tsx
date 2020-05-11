@@ -189,7 +189,7 @@ export const U: React.FC<UProps> = ({
         assertExhaustive(mode)
       }
     }
-  }, [profileUsername, mode, color, detail])
+  }, [profileUsername, mode, color, detailPresent])
 
   useEffect(() => {
     const f = () => {
@@ -231,16 +231,6 @@ export const U: React.FC<UProps> = ({
     {mode === Mode.Color && colorPicker}
   </>
 
-  const detailModal =  <Modal
-    open={detailPresent}
-    onClose={() => { history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(color)) }}
-    center
-    classNames={{ modal: "detailModal", overlay: "detailOverlay", closeIcon: "detailCloseIcon" }}
-    closeOnEsc={true}
-    animationDuration={500}>
-    <div className="flexContainer">foo</div>
-  </Modal>
-
   // Easy case. For private accounts that aren't the current user, render the
   // private info-message.
   if (priv === true && self === false) {
@@ -251,6 +241,19 @@ export const U: React.FC<UProps> = ({
   }
 
   if (detailPresent) {
+    const modalContent = <div className="flexContainer">{detail!.ident}
+    </div>
+
+    const detailModal =  <Modal
+      open={detailPresent}
+      onClose={() => { history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(color)) }}
+      center
+      classNames={{ modal: "detailModal", overlay: "detailOverlay", closeIcon: "detailCloseIcon" }}
+      closeOnEsc={true}
+      animationDuration={500}>
+      {modalContent}
+    </Modal>
+
     return <>{detailModal}</>
   }
 
