@@ -1,6 +1,28 @@
+@import "vars.scss";
+
 .detailOverlay {
-	background: white !important;
+  background: white !important;
 }
 
 .detailModal {
+  width: 85%;
+  height: 85%;
+  max-width: 1200px !important;
+  max-height: 1000px;
+  box-shadow: none !important;
+
+  .flexContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+}
+
+.detailCloseIcon {
+  width: 56px;
+  height: 56px;
+  path {
+    fill: $meta-color;
+  }
 }

@@ -238,7 +238,7 @@ export const U: React.FC<UProps> = ({
     classNames={{ modal: "detailModal", overlay: "detailOverlay", closeIcon: "detailCloseIcon" }}
     closeOnEsc={true}
     animationDuration={500}>
-    <div>foo</div>
+    <div className="flexContainer">foo</div>
   </Modal>
 
   // Easy case. For private accounts that aren't the current user, render the
