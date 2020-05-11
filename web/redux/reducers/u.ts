@@ -1,11 +1,14 @@
 import { combineReducers } from "redux"
 import { allScrobblesReducer, lovedScrobblesReducer, colorScrobblesReducer } from "./scrobbles"
+import { songReducer } from "./song"
 import { uargsReducer } from "./uargs"
 
 const reducer = combineReducers({
   allScrobbles: allScrobblesReducer,
   lovedScrobbles: lovedScrobblesReducer,
   colorScrobbles: colorScrobblesReducer,
+
+  songs: songReducer,
 
   // TODO: is there a better way to specify a no-op reducer for the read-only
   // preloadedState property uargs?

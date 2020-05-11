@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux";
 import { RouteComponentProps, Redirect } from "react-router-dom";
 import { UArgs, Song, NProgress } from "../shared/types"
-import { trimPrefix, assertExhaustive, pathComponents, assert } from "../shared/util"
+import { trimPrefix, assertExhaustive, pathComponents, assert, hexDecode, hexEncode } from "../shared/util"
 import { Header } from "./Header"
 import { Songs } from "./Songs"
 import { SegmentedControl } from "./SegmentedControl"
@@ -10,6 +10,7 @@ import { CloseIcon } from "./CloseIcon"
 import { Color, ColorPicker } from "./colorpicker"
 import { State } from "../redux/types/u"
 import { fetchAllScrobbles, fetchLovedScrobbles, fetchColorScrobbles } from "../redux/actions/scrobbles"
+import { fetchSong } from "../redux/actions/song"
 import { useStateRef } from "../shared/hooks"
 import "../scss/u.scss"
 import "../scss/detail-modal.scss"
@@ -68,7 +69,7 @@ type UProps = UArgs & {
   color?: Color
   detail?: {
     kind: DetailKind
-    ident: string // hex-encoded song ident
+    hexIdent: string // hex-encoded song ident
   }
 } & RouteComponentProps;
 
@@ -97,7 +98,6 @@ export const U: React.FC<UProps> = ({
   const limit = 504; // moreIncrement * 14
 
   const dispatch = useDispatch()
-  const detailPresent = detail !== undefined
   const [endIdx, endIdxRef, setEndIdx] = useStateRef(0)
   const [lastColor, setLastColor] = useState(color) // save latest color when switching between other modes
   useEffect(() => {
@@ -141,6 +141,16 @@ export const U: React.FC<UProps> = ({
   const scrobblesRef = useRef(scrobbles)
   useEffect(() => { scrobblesRef.current = scrobbles }, [scrobbles])
 
+  const detailSong = useSelector((s: State) => {
+    if (detail === undefined) {
+      return null
+    }
+    const key = hexDecode(detail.hexIdent)
+    return s.songs.getOrDefault(key)
+  })
+  const detailSongRef = useRef(detailSong)
+  useEffect(() => { detailSongRef.current = detailSong }, [detailSong])
+
   const nextEndIdx = (currentEndIdx: number, total: number): number => {
     // increment, but don't go over the number of items itself
     const b = Math.min(currentEndIdx + moreIncrement, total)
@@ -158,7 +168,7 @@ export const U: React.FC<UProps> = ({
   }, [scrobbles, mode])
 
   useEffect(() => {
-    if (detailPresent) {
+    if (detail !== undefined) {
       return
     }
 
@@ -181,7 +191,7 @@ export const U: React.FC<UProps> = ({
         if (color === undefined) {
           break
         }
-        if (s === null || (s!.done === false && s!.fetching === false) || s!.error === true) {
+        if (s === null || (s.done === false && s.fetching === false) || s.error === true) {
           dispatch(fetchColorScrobbles(color, profileUsername))
         }
         break
@@ -190,7 +200,17 @@ export const U: React.FC<UProps> = ({
         assertExhaustive(mode)
       }
     }
-  }, [profileUsername, mode, color, detailPresent])
+  }, [profileUsername, mode, color, detail])
+
+  useEffect(() => {
+    if (detail === undefined) {
+      return
+    }
+    const s = detailSongRef.current
+    if (s === null || (s.done === false && s.fetching === false) || s.error === true) {
+      dispatch(fetchSong(profileUsername, hexDecode(detail.hexIdent)))
+    }
+  }, [profileUsername, detail])
 
   useEffect(() => {
     const f = () => {
@@ -241,12 +261,27 @@ export const U: React.FC<UProps> = ({
     </>
   }
 
-  if (detailPresent) {
-    const modalContent = <div className="flexContainer">{detail!.ident}
+  if (detail !== undefined) {
+    assert(detailSong !== null, "detailSong unexpectedly null")
+
+    if (detailSong.fetching) {
+      NProgress.start()
+    }
+    // handle initial redux state
+    if (detailSong.done === false) {
+      return null
+    }
+    NProgress.done()
+
+    const modalContent = <div className="flexContainer">
+      {detailSong.item!.ident}
     </div>
 
-    const detailModal =  <Modal
-      open={detailPresent}
+    console.log(hexEncode(detailSong.item!.ident))
+    console.log(hexDecode(detail!.hexIdent))
+
+    const modal = <Modal
+      open={true}
       onClose={() => { history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(color)) }}
       center
       classNames={{ modal: "detailModal", overlay: "detailOverlay", closeButton: "detailCloseButton" }}
@@ -256,7 +291,7 @@ export const U: React.FC<UProps> = ({
       {modalContent}
     </Modal>
 
-    return <>{detailModal}</>
+    return <>{modal}</>
   }
 
   // If in the Color mode and no color is selected, render the top area and

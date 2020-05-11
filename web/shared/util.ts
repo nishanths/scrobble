@@ -57,7 +57,7 @@ export function hexDecode(s: string): string {
   let j = 1
   let out = ""
   for (; j < s.length; j += 2) {
-    const a = fromHexChar(s[j-1])
+    const a = fromHexChar(s[j - 1])
     const b = fromHexChar(s[j])
     if (a === null || b === null) {
       throw "invalid byte: " + s
@@ -65,7 +65,7 @@ export function hexDecode(s: string): string {
     out += String.fromCharCode((a.charCodeAt(0) << 4) | b.charCodeAt(0))
   }
   if (s.length % 2 === 1) {
-    if (fromHexChar(s[j-1]) === null) {
+    if (fromHexChar(s[j - 1]) === null) {
       throw "invalid byte: " + s
     }
     throw "bad length: " + s
@@ -90,5 +90,39 @@ export function pathComponents(p: string): string[] {
 export function assert(cond: boolean, message: string = "assertion failed"): asserts cond {
   if (!cond) {
     throw new Error(message)
+  }
+}
+
+export const copyMap = <K, V>(m: Map<K, V>): Map<K, V> => {
+  const n = new Map<K, V>()
+  for (const [key, value] of m.entries()) {
+    n.set(key, value)
+  }
+  return n
+}
+
+export class MapDefault<K, V> {
+  constructor(private readonly def: () => V, private readonly m: Map<K, V> = new Map()) {}
+
+  getOrDefault(key: K): V {
+    const v = this.m.get(key)
+    if (v === undefined) {
+      return this.def()
+    }
+    return v
+  }
+
+  has(key: K): boolean {
+    return this.m.has(key)
+  }
+
+  set(key: K, value: V): this {
+    this.m.set(key, value)
+    return this
+  }
+
+  copy(): MapDefault<K, V> {
+    const s = copyMap(this.m)
+    return new MapDefault(this.def, s)
   }
 }

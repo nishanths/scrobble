@@ -1,6 +1,7 @@
 import { AllScrobblesAction, LovedScrobblesAction, ColorScrobblesAction } from "../actions/scrobbles"
 import { ScrobblesState } from "../types/scrobbles"
 import { Song, ArtworkHash } from "../../shared/types"
+import { copyMap } from "../../shared/util"
 
 const defaultState = (): ScrobblesState => {
   return {
@@ -70,17 +71,17 @@ export const colorScrobblesReducer = (state = defaultColorScrobblesState, action
 
   switch (action.type) {
     case "COLOR_SCROBBLES_START": {
-      const s = copy(state)
+      const s = copyMap(state)
       s.set(color, { ...s.get(color)!, fetching: true, done: false })
       return s
     }
     case "COLOR_SCROBBLES_SUCCESS": {
-      const s = copy(state)
+      const s = copyMap(state)
       s.set(color, { items: action.songs, private: action.private, fetching: false, error: false, done: true })
       return s
     }
     case "COLOR_SCROBBLES_FAIL": {
-      const s = copy(state)
+      const s = copyMap(state)
       s.set(color, { ...s.get(color)!, fetching: false, error: true, done: true })
       return s
     }
@@ -88,12 +89,4 @@ export const colorScrobblesReducer = (state = defaultColorScrobblesState, action
       return state
     }
   }
-}
-
-const copy = (m: ColorScrobblesState): ColorScrobblesState => {
-  const n: ColorScrobblesState = new Map()
-  for (const [key, value] of m.entries()) {
-    n.set(key, value)
-  }
-  return n
 }

@@ -1,9 +1,9 @@
 import { Song } from "../../shared/types"
 
-export type ScrobblesState = {
+export type SongState = {
   fetching: boolean
-  items: Song[]
-  total?: number
+  item: Song | null
+  notFound: boolean
   private: boolean
   error: boolean
   done: boolean
