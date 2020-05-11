@@ -37,6 +37,49 @@ export function base64Decode(s: string): string {
   return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
 }
 
+// hex encoding and decoding implementations adapted from Go package encoding/hex.
+
+const hextable = "0123456789abcdef"
+
+export function hexEncode(s: string): string {
+  let out = "";
+  for (let x = 0; x < s.length; x++) {
+    out += hextable[s[x].charCodeAt(0) >> 4]
+    out += hextable[s[x].charCodeAt(0) & 0x0f]
+  }
+  return out
+}
+
+export function hexDecode(s: string): string {
+  let j = 1
+  let out = ""
+  for (; j < s.length; j += 2) {
+    const a = fromHexChar(s[j-1])
+    const b = fromHexChar(s[j])
+    if (a === null || b === null) {
+      throw "invalid byte: " + s
+    }
+    out += String.fromCharCode((a.charCodeAt(0) << 4) | b.charCodeAt(0))
+  }
+  if (s.length % 2 === 1) {
+    if (fromHexChar(s[j-1]) === null) {
+      throw "invalid byte: " + s
+    }
+    throw "bad length: " + s
+  }
+  return out
+}
+
+function fromHexChar(c: string): string | null {
+  if ('0' <= c && c <= '9') {
+    return String.fromCharCode(c.charCodeAt(0) - '0'.charCodeAt(0))
+  }
+  if ('a' <= c && c <= 'f') {
+    return String.fromCharCode(c.charCodeAt(0) - 'a'.charCodeAt(0) + 10)
+  }
+  return null
+}
+
 export function pathComponents(p: string): string[] {
   return p.split("/").filter(s => s != "")
 }
