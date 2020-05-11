@@ -6,6 +6,7 @@ import { trimPrefix, assertExhaustive, pathComponents, assert } from "../shared/
 import { Header } from "./Header"
 import { Songs } from "./Songs"
 import { SegmentedControl } from "./SegmentedControl"
+import { CloseIcon } from "./CloseIcon"
 import { Color, ColorPicker } from "./colorpicker"
 import { State } from "../redux/types/u"
 import { fetchAllScrobbles, fetchLovedScrobbles, fetchColorScrobbles } from "../redux/actions/scrobbles"
@@ -248,9 +249,10 @@ export const U: React.FC<UProps> = ({
       open={detailPresent}
       onClose={() => { history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(color)) }}
       center
-      classNames={{ modal: "detailModal", overlay: "detailOverlay", closeIcon: "detailCloseIcon" }}
+      classNames={{ modal: "detailModal", overlay: "detailOverlay", closeButton: "detailCloseButton" }}
       closeOnEsc={true}
-      animationDuration={500}>
+      animationDuration={500}
+      closeIcon={CloseIcon}>
       {modalContent}
     </Modal>
 
