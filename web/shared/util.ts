@@ -17,8 +17,11 @@ export function trimPrefix(s: string, prefix: string): string {
   return s
 }
 
-export function assertExhaustive(value: never, message: string = "unexpected value"): never {
-  throw new Error(message + " " + value);
+export function assertExhaustive(value: never, message?: string): never {
+  if (message === undefined) {
+    message = "unexpected value: " + value
+  }
+  throw new Error(message);
 }
 
 // base64Encode encodes the string using base64 standard encoding, i.e.,
