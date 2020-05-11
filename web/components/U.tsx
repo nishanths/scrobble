@@ -47,9 +47,17 @@ const pathForMode = (m: Mode): string => {
   assertExhaustive(m)
 }
 
+const pathForColor = (c: Color | undefined): string => {
+  if (c === undefined) {
+    return ""
+  }
+  return "/" + c
+}
+
 type UProps = UArgs & {
   wnd: Window
   mode: Mode
+  color?: Color
 } & RouteComponentProps;
 
 declare var NProgress: NProgress
@@ -66,6 +74,7 @@ export const U: React.FC<UProps> = ({
   private: priv,
   wnd,
   mode,
+  color,
   history,
 }) => {
   // Divisble by 2, 3, and 4. This is appropriate because these are the number
@@ -76,11 +85,35 @@ export const U: React.FC<UProps> = ({
 
   const dispatch = useDispatch()
   const [endIdx, endIdxRef, setEndIdx] = useStateRef(0)
-  const [color, colorRef, setColor] = useStateRef<Color | undefined>(undefined)
+  const [lastColor, setLastColor] = useState(color) // save latest color when switching between other modes
+  useEffect(() => {
+    if (mode === Mode.Color) {
+      setLastColor(color)
+    }
+  }, [color])
 
   const onControlChange = (newMode: Mode) => {
     NProgress.done()
-    history.push("/u/" + profileUsername + pathForMode(newMode))
+    let u: string;
+    switch (newMode) {
+      case Mode.All:
+      case Mode.Loved:
+        u = "/u/" + profileUsername + pathForMode(newMode)
+        break
+      case Mode.Color:
+        u = "/u/" + profileUsername + pathForMode(newMode) + pathForColor(lastColor)
+        break
+      default:
+        assertExhaustive(newMode)
+    }
+    history.push(u)
+  }
+
+  const onColorChange = (newColor: Color) => {
+    NProgress.done()
+    console.log(newColor)
+    assert(mode === Mode.Color, "mode should be Color")
+    history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(newColor))
   }
 
   const scrobbles = useSelector((s: State) => {
@@ -89,7 +122,7 @@ export const U: React.FC<UProps> = ({
       case Mode.Loved: return s.lovedScrobbles
       case Mode.Color: return color !== undefined ? s.colorScrobbles.get(color)! : null
     }
-    throw assertExhaustive(mode)
+    assertExhaustive(mode)
   })
   const scrobblesRef = useRef(scrobbles)
   useEffect(() => { scrobblesRef.current = scrobbles }, [scrobbles])
@@ -127,16 +160,16 @@ export const U: React.FC<UProps> = ({
         break
       }
       case Mode.Color: {
-        if (colorRef.current === undefined) {
+        if (color === undefined) {
           break
         }
         if (s === null || (s!.done === false && s!.fetching === false) || s!.error === true) {
-          dispatch(fetchColorScrobbles(colorRef.current, profileUsername))
+          dispatch(fetchColorScrobbles(color, profileUsername))
         }
         break
       }
       default: {
-        throw assertExhaustive(mode)
+        assertExhaustive(mode)
       }
     }
   }, [profileUsername, mode, color])
@@ -166,7 +199,7 @@ export const U: React.FC<UProps> = ({
   const header = <Header username={profileUsername} signedIn={!!logoutURL} />
 
   const colorPicker = <div className="colorPicker">
-    <ColorPicker initialSelection={color} prompt="Pick a color to see scrobbled artwork of that color." afterSelect={(c) => { setColor(c) }} />
+    <ColorPicker initialSelection={color} prompt="Pick a color to see scrobbled artwork of that color." afterSelect={(c) => { onColorChange(c) }} />
   </div>
 
   const top = <>

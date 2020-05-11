@@ -80,7 +80,7 @@ func devArtworkColorHandler(w http.ResponseWriter, r *http.Request) {
 	time.Sleep(1 * time.Second)
 
 	data := func() string {
-		b, err := ioutil.ReadFile(filepath.Join(".devdata", "scrobbled_color_blue.json"))
+		b, err := ioutil.ReadFile(filepath.Join(".devdata", "scrobbled_color_white.json"))
 		if err != nil {
 			panic(err)
 		}
