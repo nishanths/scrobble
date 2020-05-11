@@ -31,8 +31,8 @@ ReactDOM.render(
 
         <Route exact path="/u/:username/color" render={p => <U {...uargs} wnd={window} mode={Mode.Color} {...p} />} />
 
-        {colors.map(c => <Route exact path={`/u/:username/color/${c}`} render={p => <U {...uargs} wnd={window} mode={Mode.Color} color={c} {...p} />} />)}
-        {colors.map(c => <Route exact path={`/u/:username/color/${c}/album/:hexSongIdent`} render={p => <U {...uargs} wnd={window} mode={Mode.Color} color={c} detailKind={DetailKind.Album} detailIdent={p.match.params["hexSongIdent"]} {...p} />} />)}
+        {colors.map(c => <Route key={c} exact path={`/u/:username/color/${c}`} render={p => <U {...uargs} wnd={window} mode={Mode.Color} color={c} {...p} />} />)}
+        {colors.map(c => <Route key={c + "a"} exact path={`/u/:username/color/${c}/album/:hexSongIdent`} render={p => <U {...uargs} wnd={window} mode={Mode.Color} color={c} detailKind={DetailKind.Album} detailIdent={p.match.params["hexSongIdent"]} {...p} />} />)}
       </Switch>
     </Router>
   </Provider>,
