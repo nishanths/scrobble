@@ -12,6 +12,10 @@ import { fetchAllScrobbles, fetchLovedScrobbles, fetchColorScrobbles } from "../
 import { useStateRef } from "../shared/hooks"
 import "../scss/u.scss"
 
+export enum DetailKind {
+  Song, Album
+}
+
 export enum Mode {
   All, Loved, Color
 }
@@ -58,6 +62,8 @@ type UProps = UArgs & {
   wnd: Window
   mode: Mode
   color?: Color
+  detailKind?: DetailKind
+  detailIdent?: string
 } & RouteComponentProps;
 
 declare var NProgress: NProgress
