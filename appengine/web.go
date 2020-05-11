@@ -213,7 +213,7 @@ func (s *server) initializeAccountHandler(w http.ResponseWriter, r *http.Request
 
 	username := r.FormValue("username")
 	if ok := isAllowedUsername(username); !ok {
-		w.WriteHeader(http.StatusNotAcceptable) // gross, but whatever
+		http.Error(w, http.StatusText(http.StatusNotAcceptable), http.StatusNotAcceptable) // need a unique code. this is gross, but whatever.
 		return
 	}
 
@@ -260,7 +260,7 @@ func (s *server) initializeAccountHandler(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		log.Errorf("%v", err.Error())
 		if inUse {
-			w.WriteHeader(http.StatusNotAcceptable) // gross, but whatever
+			http.Error(w, http.StatusText(http.StatusNotAcceptable), http.StatusNotAcceptable) // need a unique code. this is gross, but whatever.
 		} else {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		}
@@ -372,8 +372,6 @@ func (s *server) setPrivacyHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
 }
 
 // Callers provide a transaction.

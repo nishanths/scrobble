@@ -62,8 +62,10 @@ type UProps = UArgs & {
   wnd: Window
   mode: Mode
   color?: Color
-  detailKind?: DetailKind
-  detailIdent?: string
+  detail?: {
+    kind: DetailKind
+    ident: string // hex-encoded song ident
+  }
 } & RouteComponentProps;
 
 declare var NProgress: NProgress
@@ -81,6 +83,7 @@ export const U: React.FC<UProps> = ({
   wnd,
   mode,
   color,
+  detail,
   history,
 }) => {
   // Divisble by 2, 3, and 4. This is appropriate because these are the number
@@ -281,6 +284,10 @@ export const U: React.FC<UProps> = ({
   switch (mode) {
     case Mode.All:
     case Mode.Loved: {
+      if (detail !== undefined) {
+        console.log(detail)
+        return <>{top}</>
+      }
       return <>
         {top}
         <div className="songs">
@@ -299,6 +306,10 @@ export const U: React.FC<UProps> = ({
     }
 
     case Mode.Color: {
+      if (detail !== undefined) {
+        console.log(detail)
+        return <>{top}</>
+      }
       return <>
         {top}
         <div className="songs">
