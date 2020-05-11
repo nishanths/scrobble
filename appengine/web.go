@@ -41,7 +41,7 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	if r.Method != "GET" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -80,7 +80,7 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 
 	a, err := ensureAccount(ctx, u.Email, s.ds)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
@@ -136,13 +136,13 @@ func (s *server) uHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	if r.Method != "GET" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
 
 	c := pathComponents(r.URL.Path)
 	if len(c) < 2 || len(c) > 6 {
-		w.WriteHeader(http.StatusBadRequest)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
@@ -161,7 +161,7 @@ func (s *server) uHandler(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		logoutURL = logoutURLWithRedirect(r.RequestURI)
 		if err := s.ds.Get(ctx, datastore.NameKey(KindAccount, u.Email, nil), &account); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 		self = account.Username != "" && account.Username == profileUsername
@@ -197,17 +197,17 @@ func (s *server) initializeAccountHandler(w http.ResponseWriter, r *http.Request
 	ctx := r.Context()
 
 	if r.Method != "POST" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
 
 	u, err := s.currentUser(r)
 	if err == ErrNoUser {
-		w.WriteHeader(http.StatusUnauthorized)
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
@@ -262,7 +262,7 @@ func (s *server) initializeAccountHandler(w http.ResponseWriter, r *http.Request
 		if inUse {
 			w.WriteHeader(http.StatusNotAcceptable) // gross, but whatever
 		} else {
-			w.WriteHeader(http.StatusInternalServerError)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		}
 		return
 	}
@@ -270,7 +270,7 @@ func (s *server) initializeAccountHandler(w http.ResponseWriter, r *http.Request
 	b, err := json.Marshal(account)
 	if err != nil {
 		log.Errorf("failed to json-marshal account: %v", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 	w.Write(b)
@@ -280,17 +280,17 @@ func (s *server) newAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	if r.Method != "POST" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
 
 	u, err := s.currentUser(r)
 	if err == ErrNoUser {
-		w.WriteHeader(http.StatusUnauthorized)
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
@@ -317,14 +317,14 @@ func (s *server) newAPIKeyHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Errorf("%v", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
 	b, err := json.Marshal(apiKey)
 	if err != nil {
 		log.Errorf("%v", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 	w.Write(b)
@@ -334,23 +334,23 @@ func (s *server) setPrivacyHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	if r.Method != "POST" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
 
 	u, err := s.currentUser(r)
 	if err == ErrNoUser {
-		w.WriteHeader(http.StatusUnauthorized)
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		return
 	}
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
 	privacy, err := strconv.ParseBool(r.FormValue("privacy"))
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
@@ -369,7 +369,7 @@ func (s *server) setPrivacyHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Errorf("%v", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
@@ -448,7 +448,7 @@ This policy is effective as of 12 April 2020.
 
 func (s *server) privacyPolicyHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -472,7 +472,7 @@ func (s *server) privacyPolicyHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *server) helpGuideHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
 
