@@ -48,8 +48,6 @@ export const Scrobbles: React.StatelessComponent<{
 
     assert(scrobbles !== null, "scrobbles unexpectedly null")
 
-    nProgress.configure({ showSpinner: false, minimum: 0.1, trickleSpeed: 150, speed: 500 })
-
     if (scrobbles.fetching === true) {
       nProgress.start()
       return <>{top}</>

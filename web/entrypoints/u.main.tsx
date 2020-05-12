@@ -6,12 +6,16 @@ import { createStore, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
 import { U, Mode, DetailKind } from "../components/u"
 import { colors } from "../components/colorpicker"
-import { UArgs } from "../shared/types";
+import { UArgs, NProgress } from "../shared/types";
 import reducer from "../redux/reducers/u"
 
-declare let uargs: UArgs;
+declare const uargs: UArgs;
+declare const NProgress: NProgress
 
-const store = createStore(reducer, { uargs }, applyMiddleware(thunk));
+const store = createStore(reducer, { uargs }, applyMiddleware(thunk))
+
+// configure NProgress globally
+NProgress.configure({ showSpinner: false, minimum: 0.1, trickleSpeed: 150, speed: 500 })
 
 ReactDOM.render(
   <Provider store={store}>
