@@ -11,6 +11,7 @@ import { Color } from "../colorpicker"
 import { State } from "../../redux/types/u"
 import { fetchAllScrobbles, fetchLovedScrobbles, fetchColorScrobbles } from "../../redux/actions/scrobbles"
 import { fetchSong } from "../../redux/actions/song"
+import { setLastColor } from "../../redux/actions/last-color"
 import { useStateRef } from "../../shared/hooks"
 import "../../scss/u/u.scss"
 
@@ -56,12 +57,7 @@ export const U: React.FC<UProps> = ({
 }) => {
   const dispatch = useDispatch()
   const [endIdx, endIdxRef, setEndIdx] = useStateRef(0)
-  const [lastColor, setLastColor] = useState(color) // save latest color when switching between other modes
-  useEffect(() => {
-    if (mode === Mode.Color) {
-      setLastColor(color)
-    }
-  }, [color])
+  const lastColor = useSelector((s: State) => s.lastColor)
 
   const onControlChange = (newMode: Mode) => {
     NProgress.done()
@@ -72,7 +68,7 @@ export const U: React.FC<UProps> = ({
         u = "/u/" + profileUsername + pathForMode(newMode)
         break
       case Mode.Color:
-        u = "/u/" + profileUsername + pathForMode(newMode) + pathForColor(lastColor)
+        u = "/u/" + profileUsername + pathForMode(newMode) + pathForColor(lastColor.color)
         break
       default:
         assertExhaustive(newMode)
@@ -82,7 +78,7 @@ export const U: React.FC<UProps> = ({
 
   const onColorChange = (newColor: Color) => {
     NProgress.done()
-    console.log(newColor)
+    dispatch(setLastColor(newColor))
     assert(mode === Mode.Color, "mode should be Color")
     history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(newColor))
   }
