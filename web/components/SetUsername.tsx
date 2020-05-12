@@ -7,7 +7,7 @@ interface SetUsernameProps {
   accountChange: (a: Account) => void
 }
 
-declare let notie: Notie
+declare const notie: Notie
 
 export const SetUsername: React.FC<SetUsernameProps> = ({ accountChange }) => {
   const [username, setUsername] = useState("")
