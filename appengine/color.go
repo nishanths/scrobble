@@ -78,7 +78,7 @@ func (s *server) artworkColorHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if acc.Private && !s.canViewScrobbled(ctx, accID, r) {
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 

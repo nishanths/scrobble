@@ -19,13 +19,13 @@ const songStart = (username: string, ident: string) => {
   }
 }
 
-const songSuccess = (username: string, ident: string, song: Song | null, notFound: boolean, priv: boolean) => {
+const songSuccess = (username: string, ident: string, song: Song | null, noSuchSong: boolean, priv: boolean) => {
   return {
     type: "SONG_SUCCESS" as const,
     username,
     ident,
     song,
-    notFound,
+    noSuchSong,
     private: priv,
   }
 }
@@ -40,7 +40,7 @@ const songFail = (ident: string, err: any) => {
 
 type FetchSongResult = {
   song: Song | null
-  notFound: boolean
+  noSuchSong: boolean
   private: boolean
   err: any | null
 }
@@ -50,7 +50,7 @@ export const fetchSong = (username: string, ident: string): SongThunkResult<void
     dispatch(songStart(username, ident))
     try {
       const result = await _fetchSong(username, ident)
-      dispatch(songSuccess(username, ident, result.song, result.notFound, result.private))
+      dispatch(songSuccess(username, ident, result.song, result.noSuchSong, result.private))
     } catch (e) {
       dispatch(songFail(ident, e))
     }
@@ -65,11 +65,11 @@ const _fetchSong = async (username: string, ident: string): Promise<FetchSongRes
       const rsp: ScrobbledResponse = await r.json()
       if (rsp.songs.length === 0) {
         // no song for given ident
-        return { song: null, notFound: true, private: false, err: null }
+        return { song: null, noSuchSong: true, private: false, err: null }
       }
-      return { song: rsp.songs[0], notFound: false, private: false, err: null }
-    case 404:
-      return { song: null, notFound: false, private: true, err: null }
+      return { song: rsp.songs[0], noSuchSong: false, private: false, err: null }
+    case 403:
+      return { song: null, noSuchSong: false, private: true, err: null }
     default:
       throw "bad status: " + r.status
   }

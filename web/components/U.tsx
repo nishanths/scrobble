@@ -261,38 +261,38 @@ export const U: React.FC<UProps> = ({
     </>
   }
 
-  if (detail !== undefined) {
-    assert(detailSong !== null, "detailSong unexpectedly null")
+  // if (detail !== undefined) {
+  //   assert(detailSong !== null, "detailSong unexpectedly null")
 
-    if (detailSong.fetching) {
-      NProgress.start()
-    }
-    // handle initial redux state
-    if (detailSong.done === false) {
-      return null
-    }
-    NProgress.done()
+  //   if (detailSong.fetching) {
+  //     NProgress.start()
+  //   }
+  //   // handle initial redux state
+  //   if (detailSong.done === false) {
+  //     return null
+  //   }
+  //   NProgress.done()
 
-    const modalContent = <div className="flexContainer">
-      {detailSong.item!.ident}
-    </div>
+  //   const modalContent = <div className="flexContainer">
+  //     {detailSong.item!.ident}
+  //   </div>
 
-    console.log(hexEncode(detailSong.item!.ident))
-    console.log(hexDecode(detail!.hexIdent))
+  //   console.log(hexEncode(detailSong.item!.ident))
+  //   console.log(hexDecode(detail!.hexIdent))
 
-    const modal = <Modal
-      open={true}
-      onClose={() => { history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(color)) }}
-      center
-      classNames={{ modal: "detailModal", overlay: "detailOverlay", closeButton: "detailCloseButton" }}
-      closeOnEsc={true}
-      animationDuration={500}
-      closeIcon={CloseIcon}>
-      {modalContent}
-    </Modal>
+  //   const modal = <Modal
+  //     open={true}
+  //     onClose={() => { history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(color)) }}
+  //     center
+  //     classNames={{ modal: "detailModal", overlay: "detailOverlay", closeButton: "detailCloseButton" }}
+  //     closeOnEsc={true}
+  //     animationDuration={500}
+  //     closeIcon={CloseIcon}>
+  //     {modalContent}
+  //   </Modal>
 
-    return <>{modal}</>
-  }
+  //   return <>{modal}</>
+  // }
 
   // If in the Color mode and no color is selected, render the top area and
   // the color picker, and we're done.

@@ -180,7 +180,7 @@ const _fetchColorScrobbles = async (color: string, username: string): Promise<Fe
     case 200:
       const songs: Song[] = await r.json()
       return { songs, private: false, err: null }
-    case 404:
+    case 403:
       return { songs: [], private: true, err: null }
     // TODO: if we had the ability to display toast notifications, we could show
     // "please sign in again" for 401 status
