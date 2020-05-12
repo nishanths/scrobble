@@ -1,6 +1,5 @@
 import React from "react";
-import { SongCard } from "./SongCard"
-import { MoreSongCard } from "./MoreSongCard"
+import { SongCard, MoreSongCard } from "./songcard"
 import { Song } from "../shared/types"
 
 interface SongsProps {

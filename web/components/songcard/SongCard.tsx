@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import { Song } from "../shared/types"
-import { dateDisplay } from "../shared/time"
+import { Song } from "../../shared/types"
+import { dateDisplay } from "../../shared/time"
 
 interface SongCardProps {
   song: Song; // rendering degrades gracefully if properties are missing

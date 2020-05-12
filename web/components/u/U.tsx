@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux";
 import { RouteComponentProps, Redirect } from "react-router-dom";
 import { UArgs, Song, NProgress } from "../../shared/types"
+import { Mode, DetailKind } from "./types"
 import { trimPrefix, assertExhaustive, pathComponents, assert, hexDecode, hexEncode } from "../../shared/util"
 import { Header } from "./Header"
 import { Songs } from "../Songs"
@@ -16,14 +17,6 @@ import "../../scss/u.scss"
 import "../../scss/detail-modal.scss"
 import 'react-responsive-modal/styles.css';
 import { Modal } from 'react-responsive-modal';
-
-export enum DetailKind {
-  Song, Album
-}
-
-export enum Mode {
-  All, Loved, Color
-}
 
 const controlValues = ["All", "Loved", "By color"] as const
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import { Song } from "../shared/types"
-import { dateDisplay } from "../shared/time"
+import { Song } from "../../shared/types"
+import { dateDisplay } from "../../shared/time"
 
 interface MoreSongCardProps {
   more: number
