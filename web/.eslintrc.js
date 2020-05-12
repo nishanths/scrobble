@@ -5,40 +5,48 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   plugins: [
     '@typescript-eslint',
+    'import',
   ],
   extends: [
-    // 'eslint:recommended',
-    // 'plugin:@typescript-eslint/eslint-recommended',
-    // 'plugin:@typescript-eslint/recommended',
+    'eslint:recommended',
+    'plugin:@typescript-eslint/eslint-recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:react/recommended',
   ],
 
   // several rules copied from https://github.com/typescript-eslint/typescript-eslint/blob/master/.eslintrc.js
   rules: {
+    // disables
+    "@typescript-eslint/no-use-before-define": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "react/no-unescaped-entities": "off", // e.g. `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`
+    "react/prop-types": "off", // e.g. 'username' is missing in props validation
+
+    // modifications
+    "@typescript-eslint/member-delimiter-style": [
+      "error",
+      {
+        "multiline": {
+            "delimiter": "none",
+            "requireLast": false
+        },
+        "singleline": {
+            "delimiter": "comma",
+            "requireLast": false
+        },
+      },
+    ],
+
     // Forbid the use of extraneous packages
-    'import/no-extraneous-dependencies': [
-      'error',
+    "import/no-extraneous-dependencies": [
+      "error",
       {
         devDependencies: true,
         peerDependencies: true,
         optionalDependencies: false,
       },
-    ],
-
-    '@typescript-eslint/explicit-function-return-type': 'error',
-    '@typescript-eslint/no-explicit-any': 'error',
-    '@typescript-eslint/no-non-null-assertion': 'off',
-    '@typescript-eslint/no-throw-literal': 'off',
-    '@typescript-eslint/no-use-before-define': 'off',
-    '@typescript-eslint/no-var-requires': 'off',
-    '@typescript-eslint/prefer-nullish-coalescing': 'error',
-    '@typescript-eslint/prefer-optional-chain': 'error',
-    '@typescript-eslint/unbound-method': 'off',
-    '@typescript-eslint/prefer-as-const': 'error',
-
-    'no-empty-function': 'off',
-    '@typescript-eslint/no-empty-function': [
-      'error',
-      { allow: ['arrowFunctions'] },
     ],
   },
 
@@ -47,7 +55,14 @@ module.exports = {
     ecmaFeatures: {
       jsx: true,
     },
-    project: ['./tsconfig.json', './storybook/tsconfig.json'],
+    project: ['./tsconfig.json'],
     tsconfigRootDir: __dirname,
+  },
+
+  settings: {
+    // https://github.com/yannickcr/eslint-plugin-react#configuration
+    react: {
+      version: "detect",
+    },
   },
 };

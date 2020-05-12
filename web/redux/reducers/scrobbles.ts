@@ -1,6 +1,5 @@
 import { AllScrobblesAction, LovedScrobblesAction, ColorScrobblesAction } from "../actions/scrobbles"
 import { ScrobblesState } from "../types/scrobbles"
-import { Song, ArtworkHash } from "../../shared/types"
 import { copyMap } from "../../shared/util"
 
 const defaultStateFunc = (): ScrobblesState => {

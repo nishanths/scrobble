@@ -9,7 +9,7 @@ import { colors } from "../components/colorpicker"
 import { UArgs } from "../shared/types";
 import reducer from "../redux/reducers/u"
 
-declare var uargs: UArgs;
+declare let uargs: UArgs;
 
 const store = createStore(reducer, { uargs }, applyMiddleware(thunk));
 

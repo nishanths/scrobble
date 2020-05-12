@@ -25,7 +25,6 @@ export const songsReducer = (state = defaultState, action: SongAction): typeof d
     }
     case "SONG_SUCCESS": {
       const s = state.copy()
-      const v = s.getOrDefault(action.ident)
       s.set(action.ident, { fetching: false, done: true, error: false, noSuchSong: action.noSuchSong, item: action.song, private: action.private })
       return s
     }

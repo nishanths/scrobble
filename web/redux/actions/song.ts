@@ -1,5 +1,4 @@
 import { ThunkAction, ThunkDispatch } from "redux-thunk"
-import { Dispatch } from "redux"
 import { Song, ScrobbledResponse } from "../../shared/types"
 import { PartialState } from "../types/u"
 
@@ -46,7 +45,7 @@ type FetchSongResult = {
 }
 
 export const fetchSong = (username: string, ident: string): SongThunkResult<void> => {
-  return async (dispatch, store) => {
+  return async (dispatch) => {
     dispatch(songStart(username, ident))
     try {
       const result = await _fetchSong(username, ident)
@@ -61,13 +60,14 @@ const _fetchSong = async (username: string, ident: string): Promise<FetchSongRes
   const url = "/api/v1/scrobbled?username=" + username + "&ident=" + encodeURIComponent(ident)
   const r = await fetch(url)
   switch (r.status) {
-    case 200:
+    case 200: {
       const rsp: ScrobbledResponse = await r.json()
       if (rsp.songs.length === 0) {
         // no song for given ident
         return { song: null, noSuchSong: true, private: false, err: null }
       }
       return { song: rsp.songs[0], noSuchSong: false, private: false, err: null }
+    }
     case 403:
       return { song: null, noSuchSong: false, private: true, err: null }
     default:

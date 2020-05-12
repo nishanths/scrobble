@@ -1,12 +1,12 @@
 export function dateDisplay(d: Date, now: Date): string {
-  let copy = new Date(now.getTime())
+  const copy = new Date(now.getTime())
 
   // is it today?
   if (sameDate(d, copy)) {
     return "Today"
   }
 
-  let original = copy.getDate() // save before modification
+  const original = copy.getDate() // save before modification
 
   // is it yesterday?
   copy.setDate(original - 1)
@@ -14,7 +14,7 @@ export function dateDisplay(d: Date, now: Date): string {
     return "Yesterday"
   }
 
-  for (let c of [2, 3, 4]) {
+  for (const c of [2, 3, 4]) {
     copy.setDate(original - c)
     if (sameDate(d, copy)) {
       return c + " days ago"

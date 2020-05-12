@@ -6,8 +6,8 @@ import "../../scss/color-picker.scss"
 
 type ColorPickerProps = {
   afterSelect?: (c: Color) => void
-  prompt?: string;
-  initialSelection?: Color; // if unset no color initially selected
+  prompt?: string
+  initialSelection?: Color // if unset no color initially selected
 }
 
 export const ColorPicker: React.FC<ColorPickerProps> = ({ afterSelect, prompt, initialSelection }) => {

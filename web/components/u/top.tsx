@@ -2,7 +2,7 @@ import React from "react"
 import { Header as HeaderComponent } from "./Header"
 import { ColorPicker as ColorPickerComponent, Color } from "../colorpicker"
 import { SegmentedControl } from "../SegmentedControl"
-import { controlValues, controlValueForMode, modeFromControlValue, Mode, ControlValue } from "./shared"
+import { controlValues, controlValueForMode, Mode, ControlValue } from "./shared"
 
 export const Header = (profileUsername: string, logoutURL: string) =>
   <HeaderComponent username={profileUsername} signedIn={!!logoutURL} />

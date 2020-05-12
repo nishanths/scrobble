@@ -5,7 +5,7 @@ import { Song } from "../shared/types"
 interface SongsProps {
   songs: Song[]
   artworkBaseURL: string
-  albumCentric: boolean;
+  albumCentric: boolean
 
   showMoreCard: boolean
   more?: number // required if showMoreCard is true

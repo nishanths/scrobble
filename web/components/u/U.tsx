@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux";
-import { RouteComponentProps, Redirect } from "react-router-dom";
-import { UArgs, Song, NProgress } from "../../shared/types"
+import { RouteComponentProps } from "react-router-dom";
+import { UArgs, NProgress } from "../../shared/types"
 import { Mode, DetailKind, pathForMode, pathForColor, modeFromControlValue } from "./shared"
 import { Header, ColorPicker, Top } from "./top"
 import { Scrobbles } from "./Scrobbles"
@@ -23,7 +23,7 @@ type UProps = UArgs & {
   }
 } & RouteComponentProps;
 
-declare var NProgress: NProgress
+declare const NProgress: NProgress
 
 // Divisble by 2, 3, and 4. This is appropriate because these are the number
 // of cards typically displayed per row. Using such a number ensures that
@@ -42,11 +42,9 @@ const nextEndIdx = (currentEndIdx: number, total: number): number => {
 // U is the root component for the username page, e.g.,
 // https://scrobble.littleroot.org/u/whatever.
 export const U: React.FC<UProps> = ({
-  host,
   artworkBaseURL,
   profileUsername,
   logoutURL,
-  account,
   self,
   private: priv,
   wnd,

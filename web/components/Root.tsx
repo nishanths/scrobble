@@ -10,7 +10,7 @@ Delete account?`
 
 type RootProps = BootstrapArgs
 
-declare var notie: Notie
+declare const notie: Notie
 
 export class Root extends React.Component<RootProps, { account: Account }> {
   private static readonly downloadURL = "https://github.com/nishanths/scrobble/releases/latest"
@@ -46,7 +46,7 @@ export class Root extends React.Component<RootProps, { account: Account }> {
 
   private onDeleteAccountClick(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
     e.preventDefault()
-    let ok = window.confirm(deleteMessage)
+    const ok = window.confirm(deleteMessage)
     if (!ok) {
       return
     }
