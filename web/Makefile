@@ -21,7 +21,7 @@ fmt:
 	# tsfmt
 	find . -type f \( -name '*.ts' -o -name '*.tsx' \) \
 		! -name '*.d.ts' \
-		! -regex '.*/node_modules/.*' | \
+		! -regex '.*/node_modules/.*' \
 		! -regex '.*/static/.*' | \
 		xargs $(TSFMT) --replace --
 	# lint

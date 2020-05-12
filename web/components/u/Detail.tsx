@@ -18,8 +18,8 @@ export const Detail: React.StatelessComponent<{
   nProgress,
 }) => {
 
-  return null
-}
+    return null
+  }
 
   // if (detail !== undefined) {
   //   assert(detailSong !== null, "detailSong unexpectedly null")
