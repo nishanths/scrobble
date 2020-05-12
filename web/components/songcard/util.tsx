@@ -42,6 +42,7 @@ export const MorePicture: React.SFC<{ more: number }> = ({ more }) => {
   </div>
 }
 
+// Meta is the metadata area for a SongCard.
 export const Meta: React.SFC<{
   song: Song
   albumCentric: boolean

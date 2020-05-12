@@ -27,4 +27,3 @@ export const SongCard: React.SFC<SongCardProps> = ({
     </div>
   </div>
 }
-
