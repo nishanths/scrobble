@@ -21,7 +21,11 @@ const TrackLink: React.SFC<{ previewURL: string }> = ({ previewURL }) => {
 }
 
 // Picture is the picture area for a SongCard.
-export const Picture: React.SFC<{ song: Song, artworkBaseURL: string, albumCentric: boolean }> = ({ song, artworkBaseURL, albumCentric }) => {
+export const Picture: React.SFC<{
+  song: Song
+  artworkBaseURL: string
+  albumCentric: boolean
+}> = ({ song, artworkBaseURL, albumCentric }) => {
   const previewURL = trackViewURL(song.trackViewURL, albumCentric)
   const artworkURL = song.artworkHash ? artworkBaseURL + "/" + song.artworkHash : "";
   const imgStyles = artworkURL ? { backgroundImage: `url(${artworkURL})` } : { backgroundColor: "#fff" }
@@ -62,18 +66,20 @@ export const Meta: React.SFC<{
   albumCentric: boolean
   showDate: boolean
   now?: () => Date
+  onClick: () => void
 }> = ({
   song: s,
   albumCentric,
   showDate,
   now,
+  onClick,
 }) => {
     const tooltip = metaTooltip(albumCentric, s.title, s.artistName, s.albumTitle)
     const title = albumCentric ? s.albumTitle : s.title
     const includeLoved = !albumCentric && s.loved
     const includeDate = !albumCentric && showDate && s.lastPlayed
 
-    return <div className="meta" title={tooltip}>
+    return <div className="meta" title={tooltip} onClick={onClick}>
       <div className="title">
         <span className="titleContent">{title}</span>
         {includeLoved && <span className="love"></span>}

@@ -85,7 +85,7 @@
   .meta {
     padding-left: 3px;
     padding-right: 3px;
-    cursor: default;
+    cursor: pointer; // for linking to detail
     color: $meta-color;
     text-align: center;
 

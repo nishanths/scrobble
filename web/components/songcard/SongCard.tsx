@@ -8,6 +8,7 @@ export interface SongCardProps {
   // album-centric instead of song-centric
   // e.g. use album title instead of song title in the title area
   albumCentric: boolean
+  onSongClick: (s: Song) => void
 
   showDate: boolean
   now?: () => Date // required if showDates is true
@@ -18,12 +19,13 @@ export const SongCard: React.SFC<SongCardProps> = ({
   artworkBaseURL,
   albumCentric,
   showDate,
-  now
+  now,
+  onSongClick,
 }) => {
   return <div className="SongCard">
     <div className="scaleArea">
       <Picture song={song} artworkBaseURL={artworkBaseURL} albumCentric={albumCentric} />
-      <Meta song={song} albumCentric={albumCentric} showDate={showDate} now={now} />
+      <Meta song={song} albumCentric={albumCentric} showDate={showDate} now={now} onClick={() => onSongClick(song)} />
     </div>
   </div>
 }

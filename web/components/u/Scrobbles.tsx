@@ -1,6 +1,6 @@
 import React from "react"
 import { assertExhaustive, assert } from "../../shared/util"
-import { NProgress } from "../../shared/types"
+import { NProgress, Song } from "../../shared/types"
 import { Mode, ControlValue } from "./shared"
 import { Color } from "../colorpicker"
 import { ScrobblesState } from "../../redux/types/scrobbles"
@@ -20,6 +20,7 @@ export const Scrobbles: React.StatelessComponent<{
   nProgress: NProgress
   onColorChange: (c: Color) => void
   onControlChange: (v: ControlValue) => void
+  onSongClick: (s: Song) => void
 }> = ({
   scrobbles,
   profileUsername,
@@ -33,6 +34,7 @@ export const Scrobbles: React.StatelessComponent<{
   nProgress,
   onColorChange,
   onControlChange,
+  onSongClick,
 }) => {
     const header = Header(profileUsername, signedIn, true)
     const colorPicker = ColorPicker(color, onColorChange)
@@ -109,6 +111,7 @@ export const Scrobbles: React.StatelessComponent<{
               showMoreCard={(itemsToShow.length === scrobbles.items.length) && (scrobbles.total! > scrobbles.items.length)}
               showDates={true}
               now={() => new Date()}
+              onSongClick={onSongClick}
             />
           </div>
         </>
@@ -124,6 +127,7 @@ export const Scrobbles: React.StatelessComponent<{
               albumCentric={true}
               showMoreCard={false}
               showDates={false}
+              onSongClick={onSongClick}
             />
           </div>
         </>
