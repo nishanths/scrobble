@@ -1,8 +1,8 @@
 // TODO: this file is ugly
 
 @import "../vars.scss";
+@import "songcard.scss";
 @import "shared.scss";
-@import "../songcard/songcard.scss";
 
 @function header-width($n-cards, $songcard-dim) {
   $cut: $songcard-border-w * $n-cards * 3; /* arbitrary */
@@ -11,6 +11,12 @@
 
 @function breakpoint-width($n-cards, $songcard-dim) {
   @return app-width($n-cards, $songcard-dim) + (2 * $body-margin-w) + (2 * $app-padding-w)
+}
+
+#app {
+  max-width: app-width(1, $dim);
+  margin: 0 auto;
+  padding: 0 $app-padding-w;
 }
 
 .header {

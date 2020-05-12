@@ -48,19 +48,19 @@ export const Detail: React.StatelessComponent<{
       </div>
     </Modal>
 
-    let content: JSX.Element
+    const privateContent = <div className="info">(This user's songs are private.)</div>
 
-    if (true || priv === true && self === false) {
-      return modal(<div className="info">(This user's songs are private.)</div>)
+    if (priv === true && self === false) {
+      return modal(privateContent)
     }
 
     if (song.fetching === true) {
       nProgress.start()
-      return null // TODO
+      return modal(null)
     }
     if (song.error === true) {
       nProgress.done()
-      return null // TODO
+      return modal(<div className="info">(Failed to fetch scrobbles.)</div>)
     }
     // handle initial redux state
     if (song.done === false) {
@@ -69,7 +69,7 @@ export const Detail: React.StatelessComponent<{
     nProgress.done()
 
     if (song.private === true) {
-      return null // TODO
+      return modal(privateContent)
     }
     if (song.noSuchSong === true) {
       return null // TODO
