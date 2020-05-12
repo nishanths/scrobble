@@ -86,5 +86,5 @@ export const Detail: React.StatelessComponent<{
     const item = song.item
     assert(item !== null, "item should not be null")
 
-    return <>{modal(null)}</> // TODO
+    return <>{modal(item.ident)}</> // TODO
   }
