@@ -28,27 +28,23 @@ const nounForDetailKind = (k: DetailKind): string => {
 export const Detail: React.StatelessComponent<{
   song: SongState
   profileUsername: string
-  mode: Mode
-  color: Color | undefined
   private: boolean
   self: boolean
   detailKind: DetailKind
   nProgress: NProgress
-  history: History
+  onDetailClose: () => void
 }> = ({
   song,
   profileUsername,
-  mode,
-  color,
   private: priv,
   self,
   detailKind,
   nProgress,
-  history,
+  onDetailClose,
 }) => {
     const modal = (content: React.ReactNode) => <Modal
       open={true}
-      onClose={() => { history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(color)) }}
+      onClose={onDetailClose}
       center
       classNames={{ modal: "detailModal", overlay: "detailOverlay", closeButton: "detailCloseButton" }}
       closeOnEsc={true}

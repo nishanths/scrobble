@@ -211,13 +211,11 @@ export const U: React.FC<UProps> = ({
     return <Detail
       song={detailSong!}
       profileUsername={profileUsername}
-      mode={mode}
-      color={color}
       private={priv}
       self={self}
       detailKind={detail.kind}
       nProgress={NProgress}
-      history={history}
+      onDetailClose={() => { history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(color)) }}
     />
   }
 }
