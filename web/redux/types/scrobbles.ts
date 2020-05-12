@@ -1,4 +1,4 @@
-import { Song, ArtworkHash } from "../../shared/types"
+import { Song } from "../../shared/types"
 
 export type ScrobblesState = {
   fetching: boolean

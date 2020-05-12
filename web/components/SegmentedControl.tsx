@@ -27,7 +27,7 @@ export const SegmentedControl = <V extends readonly string[]>(props: (SegmentedC
   }
 
   return <div className="SegmentedControl">
-    {values.map((v, i) => {
+    {values.map((v) => {
       return <Item key={v} className={className(selected === v)} onClick={() => onControlClick(v)} content={v} />
     })}
   </div>

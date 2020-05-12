@@ -1,6 +1,5 @@
 import { ThunkAction, ThunkDispatch } from "redux-thunk"
-import { Dispatch } from "redux"
-import { Song, ScrobbledResponse, ArtworkHash } from "../../shared/types"
+import { Song, ScrobbledResponse } from "../../shared/types"
 import { PartialState } from "../types/u"
 
 export type AllScrobblesAction =
@@ -76,7 +75,7 @@ const lovedScrobblesFail = (err: any) => {
 }
 
 export const fetchAllScrobbles = (username: string, limit: number): AllScrobblesThunkResult<void> => {
-  return async (dispatch, store) => {
+  return async (dispatch) => {
     dispatch(allScrobblesStart(username))
 
     try {
@@ -89,7 +88,7 @@ export const fetchAllScrobbles = (username: string, limit: number): AllScrobbles
 }
 
 export const fetchLovedScrobbles = (username: string, limit: number): LovedScrobblesThunkResult<void> => {
-  return async (dispatch, store) => {
+  return async (dispatch) => {
     dispatch(lovedScrobblesStart(username))
 
     try {
@@ -115,9 +114,10 @@ const _fetchScrobbledSongs = async (username: string, limit: number, loved: bool
   }
   const r = await fetch(url)
   switch (r.status) {
-    case 200:
+    case 200: {
       const rsp: ScrobbledResponse = await r.json()
       return { songs: rsp.songs, total: rsp.total, private: false, err: null }
+    }
     case 404:
       return { songs: [], total: 0, private: true, err: null }
     // TODO: if we had the ability to display toast notifications, we could show
@@ -154,7 +154,7 @@ const colorScrobblesFail = (err: any, color: string) => {
 }
 
 export const fetchColorScrobbles = (color: string, username: string): ColorScrobblesThunkResult<void> => {
-  return async (dispatch, store) => {
+  return async (dispatch) => {
     dispatch(colorScrobblesStart(color, username))
 
     try {
@@ -177,10 +177,11 @@ const _fetchColorScrobbles = async (color: string, username: string): Promise<Fe
 
   const r = await fetch(url)
   switch (r.status) {
-    case 200:
+    case 200: {
       const songs: Song[] = await r.json()
       return { songs, private: false, err: null }
-    case 404:
+    }
+    case 403:
       return { songs: [], private: true, err: null }
     // TODO: if we had the ability to display toast notifications, we could show
     // "please sign in again" for 401 status

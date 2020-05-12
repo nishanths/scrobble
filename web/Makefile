@@ -1,5 +1,5 @@
 WEBPACK := npx webpack-cli
-TSFMT := npx tsfmt
+ESLINT_BASE := npx eslint . --ext .ts,.tsx
 
 default:
 	@echo "the default target does nothing!"
@@ -18,10 +18,18 @@ clean:
 
 .PHONY: fmt
 fmt:
+	# tsfmt
 	find . -type f \( -name '*.ts' -o -name '*.tsx' \) \
 		! -name '*.d.ts' \
-		! -regex '.*/node_modules/.*' | \
-		xargs $(TSFMT) --replace --
+		! -regex '.*/node_modules/.*' \
+		! -regex '.*/static/.*' | \
+		xargs npx tsfmt --replace --
+	# lint
+	$(ESLINT_BASE)
+
+.PHONY: fix
+fix:
+	$(ESLINT_BASE) --fix
 
 .PHONY: sb
 sb:

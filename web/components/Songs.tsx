@@ -1,12 +1,11 @@
 import React from "react";
-import { SongCard } from "./SongCard"
-import { MoreSongCard } from "./MoreSongCard"
+import { SongCard, MoreSongCard } from "./songcard"
 import { Song } from "../shared/types"
 
 interface SongsProps {
   songs: Song[]
   artworkBaseURL: string
-  albumCentric: boolean;
+  albumCentric: boolean
 
   showMoreCard: boolean
   more?: number // required if showMoreCard is true

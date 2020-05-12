@@ -52,10 +52,10 @@ export type NProgress = {
 
 export type Notie = {
   alert(options: {
-    type?: 'success' | 'warning' | 'error' | 'info' | 'neutral', // optional, default = 'info'
-    text: string,
-    stay?: boolean, // optional, default = false
-    time?: number, // optional, default = 3, minimum = 1
+    type?: 'success' | 'warning' | 'error' | 'info' | 'neutral' // optional, default = 'info'
+    text: string
+    stay?: boolean // optional, default = false
+    time?: number // optional, default = 3, minimum = 1
     position?: 'top' | 'bottom' // optional, default = 'top'
   }): void
 }

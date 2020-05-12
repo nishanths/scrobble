@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Account, Notie } from "../shared/types"
 import { cookieAuthErrorMessage } from "../shared/util"
 import "../scss/set-username.scss";
@@ -7,7 +7,7 @@ interface SetUsernameProps {
   accountChange: (a: Account) => void
 }
 
-declare var notie: Notie
+declare const notie: Notie
 
 export const SetUsername: React.FC<SetUsernameProps> = ({ accountChange }) => {
   const [username, setUsername] = useState("")
@@ -27,7 +27,7 @@ export const SetUsername: React.FC<SetUsernameProps> = ({ accountChange }) => {
   }
 
   const initializeAccount = (u: string): void => {
-    let { reason, ok } = validateUsername(u)
+    const { reason, ok } = validateUsername(u)
     if (!ok) {
       showError(reason)
       return

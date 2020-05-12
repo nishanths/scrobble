@@ -17,8 +17,11 @@ export function trimPrefix(s: string, prefix: string): string {
   return s
 }
 
-export function assertExhaustive(value: never, message: string = "unexpected value"): never {
-  throw new Error(message + " " + value);
+export function assertExhaustive(value: never, message?: string): never {
+  if (message === undefined) {
+    message = "unexpected value: " + value
+  }
+  throw new Error(message);
 }
 
 // base64Encode encodes the string using base64 standard encoding, i.e.,
@@ -27,22 +30,98 @@ export function assertExhaustive(value: never, message: string = "unexpected val
 // Verified using https://runkit.com/nishanths/5cd735892538b9001a7e08d5
 // and https://gobyexample.com/base64-encoding.
 export function base64Encode(s: string): string {
-  let bytes = new TextEncoder().encode(s);
+  const bytes = new TextEncoder().encode(s);
   return base64js.fromByteArray(bytes);
 }
 
 // base64Decode is the inverse of base64Encode.
 export function base64Decode(s: string): string {
-  let bytes = base64js.toByteArray(s);
+  const bytes = base64js.toByteArray(s);
   return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+}
+
+// hex encoding and decoding adapted from Go package encoding/hex.
+
+const hextable = "0123456789abcdef"
+
+export function hexEncode(s: string): string {
+  let out = "";
+  for (let x = 0; x < s.length; x++) {
+    out += hextable[s[x].charCodeAt(0) >> 4]
+    out += hextable[s[x].charCodeAt(0) & 0x0f]
+  }
+  return out
+}
+
+export function hexDecode(s: string): string {
+  let j = 1
+  let out = ""
+  for (; j < s.length; j += 2) {
+    const a = fromHexChar(s[j - 1])
+    const b = fromHexChar(s[j])
+    if (a === null || b === null) {
+      throw "invalid byte in input: " + s
+    }
+    out += String.fromCharCode((a.charCodeAt(0) << 4) | b.charCodeAt(0))
+  }
+  if (s.length % 2 === 1) {
+    if (fromHexChar(s[j - 1]) === null) {
+      throw "invalid byte in input: " + s
+    }
+    throw "bad length: " + s
+  }
+  return out
+}
+
+function fromHexChar(c: string): string | null {
+  if ('0' <= c && c <= '9') {
+    return String.fromCharCode(c.charCodeAt(0) - '0'.charCodeAt(0))
+  }
+  if ('a' <= c && c <= 'f') {
+    return String.fromCharCode(c.charCodeAt(0) - 'a'.charCodeAt(0) + 10)
+  }
+  return null
 }
 
 export function pathComponents(p: string): string[] {
   return p.split("/").filter(s => s != "")
 }
 
-export function assert(cond: boolean, message: string = "assertion failed"): asserts cond {
+export function assert(cond: boolean, message = "assertion failed"): asserts cond {
   if (!cond) {
     throw new Error(message)
+  }
+}
+
+export const copyMap = <K, V>(m: Map<K, V>): Map<K, V> => {
+  const n = new Map<K, V>()
+  for (const [key, value] of m.entries()) {
+    n.set(key, value)
+  }
+  return n
+}
+
+export class MapDefault<K, V> {
+  constructor(private readonly def: () => V, private readonly m: Map<K, V> = new Map()) { }
+
+  getOrDefault(key: K): V {
+    const v = this.m.get(key)
+    if (v === undefined) {
+      return this.def()
+    }
+    return v
+  }
+
+  has(key: K): boolean {
+    return this.m.has(key)
+  }
+
+  set(key: K, value: V): this {
+    this.m.set(key, value)
+    return this
+  }
+
+  copy(): MapDefault<K, V> {
+    return new MapDefault(this.def, copyMap(this.m))
   }
 }

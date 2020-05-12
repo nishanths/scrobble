@@ -3,7 +3,7 @@ import { Account, Notie } from "../shared/types"
 import { cookieAuthErrorMessage } from "../shared/util"
 import "../scss/account"
 
-declare var notie: Notie
+declare const notie: Notie
 
 interface AccountDetailProps {
   account: Account

@@ -1,0 +1,28 @@
+@import "vars.scss";
+
+.detailOverlay {
+  background: white !important;
+}
+
+.detailModal {
+  width: 90%;
+  height: 100%;
+  max-width: 1200px !important;
+  max-height: 1000px;
+  box-shadow: none !important;
+
+  .flexContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+}
+
+.detailCloseButton {
+  svg {
+    width: 100px;
+    height: 100px;
+    fill: #d3d3d3;
+  }
+}

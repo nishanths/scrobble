@@ -306,7 +306,7 @@ func (svr *server) scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if acc.Private && !svr.canViewScrobbled(ctx, accID, r) {
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 

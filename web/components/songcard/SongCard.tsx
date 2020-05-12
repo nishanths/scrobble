@@ -1,13 +1,13 @@
-import React, { useEffect, useRef } from "react";
-import { Song } from "../shared/types"
-import { dateDisplay } from "../shared/time"
+import React, { useEffect } from "react";
+import { Song } from "../../shared/types"
+import { dateDisplay } from "../../shared/time"
 
 interface SongCardProps {
-  song: Song; // rendering degrades gracefully if properties are missing
-  artworkBaseURL: string;
+  song: Song // rendering degrades gracefully if properties are missing
+  artworkBaseURL: string
   // album-centric instead of song-centric
   // e.g. use album instead of song title in the title areas
-  albumCentric: boolean;
+  albumCentric: boolean
 
   showDate: boolean
   now?: () => Date // required if showDates is true
@@ -43,7 +43,7 @@ export const SongCard: React.StatelessComponent<SongCardProps> = ({
     return song.trackViewURL
   })()
 
-  const trackLinkArea = <a href={trackViewURL} title={trackViewURL} target="_blank">
+  const trackLinkArea = <a href={trackViewURL} title={trackViewURL} target="_blank" rel="noopener noreferrer">
     <div className="trackLinkArea" ref={r => { trackLinkAreaElem = r }}>
       <div className="trackLink"></div>
     </div>
