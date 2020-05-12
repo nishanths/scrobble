@@ -4,8 +4,8 @@ import { ColorPicker as ColorPickerComponent, Color } from "../colorpicker"
 import { SegmentedControl } from "../SegmentedControl"
 import { controlValues, controlValueForMode, Mode, ControlValue } from "./shared"
 
-export const Header = (profileUsername: string, logoutURL: string) =>
-  <HeaderComponent username={profileUsername} signedIn={!!logoutURL} />
+export const Header = (profileUsername: string, signedIn: boolean, showNav: boolean) =>
+  <HeaderComponent username={profileUsername} signedIn={signedIn} showNav={showNav} />
 
 export const ColorPicker = (color?: Color, onColorChange?: (c: Color) => void) =>
   <div className="colorPicker">

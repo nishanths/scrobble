@@ -3,11 +3,12 @@ import { SongState } from "../../redux/types/song"
 import { NProgress } from "../../shared/types"
 import { assert, assertExhaustive } from "../../shared/util"
 import { DetailKind } from "./shared"
+import { Header } from "./top"
 import { CloseIcon } from "../CloseIcon"
-import { RouteComponentProps } from "react-router-dom";
-import "../../scss/u/detail.scss"
+import { LargeSongCard } from "../songcard"
 import { Modal } from 'react-responsive-modal';
 import 'react-responsive-modal/styles.css';
+import "../../scss/u/detail.scss"
 
 const nounForDetailKind = (k: DetailKind): string => {
   switch (k) {
@@ -22,6 +23,7 @@ const nounForDetailKind = (k: DetailKind): string => {
 
 export const Detail: React.StatelessComponent<{
   song: SongState
+  artworkBaseURL: string
   private: boolean
   self: boolean
   detailKind: DetailKind
@@ -29,12 +31,15 @@ export const Detail: React.StatelessComponent<{
   onDetailClose: () => void
 }> = ({
   song,
+  artworkBaseURL,
   private: priv,
   self,
   detailKind,
   nProgress,
   onDetailClose,
 }) => {
+    const header = Header("devuser", false, false)
+
     const modal = (content: React.ReactNode) => <Modal
       open={true}
       onClose={onDetailClose}
@@ -43,6 +48,7 @@ export const Detail: React.StatelessComponent<{
       closeOnEsc={true}
       animationDuration={500}
       closeIcon={CloseIcon}>
+      {header}
       <div className="flexContainer">
         {content}
       </div>
@@ -79,5 +85,13 @@ export const Detail: React.StatelessComponent<{
     const item = song.item
     assert(item !== null, "item should not be null")
 
-    return <>{modal(item.ident)}</> // TODO
+    return modal(<>
+      <LargeSongCard
+        song={item}
+        artworkBaseURL={artworkBaseURL}
+        albumCentric={detailKind === DetailKind.Album}
+        showDate={detailKind === DetailKind.Song}
+        now={() => new Date()}
+      />
+    </>)
   }

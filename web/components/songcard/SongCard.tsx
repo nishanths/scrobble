@@ -2,7 +2,7 @@ import React from "react";
 import { Song } from "../../shared/types"
 import { Picture, Meta } from "./util"
 
-interface SongCardProps {
+export interface SongCardProps {
   song: Song // rendering degrades gracefully if song properties are missing
   artworkBaseURL: string
   // album-centric instead of song-centric

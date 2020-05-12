@@ -1,8 +1,354 @@
+// TODO: the media queries section in this file is ugly
+
+// NOTE: this file is, in essence, a combination of "u" and "scrobbles".
+// It would be ideal to pull these two apart into separate files.
+
 @import "../common.scss";
 @import "../vars.scss";
+@import "../songcard/songcard.scss";
 @import "shared.scss";
+
+$dim: 250px;
+$bb: 110px;
+$fa: 2px;
 
 body {
   font-family: $font-family;
   margin: $body-margin-w;
+}
+
+#app {
+  max-width: app-width(1, $dim);
+  margin: 0 auto;
+  padding: 0 $app-padding-w;
+}
+
+.header {
+  max-width: header-width(1, $dim);
+
+  // Aligning elements center and right: https://stackoverflow.com/a/38948646
+  display: grid;
+  grid-template-columns: 1fr repeat(1, auto) 1fr;
+  grid-column-gap: 5px;
+  justify-items: center;
+
+  font-size: 24px;
+  color: $muted-color;
+  margin: 30px auto 0;
+
+  .username {
+    max-width: 275px;
+    @include ellipsis();
+    display: block;
+    grid-column-start: 2;
+    .emph {
+      font-weight: 600;
+    }
+  }
+
+  .nav {
+    display: none;
+    margin-left: auto;
+    font-size: 15px;
+    font-weight: 500;
+    position: relative;
+    top: 8px;
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+  }
+}
+
+.control {
+  margin: 60px auto 55px;
+  display: flex;
+  justify-content: center;
+}
+
+.info {
+  margin: 50px auto 0;
+  text-align: center;
+  font-size: 20px;
+  color: $muted-color;
+}
+
+.colorPicker {
+  margin: 0 auto 55px auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.songs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.SongCard {
+  @include songCardProps($dim, $bb, $fa);
+}
+
+.MoreSongCard {
+  @include moreSongCardProps($fa);
+}
+
+// TODO: the styles below can be generated using a loop.
+// TODO: should validate programatically that at each breakpoint, the
+// specified number of cards (i.e. $n-cards) can really be shown.
+
+@media screen and (min-width: 360px) {
+  $cards: 2;
+  $dim: 139px;
+  $bb: 90px;
+  $fa: 0;
+
+  #app {
+    max-width: app-width($cards, $dim)
+  }
+  .header {
+    max-width: header-width($cards, $dim)
+  }
+  .SongCard {
+    @include songCardProps($dim, $bb, $fa);
+  }
+  .MoreSongCard {
+    @include moreSongCardProps($fa);
+  }
+
+  .username {
+    max-width: 380px;
+  }
+}
+
+@media screen and (min-width: 380px) {
+  $cards: 2;
+  $dim: 144px;
+  $bb: 90px;
+  $fa: 0;
+
+  #app {
+    max-width: app-width($cards, $dim)
+  }
+  .header {
+    max-width: header-width($cards, $dim)
+  }
+  .SongCard {
+    @include songCardProps($dim, $bb, $fa);
+  }
+  .MoreSongCard {
+    @include moreSongCardProps($fa);
+  }
+}
+
+@media screen and (min-width: 400px) {
+  $cards: 2;
+  $dim: 154px;
+  $bb: 90px;
+  $fa: 0;
+
+  #app {
+    max-width: app-width($cards, $dim)
+  }
+  .header {
+    max-width: header-width($cards, $dim)
+  }
+  .SongCard {
+    @include songCardProps($dim, $bb, $fa);
+  }
+  .MoreSongCard {
+    @include moreSongCardProps($fa);
+  }
+}
+
+@media screen and (min-width: 420px) {
+  $cards: 2;
+  $dim: 160px;
+  $bb: 90px;
+  $fa: 0;
+
+  #app {
+    max-width: app-width($cards, $dim)
+  }
+  .header {
+    max-width: header-width($cards, $dim)
+  }
+  .SongCard {
+    @include songCardProps($dim, $bb, $fa);
+  }
+  .MoreSongCard {
+    @include moreSongCardProps($fa);
+  }
+}
+
+@media screen and (min-width: 450px) {
+  $cards: 2;
+  $dim: 164px;
+  $bb: 100px;
+  $fa: 0;
+
+  #app {
+    max-width: app-width($cards, $dim)
+  }
+  .header {
+    max-width: header-width($cards, $dim)
+  }
+  .SongCard {
+    @include songCardProps($dim, $bb, $fa);
+  }
+  .MoreSongCard {
+    @include moreSongCardProps($fa);
+  }
+}
+
+@media screen and (min-width: 475px) {
+  $cards: 2;
+  $dim: 170px;
+  $bb: 100px;
+  $fa: 0;
+
+  #app {
+    max-width: app-width($cards, $dim)
+  }
+  .header {
+    max-width: header-width($cards, $dim)
+  }
+  .SongCard {
+    @include songCardProps($dim, $bb, $fa);
+  }
+  .MoreSongCard {
+    @include moreSongCardProps($fa);
+  }
+}
+
+@media screen and (min-width: 500px) {
+  $cards: 2;
+  $dim: 180px;
+  $bb: 100px;
+  $fa: 0;
+
+  #app {
+    max-width: app-width($cards, $dim)
+  }
+  .header {
+    max-width: header-width($cards, $dim)
+  }
+  .SongCard {
+    @include songCardProps($dim, $bb, $fa);
+  }
+  .MoreSongCard {
+    @include moreSongCardProps($fa);
+  }
+}
+
+@media screen and (min-width: 570px) {
+  $cards: 3;
+  $dim: 130px;
+  $bb: 90px;
+  $fa: 0;
+
+  #app {
+    max-width: app-width($cards, $dim)
+  }
+  .header {
+    max-width: header-width($cards, $dim)
+  }
+  .SongCard {
+    @include songCardProps($dim, $bb, $fa);
+  }
+  .MoreSongCard {
+    @include moreSongCardProps($fa);
+  }
+}
+
+@media screen and (min-width: 640px) {
+  $cards: 3;
+  $dim: 160px;
+  $bb: 100px;
+  $fa: 0;
+
+  #app {
+    max-width: app-width($cards, $dim)
+  }
+  .header {
+    max-width: header-width($cards, $dim)
+  }
+  .SongCard {
+    @include songCardProps($dim, $bb, $fa);
+  }
+  .MoreSongCard {
+    @include moreSongCardProps($fa);
+  }
+}
+
+@media screen and (min-width: 700px) {
+  $cards: 3;
+  $dim: 180px;
+  $bb: 100px;
+  $fa: 1px;
+
+  #app {
+    max-width: app-width($cards, $dim)
+  }
+  .header {
+    max-width: header-width($cards, $dim)
+  }
+  .SongCard {
+    @include songCardProps($dim, $bb, $fa);
+  }
+  .MoreSongCard {
+    @include moreSongCardProps($fa);
+  }
+
+  .header {
+    .username {
+      max-width: 500px;
+    }
+    .nav {
+      display: block;
+    }
+  }
+}
+
+@media screen and (min-width: 915px) {
+  $cards: 4;
+  $dim: 180px;
+  $bb: 100px;
+  $fa: 1px;
+  $songcard-border-w: 19px; // HACK
+
+  #app {
+    max-width: app-width($cards, $dim)
+  }
+  .header {
+    max-width: header-width($cards, $dim)
+  }
+  .SongCard {
+    @include songCardProps($dim, $bb, $fa);
+  }
+  .MoreSongCard {
+    @include moreSongCardProps($fa);
+  }
+}
+
+@media screen and (min-width: 1380px) {
+  $cards: 5;
+  $dim: 180px;
+  $bb: 100px;
+  $fa: 2px;
+  $songcard-border-w: 20px; // HACK
+
+  #app {
+    max-width: app-width($cards, $dim)
+  }
+  .header {
+    max-width: header-width($cards, $dim)
+  }
+  .SongCard {
+    @include songCardProps($dim, $bb, $fa);
+  }
+  .MoreSongCard {
+    @include moreSongCardProps($fa);
+  }
 }

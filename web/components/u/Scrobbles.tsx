@@ -5,7 +5,6 @@ import { Mode } from "./shared"
 import { Color } from "../colorpicker"
 import { ScrobblesState } from "../../redux/types/scrobbles"
 import { Songs } from "../Songs"
-import "../../scss/u/scrobbles.scss"
 
 export const Scrobbles: React.StatelessComponent<{
   scrobbles: ScrobblesState | null
@@ -97,7 +96,7 @@ export const Scrobbles: React.StatelessComponent<{
               artworkBaseURL={artworkBaseURL}
               albumCentric={false}
               more={scrobbles.total! - itemsToShow.length}
-              // "showing all songs that are available on the client" && "more number of songs present for the user "
+              // "showing all songs that are available on the client" && "more number of songs present for the user"
               showMoreCard={(itemsToShow.length === scrobbles.items.length) && (scrobbles.total! > scrobbles.items.length)}
               showDates={true}
               now={() => new Date()}

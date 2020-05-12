@@ -186,11 +186,11 @@ export const U: React.FC<UProps> = ({
 
   // ... render ...
 
-  const header = Header(profileUsername, logoutURL)
-  const colorPicker = ColorPicker(color, onColorChange)
-  const top = Top(header, colorPicker, mode, (v) => { onControlChange(modeFromControlValue(v)) })
-
   if (detail === undefined) {
+    const header = Header(profileUsername, !!logoutURL, true)
+    const colorPicker = ColorPicker(color, onColorChange)
+    const top = Top(header, colorPicker, mode, (v) => { onControlChange(modeFromControlValue(v)) })
+
     return <Scrobbles
       scrobbles={scrobbles}
       artworkBaseURL={artworkBaseURL}
@@ -206,6 +206,7 @@ export const U: React.FC<UProps> = ({
   } else {
     return <Detail
       song={detailSong!}
+      artworkBaseURL={artworkBaseURL}
       private={priv}
       self={self}
       detailKind={detail.kind}
