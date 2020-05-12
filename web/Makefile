@@ -1,4 +1,5 @@
 WEBPACK := npx webpack-cli
+ESLINT_BASE := npx eslint . --ext .ts,.tsx
 
 default:
 	@echo "the default target does nothing!"
@@ -24,7 +25,11 @@ fmt:
 		! -regex '.*/static/.*' | \
 		xargs npx tsfmt --replace --
 	# lint
-	npx eslint . --ext .ts,.tsx
+	$(ESLINT_BASE)
+
+.PHONY: fix
+fix:
+	$(ESLINT_BASE) --fix
 
 .PHONY: sb
 sb:

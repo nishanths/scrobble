@@ -40,7 +40,7 @@ export function base64Decode(s: string): string {
   return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
 }
 
-// hex encoding and decoding implementations adapted from Go package encoding/hex.
+// hex encoding and decoding adapted from Go package encoding/hex.
 
 const hextable = "0123456789abcdef"
 
