@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux";
 import { RouteComponentProps, Redirect } from "react-router-dom";
-import { UArgs, Song, NProgress } from "../shared/types"
-import { trimPrefix, assertExhaustive, pathComponents, assert, hexDecode, hexEncode } from "../shared/util"
+import { UArgs, Song, NProgress } from "../../shared/types"
+import { trimPrefix, assertExhaustive, pathComponents, assert, hexDecode, hexEncode } from "../../shared/util"
 import { Header } from "./Header"
-import { Songs } from "./Songs"
-import { SegmentedControl } from "./SegmentedControl"
-import { CloseIcon } from "./CloseIcon"
-import { Color, ColorPicker } from "./colorpicker"
-import { State } from "../redux/types/u"
-import { fetchAllScrobbles, fetchLovedScrobbles, fetchColorScrobbles } from "../redux/actions/scrobbles"
-import { fetchSong } from "../redux/actions/song"
-import { useStateRef } from "../shared/hooks"
-import "../scss/u.scss"
-import "../scss/detail-modal.scss"
+import { Songs } from "../Songs"
+import { SegmentedControl } from "../SegmentedControl"
+import { CloseIcon } from "../CloseIcon"
+import { Color, ColorPicker } from "../colorpicker"
+import { State } from "../../redux/types/u"
+import { fetchAllScrobbles, fetchLovedScrobbles, fetchColorScrobbles } from "../../redux/actions/scrobbles"
+import { fetchSong } from "../../redux/actions/song"
+import { useStateRef } from "../../shared/hooks"
+import "../../scss/u.scss"
+import "../../scss/detail-modal.scss"
 import 'react-responsive-modal/styles.css';
 import { Modal } from 'react-responsive-modal';
 
