@@ -47,6 +47,7 @@ export const Detail: React.StatelessComponent<{
       nProgress.done()
       return null // TODO
     }
+    // handle initial redux state
     if (song.done === false) {
       return null
     }

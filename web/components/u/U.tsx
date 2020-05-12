@@ -208,7 +208,6 @@ export const U: React.FC<UProps> = ({
       nProgress={NProgress}
     />
   } else {
-    // render detail
     return <Detail
       song={detailSong!}
       profileUsername={profileUsername}
