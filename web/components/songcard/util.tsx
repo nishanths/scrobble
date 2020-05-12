@@ -121,7 +121,7 @@ export const LargeMeta: React.SFC<{
           <span className="otherContent">{other}</span>
         </div>
         {includePlayCount && <div className="lastLine">
-          <span className="playCount">Played {s.playCount.toLocaleString()} {pluralize("time", s.playCount)}</span>
+          <span className="playCount">Played {s.playCount.toLocaleString()} {pluralize("time", s.playCount)}.</span>
         </div>}
       </div>
     </a>
