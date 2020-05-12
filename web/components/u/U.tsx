@@ -5,19 +5,13 @@ import { UArgs, Song, NProgress } from "../../shared/types"
 import { Mode, DetailKind, pathForMode, pathForColor, modeFromControlValue } from "./shared"
 import { Header, ColorPicker, Top } from "./top"
 import { Scrobbles } from "./Scrobbles"
-import { trimPrefix, assertExhaustive, pathComponents, assert, hexDecode, hexEncode } from "../../shared/util"
-import { Songs } from "../Songs"
-import { SegmentedControl } from "../SegmentedControl"
-import { CloseIcon } from "../CloseIcon"
+import { assertExhaustive, hexDecode, assert } from "../../shared/util"
 import { Color } from "../colorpicker"
 import { State } from "../../redux/types/u"
 import { fetchAllScrobbles, fetchLovedScrobbles, fetchColorScrobbles } from "../../redux/actions/scrobbles"
 import { fetchSong } from "../../redux/actions/song"
 import { useStateRef } from "../../shared/hooks"
 import "../../scss/u.scss"
-import "../../scss/detail-modal.scss"
-import 'react-responsive-modal/styles.css';
-import { Modal } from 'react-responsive-modal';
 
 type UProps = UArgs & {
   wnd: Window

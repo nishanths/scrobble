@@ -2,6 +2,11 @@ import React from "react"
 import { SongState } from "../../redux/types/song"
 import { NProgress } from "../../shared/types"
 import { DetailKind } from "./shared"
+import { CloseIcon } from "../CloseIcon"
+
+import "../../scss/detail-modal.scss"
+import 'react-responsive-modal/styles.css';
+import { Modal } from 'react-responsive-modal';
 
 export const Detail: React.StatelessComponent<{
   song: SongState
@@ -12,8 +17,9 @@ export const Detail: React.StatelessComponent<{
   detailKind,
   nProgress,
 }) => {
-    return null
-  }
+
+  return null
+}
 
   // if (detail !== undefined) {
   //   assert(detailSong !== null, "detailSong unexpectedly null")
