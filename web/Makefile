@@ -18,10 +18,14 @@ clean:
 
 .PHONY: fmt
 fmt:
+	# tsfmt
 	find . -type f \( -name '*.ts' -o -name '*.tsx' \) \
 		! -name '*.d.ts' \
 		! -regex '.*/node_modules/.*' | \
+		! -regex '.*/static/.*' | \
 		xargs $(TSFMT) --replace --
+	# lint
+	npx eslint . --ext .ts,.tsx
 
 .PHONY: sb
 sb:

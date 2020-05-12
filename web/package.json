@@ -25,9 +25,12 @@
   "devDependencies": {
     "@babel/core": "^7.9.6",
     "@storybook/react": "^5.3.18",
+    "@typescript-eslint/eslint-plugin": "^2.32.0",
+    "@typescript-eslint/parser": "^2.32.0",
     "awesome-typescript-loader": "^5.2.1",
     "babel-loader": "^8.1.0",
     "css-loader": "^3.2.0",
+    "eslint": "^7.0.0",
     "mini-css-extract-plugin": "^0.8.0",
     "node-sass": "^4.13.0",
     "sass": "^1.26.0",
