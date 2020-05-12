@@ -14,7 +14,9 @@ module.exports = {
     'plugin:react/recommended',
   ],
 
-  // several rules copied from https://github.com/typescript-eslint/typescript-eslint/blob/master/.eslintrc.js
+  // some rules copied from https://github.com/typescript-eslint/typescript-eslint/blob/master/.eslintrc.js,
+  // which is a useful resource to discover rules
+
   rules: {
     // disables
     "@typescript-eslint/no-use-before-define": "off",
