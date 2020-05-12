@@ -123,6 +123,14 @@ export const U: React.FC<UProps> = ({
     history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(newColor))
   }
 
+  const nextEndIdx = (currentEndIdx: number, total: number): number => {
+    // increment, but don't go over the number of items itself
+    const b = Math.min(currentEndIdx + moreIncrement, total)
+    // if there aren't sufficient items left for the next time, just include them now
+    return total - b < moreIncrement ? total : b;
+  }
+
+  // scrobbles redux state
   const scrobbles = useSelector((s: State) => {
     switch (mode) {
       case Mode.All: return s.allScrobbles
@@ -134,6 +142,7 @@ export const U: React.FC<UProps> = ({
   const scrobblesRef = useRef(scrobbles)
   useEffect(() => { scrobblesRef.current = scrobbles }, [scrobbles])
 
+  // song detail redux state
   const detailSong = useSelector((s: State) => {
     if (detail === undefined) {
       return null
@@ -144,13 +153,7 @@ export const U: React.FC<UProps> = ({
   const detailSongRef = useRef(detailSong)
   useEffect(() => { detailSongRef.current = detailSong }, [detailSong])
 
-  const nextEndIdx = (currentEndIdx: number, total: number): number => {
-    // increment, but don't go over the number of items itself
-    const b = Math.min(currentEndIdx + moreIncrement, total)
-    // if there aren't sufficient items left for the next time, just include them now
-    return total - b < moreIncrement ? total : b;
-  }
-
+  // initial end idx
   useEffect(() => {
     const s = scrobblesRef.current
     if (s === null) {
@@ -160,6 +163,7 @@ export const U: React.FC<UProps> = ({
     setEndIdx(e)
   }, [scrobbles, mode])
 
+  // fetch scrobbles
   useEffect(() => {
     if (detail !== undefined) {
       return
@@ -195,6 +199,7 @@ export const U: React.FC<UProps> = ({
     }
   }, [profileUsername, mode, color, detail])
 
+  // fetch song detail
   useEffect(() => {
     if (detail === undefined) {
       return
@@ -205,6 +210,7 @@ export const U: React.FC<UProps> = ({
     }
   }, [profileUsername, detail])
 
+  // infinite scroll
   useEffect(() => {
     const f = () => {
       const s = scrobblesRef.current
@@ -253,39 +259,6 @@ export const U: React.FC<UProps> = ({
       <div className="info">(This user's scrobbles are private.)</div>
     </>
   }
-
-  // if (detail !== undefined) {
-  //   assert(detailSong !== null, "detailSong unexpectedly null")
-
-  //   if (detailSong.fetching) {
-  //     NProgress.start()
-  //   }
-  //   // handle initial redux state
-  //   if (detailSong.done === false) {
-  //     return null
-  //   }
-  //   NProgress.done()
-
-  //   const modalContent = <div className="flexContainer">
-  //     {detailSong.item!.ident}
-  //   </div>
-
-  //   console.log(hexEncode(detailSong.item!.ident))
-  //   console.log(hexDecode(detail!.hexIdent))
-
-  //   const modal = <Modal
-  //     open={true}
-  //     onClose={() => { history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(color)) }}
-  //     center
-  //     classNames={{ modal: "detailModal", overlay: "detailOverlay", closeButton: "detailCloseButton" }}
-  //     closeOnEsc={true}
-  //     animationDuration={500}
-  //     closeIcon={CloseIcon}>
-  //     {modalContent}
-  //   </Modal>
-
-  //   return <>{modal}</>
-  // }
 
   // If in the Color mode and no color is selected, render the top area and
   // the color picker, and we're done.
