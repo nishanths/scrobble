@@ -60,13 +60,13 @@ export function hexDecode(s: string): string {
     const a = fromHexChar(s[j - 1])
     const b = fromHexChar(s[j])
     if (a === null || b === null) {
-      throw "invalid byte: " + s
+      throw "invalid byte in input: " + s
     }
     out += String.fromCharCode((a.charCodeAt(0) << 4) | b.charCodeAt(0))
   }
   if (s.length % 2 === 1) {
     if (fromHexChar(s[j - 1]) === null) {
-      throw "invalid byte: " + s
+      throw "invalid byte in input: " + s
     }
     throw "bad length: " + s
   }
