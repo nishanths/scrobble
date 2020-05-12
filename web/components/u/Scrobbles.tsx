@@ -5,6 +5,7 @@ import { Mode } from "./shared"
 import { Color } from "../colorpicker"
 import { ScrobblesState } from "../../redux/types/scrobbles"
 import { Songs } from "../Songs"
+import "../../scss/u/scrobbles.scss"
 
 export const Scrobbles: React.StatelessComponent<{
   scrobbles: ScrobblesState | null

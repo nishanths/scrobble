@@ -12,7 +12,7 @@ import { State } from "../../redux/types/u"
 import { fetchAllScrobbles, fetchLovedScrobbles, fetchColorScrobbles } from "../../redux/actions/scrobbles"
 import { fetchSong } from "../../redux/actions/song"
 import { useStateRef } from "../../shared/hooks"
-import "../../scss/u.scss"
+import "../../scss/u/u.scss"
 
 type UProps = UArgs & {
   wnd: Window

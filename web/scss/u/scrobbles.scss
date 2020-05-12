@@ -1,22 +1,16 @@
 // TODO: this file is ugly
 
-@import "common.scss";
-@import "vars.scss";
-@import "u-mixin.scss";
+@import "../vars.scss";
+@import "shared.scss";
+@import "../songcard/songcard.scss";
 
-$dim: 250px;
-$bb: 110px;
-$fa: 2px;
-
-body {
-  font-family: $font-family;
-  margin: $body-margin-w;
+@function header-width($n-cards, $songcard-dim) {
+  $cut: $songcard-border-w * $n-cards * 3; /* arbitrary */
+  @return $n-cards * ($songcard-dim + ($songcard-border-w * 2)) - $cut;
 }
 
-#app {
-  max-width: app-width(1, $dim);
-  margin: 0 auto;
-  padding: 0 $app-padding-w;
+@function breakpoint-width($n-cards, $songcard-dim) {
+  @return app-width($n-cards, $songcard-dim) + (2 * $body-margin-w) + (2 * $app-padding-w)
 }
 
 .header {

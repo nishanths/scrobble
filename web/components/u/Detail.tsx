@@ -7,8 +7,8 @@ import { CloseIcon } from "../CloseIcon"
 import { Mode, pathForMode, pathForColor } from "./shared"
 import { Color } from "../colorpicker"
 import { RouteComponentProps } from "react-router-dom";
+import "../../scss/u/detail.scss"
 
-import "../../scss/detail-modal.scss"
 import 'react-responsive-modal/styles.css';
 import { Modal } from 'react-responsive-modal';
 
@@ -35,8 +35,23 @@ export const Detail: React.StatelessComponent<{
   nProgress,
   history,
 }) => {
-    if (priv === true && self === false) {
-      return null // TODO
+    const modal = (content: React.ReactNode) => <Modal
+      open={true}
+      onClose={() => { history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(color)) }}
+      center
+      classNames={{ modal: "detailModal", overlay: "detailOverlay", closeButton: "detailCloseButton" }}
+      closeOnEsc={true}
+      animationDuration={500}
+      closeIcon={CloseIcon}>
+      <div className="flexContainer">
+        {content}
+      </div>
+    </Modal>
+
+    let content: JSX.Element
+
+    if (true || priv === true && self === false) {
+      return modal(<div className="info">(This user's songs are private.)</div>)
     }
 
     if (song.fetching === true) {
@@ -63,20 +78,5 @@ export const Detail: React.StatelessComponent<{
     const item = song.item
     assert(item !== null, "item should not be null")
 
-    const content = <div className="flexContainer">
-      {item.ident}
-    </div>
-
-    const modal = <Modal
-      open={true}
-      onClose={() => { history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(color)) }}
-      center
-      classNames={{ modal: "detailModal", overlay: "detailOverlay", closeButton: "detailCloseButton" }}
-      closeOnEsc={true}
-      animationDuration={500}
-      closeIcon={CloseIcon}>
-      {content}
-    </Modal>
-
-    return <>{modal}</>
+    return <>{modal(null)}</>
   }

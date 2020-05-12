@@ -1,0 +1,12 @@
+@function card-width($songcard-dim) {
+  @return $songcard-dim + ($songcard-border-w * 2)
+}
+
+@function app-width($n-cards, $songcard-dim) {
+  @return $n-cards * card-width($songcard-dim)
+}
+
+// scrobbles vars
+$dim: 250px;
+$bb: 110px;
+$fa: 2px;

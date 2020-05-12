@@ -1,0 +1,14 @@
+@import "../common.scss";
+@import "../vars.scss";
+@import "shared.scss";
+
+body {
+  font-family: $font-family;
+  margin: $body-margin-w;
+}
+
+#app {
+  max-width: app-width(1, $dim);
+  margin: 0 auto;
+  padding: 0 $app-padding-w;
+}
