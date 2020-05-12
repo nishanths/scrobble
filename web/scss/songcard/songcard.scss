@@ -1,27 +1,5 @@
-@import "vars.scss";
-
-@mixin ellipsis() {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-@function card-width($songcard-dim) {
-  @return $songcard-dim + ($songcard-border-w * 2)
-}
-
-@function app-width($n-cards, $songcard-dim) {
-  @return $n-cards * card-width($songcard-dim)
-}
-
-@function header-width($n-cards, $songcard-dim) {
-  $cut: $songcard-border-w * $n-cards * 3; /* arbitrary */
-  @return $n-cards * ($songcard-dim + ($songcard-border-w * 2)) - $cut;
-}
-
-@function breakpoint-width($n-cards, $songcard-dim) {
-  @return app-width($n-cards, $songcard-dim) + (2 * $body-margin-w) + (2 * $app-padding-w)
-}
+@import "../vars.scss";
+@import "../mixins.scss";
 
 @mixin songCardProps($songcard-dim, $border-bottom, $adjust-font-size) {
   max-width: $songcard-dim;
@@ -107,7 +85,7 @@
   .meta {
     padding-left: 3px;
     padding-right: 3px;
-    cursor: default;
+    cursor: pointer; // for linking to detail
     color: $meta-color;
     text-align: center;
 
@@ -178,6 +156,64 @@
     }
     .number {
       font-size: 27px + $adjust-font-size;
+    }
+  }
+}
+
+@mixin largeSongCardProps($pict-dim, $icon-dim, $adjust-font-size) {
+  .pict {
+    width: $pict-dim;
+    height: $pict-dim;
+    background-size: cover;
+    box-shadow: 10px 8px 20px rgba(0, 0, 0, 0.4), 20px 10px 80px rgba(0, 0, 0, 0.2) inset;
+  }
+
+  .link {
+    text-decoration: none;
+    color: $meta-color;
+  }
+
+  .meta {
+    margin-top: 30px;
+
+    padding-left: 3px;
+    padding-right: 3px;
+    color: $meta-color;
+    text-align: center;
+
+    .title {
+      font-size: 16px + $adjust-font-size;
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+    }
+
+    .titleContent {
+      display: block;
+    }
+
+    .love {
+      background-image: url(/static/img/ios10-apple-music-love-icon.png);
+      background-repeat: no-repeat;
+      background-size: cover;
+      height: $icon-dim;
+      width: $icon-dim;
+      position: absolute;
+      right: 0;
+      box-shadow: -4px 0px 0px 0px white;
+      border: 3px solid white;
+    }
+
+    .other {
+      font-size: 14px + $adjust-font-size;
+      line-height: 1.5;
+    }
+
+    .lastLine {
+      font-size: 14px + $adjust-font-size;
+      margin-top: 20px;
     }
   }
 }

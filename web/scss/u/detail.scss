@@ -1,0 +1,133 @@
+@import "../vars.scss";
+@import "../songcard/songcard.scss";
+
+.detailOverlay {
+  background: white !important;
+}
+
+.detailModal {
+  width: 90%;
+  height: 100%;
+  max-width: 1200px !important;
+  max-height: 1000px;
+  box-shadow: none !important;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .header {
+    // TODO: header interferes with close icon at narrow widths
+  }
+
+  .flexContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: inherit; // inherit from modal
+  }
+}
+
+.detailCloseButton {
+  svg {
+    width: 100px;
+    height: 100px;
+    fill: #d3d3d3;
+    &:hover {
+      fill: #aaa;
+    }
+  }
+}
+
+.info {
+  margin: 120px auto 0;
+  text-align: center;
+  font-size: 20px;
+  color: $muted-color;
+  align-self: start;
+}
+
+$pict: 275px;
+$love: 9px;
+$fa: 0;
+
+.LargeSongCard {
+  width: inherit; // inherit from flexContainer
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.flexContainer {
+  margin-top: 45px;
+}
+.LargeSongCard {
+  @include largeSongCardProps($pict, $love, $fa);
+}
+
+@media screen and (min-width: 420px) {
+  $pict: 350px;
+  $love: 9px;
+  $fa: 1px;
+
+  .flexContainer {
+    margin-top: 45px;
+  }
+  .LargeSongCard {
+    @include largeSongCardProps($pict, $love, $fa);
+  }
+}
+
+@media screen and (min-width: 500px) {
+  $pict: 400px;
+  $love: 9px;
+  $fa: 1px;
+
+  .flexContainer {
+    margin-top: 15px;
+  }
+  .LargeSongCard {
+    @include largeSongCardProps($pict, $love, $fa);
+  }
+}
+
+@media screen and (min-width: 640px) {
+  $pict: 500px;
+  $love: 9px;
+  $fa: 1px;
+
+  .flexContainer {
+    margin-top: 15px;
+  }
+  .LargeSongCard {
+    @include largeSongCardProps($pict, $love, $fa);
+  }
+}
+
+@media screen and (min-width: 915px) {
+  $pict: 600px;
+  $love: 10px;
+  $fa: 2px;
+
+  .flexContainer {
+    margin-top: 15px;
+  }
+  .LargeSongCard {
+    @include largeSongCardProps($pict, $love, $fa);
+  }
+}
+
+@media screen and (min-width: 1380px) {
+  $pict: 725px;
+  $love: 11px;
+  $fa: 3px;
+
+  .flexContainer {
+    margin-top: 45px;
+  }
+  .LargeSongCard {
+    @include largeSongCardProps($pict, $love, $fa);
+  }
+}

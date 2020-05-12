@@ -1,34 +1,45 @@
 import React from "react"
 import { assertExhaustive, assert } from "../../shared/util"
-import { NProgress } from "../../shared/types"
-import { Mode } from "./shared"
+import { NProgress, Song } from "../../shared/types"
+import { Mode, ControlValue } from "./shared"
 import { Color } from "../colorpicker"
 import { ScrobblesState } from "../../redux/types/scrobbles"
 import { Songs } from "../Songs"
+import { Header, ColorPicker, Top } from "./top"
 
 export const Scrobbles: React.StatelessComponent<{
   scrobbles: ScrobblesState | null
+  profileUsername: string
+  signedIn: boolean
   artworkBaseURL: string
   endIdx: number
   private: boolean
   self: boolean
   mode: Mode
   color: Color | undefined
-  header: JSX.Element
-  top: JSX.Element
   nProgress: NProgress
+  onColorChange: (c: Color) => void
+  onControlChange: (v: ControlValue) => void
+  onSongClick: (s: Song) => void
 }> = ({
   scrobbles,
+  profileUsername,
+  signedIn,
   artworkBaseURL,
   endIdx,
   private: priv,
   self,
   mode,
   color,
-  header,
-  top,
-  nProgress
+  nProgress,
+  onColorChange,
+  onControlChange,
+  onSongClick,
 }) => {
+    const header = Header(profileUsername, signedIn, true)
+    const colorPicker = ColorPicker(color, onColorChange)
+    const top = Top(header, colorPicker, mode, onControlChange)
+
     // Easy case. For private accounts that aren't the current user, render the
     // private info-message.
     if (priv === true && self === false) {
@@ -96,10 +107,11 @@ export const Scrobbles: React.StatelessComponent<{
               artworkBaseURL={artworkBaseURL}
               albumCentric={false}
               more={scrobbles.total! - itemsToShow.length}
-              // "showing all songs that are available on the client" && "more number of songs present for the user "
+              // "showing all songs that are available on the client" && "more number of songs present for the user"
               showMoreCard={(itemsToShow.length === scrobbles.items.length) && (scrobbles.total! > scrobbles.items.length)}
               showDates={true}
               now={() => new Date()}
+              onSongClick={onSongClick}
             />
           </div>
         </>
@@ -115,6 +127,7 @@ export const Scrobbles: React.StatelessComponent<{
               albumCentric={true}
               showMoreCard={false}
               showDates={false}
+              onSongClick={onSongClick}
             />
           </div>
         </>

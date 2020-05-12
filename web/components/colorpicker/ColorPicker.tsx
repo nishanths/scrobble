@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import { Swatch } from "./Swatch"
 import { colors, Color } from "./color"
 import { capitalize } from "../../shared/util"
-import "../../scss/color-picker.scss"
+import "../../scss/colorpicker/color-picker.scss"
 
 type ColorPickerProps = {
   afterSelect?: (c: Color) => void

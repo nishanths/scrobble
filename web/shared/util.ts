@@ -6,6 +6,13 @@ export function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+export function pluralize(w: string, n: number): string {
+  if (n === 1) {
+    return w
+  }
+  return w + "s"
+}
+
 export function hasPrefix(s: string, prefix: string): boolean {
   return s.length >= prefix.length && s.slice(0, prefix.length) == prefix
 }

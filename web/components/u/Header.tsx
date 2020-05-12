@@ -1,13 +1,14 @@
 import React from "react"
 
-export const Header: React.StatelessComponent<{ username: string, signedIn: boolean }> = ({
+export const Header: React.StatelessComponent<{ username: string, signedIn: boolean, showNav: boolean }> = ({
   username,
-  signedIn
+  signedIn,
+  showNav,
 }) => {
   return <div className="header">
     <span className="username"><span className="emph">{username}</span><span className="rest">'s scrobbles</span></span>
-    <span className="nav">
+    {showNav && <span className="nav">
       {signedIn ? <a href="/">Settings</a> : <a href="/login">Sign In</a>}
-    </span>
+    </span>}
   </div>
 }

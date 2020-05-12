@@ -40,6 +40,12 @@ module.exports = {
         },
       },
     ],
+    "@typescript-eslint/no-empty-interface": [
+      "error",
+      {
+        "allowSingleExtends": true
+      }
+    ],
 
     // Forbid the use of extraneous packages
     "import/no-extraneous-dependencies": [

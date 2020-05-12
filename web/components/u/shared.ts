@@ -46,3 +46,14 @@ export const pathForColor = (c: Color | undefined): string => {
   }
   return "/" + c
 }
+
+export const pathForDetailKind = (k: DetailKind): string => {
+  switch (k) {
+    case DetailKind.Song:
+      return "/song"
+    case DetailKind.Album:
+      return "/album"
+    default:
+      assertExhaustive(k)
+  }
+}

@@ -1,0 +1,18 @@
+$header-margin: 30px auto 0;
+
+@function card-width($songcard-dim) {
+  @return $songcard-dim + ($songcard-border-w * 2)
+}
+
+@function app-width($n-cards, $songcard-dim) {
+  @return $n-cards * card-width($songcard-dim)
+}
+
+@function header-width($n-cards, $songcard-dim) {
+  $cut: $songcard-border-w * $n-cards * 3; /* arbitrary */
+  @return $n-cards * ($songcard-dim + ($songcard-border-w * 2)) - $cut;
+}
+
+@function breakpoint-width($n-cards, $songcard-dim) {
+  @return app-width($n-cards, $songcard-dim) + (2 * $body-margin-w) + (2 * $app-padding-w)
+}

@@ -1,51 +1,76 @@
 import React from "react"
 import { SongState } from "../../redux/types/song"
 import { NProgress } from "../../shared/types"
-import { assert } from "../../shared/util"
+import { assert, assertExhaustive } from "../../shared/util"
 import { DetailKind } from "./shared"
+import { Header } from "./top"
 import { CloseIcon } from "../CloseIcon"
-import { Mode, pathForMode, pathForColor } from "./shared"
-import { Color } from "../colorpicker"
-import { RouteComponentProps } from "react-router-dom";
-
-import "../../scss/detail-modal.scss"
-import 'react-responsive-modal/styles.css';
+import { LargeSongCard } from "../songcard"
 import { Modal } from 'react-responsive-modal';
+import 'react-responsive-modal/styles.css';
+import "../../scss/u/detail.scss"
 
-type History = RouteComponentProps["history"]
+const nounForDetailKind = (k: DetailKind): string => {
+  switch (k) {
+    case DetailKind.Song:
+      return "song"
+    case DetailKind.Album:
+      return "album"
+    default:
+      assertExhaustive(k)
+  }
+}
 
 export const Detail: React.StatelessComponent<{
   song: SongState
   profileUsername: string
-  mode: Mode
-  color: Color | undefined
+  artworkBaseURL: string
   private: boolean
   self: boolean
   detailKind: DetailKind
   nProgress: NProgress
-  history: History
+  onDetailClose: () => void
 }> = ({
   song,
   profileUsername,
-  mode,
-  color,
+  artworkBaseURL,
   private: priv,
   self,
   detailKind,
   nProgress,
-  history,
+  onDetailClose,
 }) => {
+    const header = Header(profileUsername, false, false)
+
+    const modal = (content: React.ReactNode) => <Modal
+      open={true}
+      onClose={onDetailClose}
+      center
+      classNames={{ modal: "detailModal", overlay: "detailOverlay", closeButton: "detailCloseButton" }}
+      closeOnOverlayClick={false}
+      closeOnEsc={true}
+      animationDuration={500}
+      closeIcon={CloseIcon}>
+      {header}
+      <div className="flexContainer">
+        {content}
+      </div>
+    </Modal>
+
+    const noun = nounForDetailKind(detailKind)
+    const privateContent = <div className="info">(This user's songs are private.)</div>
+
     if (priv === true && self === false) {
-      return null // TODO
+      return modal(privateContent)
     }
 
     if (song.fetching === true) {
       nProgress.start()
-      return null // TODO
+      return modal(null)
     }
     if (song.error === true) {
       nProgress.done()
-      return null // TODO
+      return modal(<div className="info">(Failed to fetch scrobbles.)</div>)
     }
     // handle initial redux state
     if (song.done === false) {
@@ -54,29 +79,20 @@ export const Detail: React.StatelessComponent<{
     nProgress.done()
 
     if (song.private === true) {
-      return null // TODO
+      return modal(privateContent)
     }
     if (song.noSuchSong === true) {
-      return null // TODO
+      return modal(<div className="info">(Failed to find the specified {noun}.)</div>)
     }
 
     const item = song.item
     assert(item !== null, "item should not be null")
 
-    const content = <div className="flexContainer">
-      {item.ident}
-    </div>
-
-    const modal = <Modal
-      open={true}
-      onClose={() => { history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(color)) }}
-      center
-      classNames={{ modal: "detailModal", overlay: "detailOverlay", closeButton: "detailCloseButton" }}
-      closeOnEsc={true}
-      animationDuration={500}
-      closeIcon={CloseIcon}>
-      {content}
-    </Modal>
-
-    return <>{modal}</>
+    return modal(<>
+      <LargeSongCard
+        song={item}
+        artworkBaseURL={artworkBaseURL}
+        albumCentric={detailKind === DetailKind.Album}
+      />
+    </>)
   }

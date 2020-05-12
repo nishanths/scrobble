@@ -1,18 +1,18 @@
-import React, { useState, useEffect, useRef } from "react"
+import React, { useEffect, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux";
 import { RouteComponentProps } from "react-router-dom";
-import { UArgs, NProgress } from "../../shared/types"
-import { Mode, DetailKind, pathForMode, pathForColor, modeFromControlValue } from "./shared"
-import { Header, ColorPicker, Top } from "./top"
+import { UArgs, NProgress, Song } from "../../shared/types"
+import { Mode, DetailKind, pathForMode, pathForColor, pathForDetailKind, modeFromControlValue } from "./shared"
 import { Scrobbles } from "./Scrobbles"
 import { Detail } from "./Detail"
-import { assertExhaustive, hexDecode, assert } from "../../shared/util"
+import { assertExhaustive, hexDecode, assert, hexEncode } from "../../shared/util"
 import { Color } from "../colorpicker"
 import { State } from "../../redux/types/u"
 import { fetchAllScrobbles, fetchLovedScrobbles, fetchColorScrobbles } from "../../redux/actions/scrobbles"
 import { fetchSong } from "../../redux/actions/song"
+import { setLastColor } from "../../redux/actions/last-color"
 import { useStateRef } from "../../shared/hooks"
-import "../../scss/u.scss"
+import "../../scss/u/u.scss"
 
 type UProps = UArgs & {
   wnd: Window
@@ -56,12 +56,7 @@ export const U: React.FC<UProps> = ({
 }) => {
   const dispatch = useDispatch()
   const [endIdx, endIdxRef, setEndIdx] = useStateRef(0)
-  const [lastColor, setLastColor] = useState(color) // save latest color when switching between other modes
-  useEffect(() => {
-    if (mode === Mode.Color) {
-      setLastColor(color)
-    }
-  }, [color])
+  const lastColor = useSelector((s: State) => s.lastColor)
 
   const onControlChange = (newMode: Mode) => {
     NProgress.done()
@@ -72,7 +67,7 @@ export const U: React.FC<UProps> = ({
         u = "/u/" + profileUsername + pathForMode(newMode)
         break
       case Mode.Color:
-        u = "/u/" + profileUsername + pathForMode(newMode) + pathForColor(lastColor)
+        u = "/u/" + profileUsername + pathForMode(newMode) + pathForColor(lastColor.color)
         break
       default:
         assertExhaustive(newMode)
@@ -82,9 +77,28 @@ export const U: React.FC<UProps> = ({
 
   const onColorChange = (newColor: Color) => {
     NProgress.done()
-    console.log(newColor)
+    dispatch(setLastColor(newColor))
     assert(mode === Mode.Color, "mode should be Color")
     history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(newColor))
+  }
+
+  const onSongClick = (s: Song) => {
+    NProgress.done()
+
+    let kind: DetailKind
+    switch (mode) {
+      case Mode.All:
+      case Mode.Loved:
+        kind = DetailKind.Song
+        break
+      case Mode.Color:
+        kind = DetailKind.Album
+        break
+      default:
+        assertExhaustive(mode)
+    }
+
+    history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(color) + pathForDetailKind(kind) + "/" + hexEncode(s.ident))
   }
 
   // scrobbles redux state
@@ -190,34 +204,32 @@ export const U: React.FC<UProps> = ({
 
   // ... render ...
 
-  const header = Header(profileUsername, logoutURL)
-  const colorPicker = ColorPicker(color, onColorChange)
-  const top = Top(header, colorPicker, mode, (v) => { onControlChange(modeFromControlValue(v)) })
-
   if (detail === undefined) {
     return <Scrobbles
       scrobbles={scrobbles}
+      profileUsername={profileUsername}
+      signedIn={!!logoutURL}
       artworkBaseURL={artworkBaseURL}
       endIdx={endIdx}
       private={priv}
       self={self}
       mode={mode}
       color={color}
-      header={header}
-      top={top}
       nProgress={NProgress}
+      onColorChange={onColorChange}
+      onControlChange={(v) => { onControlChange(modeFromControlValue(v)) }}
+      onSongClick={onSongClick}
     />
   } else {
     return <Detail
       song={detailSong!}
       profileUsername={profileUsername}
-      mode={mode}
-      color={color}
+      artworkBaseURL={artworkBaseURL}
       private={priv}
       self={self}
       detailKind={detail.kind}
       nProgress={NProgress}
-      history={history}
+      onDetailClose={() => { NProgress.done(); history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(color)) }}
     />
   }
 }

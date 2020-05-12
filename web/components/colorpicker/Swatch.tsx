@@ -1,6 +1,6 @@
 import React from "react"
 import { Color } from "./color"
-import "../../scss/swatch.scss"
+import "../../scss/colorpicker/swatch.scss"
 
 type SwatchProps = {
   color: Color

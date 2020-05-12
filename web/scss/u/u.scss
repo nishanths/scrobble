@@ -1,8 +1,12 @@
-// TODO: this file is ugly
+// TODO: the media queries section in this file is ugly
 
-@import "common.scss";
-@import "vars.scss";
-@import "u-mixin.scss";
+// NOTE: this file is, in essence, a combination of "u" and "scrobbles".
+// It would be ideal to pull these two apart into separate files.
+
+@import "../common.scss";
+@import "../vars.scss";
+@import "../songcard/songcard.scss";
+@import "shared.scss";
 
 $dim: 250px;
 $bb: 110px;
@@ -30,7 +34,7 @@ body {
 
   font-size: 24px;
   color: $muted-color;
-  margin: 30px auto 0;
+  margin: $header-margin;
 
   .username {
     max-width: 275px;
