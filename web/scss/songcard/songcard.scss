@@ -159,3 +159,60 @@
     }
   }
 }
+
+@mixin largeSongCardProps($songcard-dim, $icon-dim, $adjust-font-size) {
+  .pict {
+    width: $songcard-dim;
+    height: $songcard-dim;
+    background-size: cover;
+    box-shadow: 10px 8px 20px rgba(0, 0, 0, 0.4), 20px 10px 80px rgba(0, 0, 0, 0.2) inset;
+  }
+
+  .link {
+    text-decoration: none;
+    color: $meta-color;
+  }
+
+  .meta {
+    margin-top: 45px;
+
+    padding-left: 3px;
+    padding-right: 3px;
+    color: $meta-color;
+    text-align: center;
+
+    .title {
+      font-size: 18px + $adjust-font-size;
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+    }
+
+    .titleContent {
+      display: block;
+    }
+
+    .love {
+      background-image: url(/static/img/ios10-apple-music-love-icon.png);
+      background-repeat: no-repeat;
+      background-size: cover;
+      height: $icon-dim;
+      width: $icon-dim;
+      position: absolute;
+      right: 0;
+      box-shadow: -4px 0px 0px 0px white;
+      border: 3px solid white;
+    }
+
+    .other {
+      font-size: 16px + $adjust-font-size;
+      line-height: 1.5;
+    }
+
+    .lastLine {
+      margin-top: 20px;
+    }
+  }
+}

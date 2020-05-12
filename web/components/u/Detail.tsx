@@ -40,13 +40,14 @@ export const Detail: React.StatelessComponent<{
   nProgress,
   onDetailClose,
 }) => {
-    const header = Header(profileUsername, false /* value should not matter */, false)
+    const header = Header(profileUsername, false, false)
 
     const modal = (content: React.ReactNode) => <Modal
       open={true}
       onClose={onDetailClose}
       center
       classNames={{ modal: "detailModal", overlay: "detailOverlay", closeButton: "detailCloseButton" }}
+      closeOnOverlayClick={false}
       closeOnEsc={true}
       animationDuration={500}
       closeIcon={CloseIcon}>
@@ -92,8 +93,6 @@ export const Detail: React.StatelessComponent<{
         song={item}
         artworkBaseURL={artworkBaseURL}
         albumCentric={detailKind === DetailKind.Album}
-        showDate={detailKind === DetailKind.Song}
-        now={() => new Date()}
       />
     </>)
   }
