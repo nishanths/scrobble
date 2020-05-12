@@ -5,6 +5,7 @@ import { UArgs, NProgress } from "../../shared/types"
 import { Mode, DetailKind, pathForMode, pathForColor, modeFromControlValue } from "./shared"
 import { Header, ColorPicker, Top } from "./top"
 import { Scrobbles } from "./Scrobbles"
+import { Detail } from "./Detail"
 import { assertExhaustive, hexDecode, assert } from "../../shared/util"
 import { Color } from "../colorpicker"
 import { State } from "../../redux/types/u"
@@ -208,7 +209,17 @@ export const U: React.FC<UProps> = ({
     />
   } else {
     // render detail
-    return null
+    return <Detail
+      song={detailSong!}
+      profileUsername={profileUsername}
+      mode={mode}
+      color={color}
+      private={priv}
+      self={self}
+      detailKind={detail.kind}
+      nProgress={NProgress}
+      history={history}
+    />
   }
 }
 
