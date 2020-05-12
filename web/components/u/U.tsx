@@ -161,8 +161,8 @@ export const U: React.FC<UProps> = ({
     if (detail === undefined) {
       return
     }
-    const s = detailSongRef.current
-    if (s === null || (s.done === false && s.fetching === false) || s.error === true) {
+    const song = detailSongRef.current
+    if (song === null || (song.done === false && song.fetching === false) || song.error === true) {
       dispatch(fetchSong(profileUsername, hexDecode(detail.hexIdent)))
     }
   }, [profileUsername, detail])
