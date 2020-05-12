@@ -7,7 +7,7 @@ interface SegmentedControlProps<V extends readonly string[]> {
   values: V
 }
 
-// TODO: support for React.FC with generic props?
+// TODO: support for defining React.FC with generic props?
 
 export const SegmentedControl = <V extends readonly string[]>(props: (SegmentedControlProps<V> & { children?: ReactNode })) => {
   const { afterChange, initialValue, values } = props;
