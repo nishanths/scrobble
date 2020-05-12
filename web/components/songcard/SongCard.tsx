@@ -43,7 +43,7 @@ export const SongCard: React.StatelessComponent<SongCardProps> = ({
     return song.trackViewURL
   })()
 
-  const trackLinkArea = <a href={trackViewURL} title={trackViewURL} target="_blank"  rel="noopener noreferrer">
+  const trackLinkArea = <a href={trackViewURL} title={trackViewURL} target="_blank" rel="noopener noreferrer">
     <div className="trackLinkArea" ref={r => { trackLinkAreaElem = r }}>
       <div className="trackLink"></div>
     </div>
