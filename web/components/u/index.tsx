@@ -1,2 +1,2 @@
-export * from "./types"
-export * from "./U"
+export { U } from "./U"
+export { DetailKind, Mode } from "./shared"

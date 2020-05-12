@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux";
 import { RouteComponentProps, Redirect } from "react-router-dom";
 import { UArgs, Song, NProgress } from "../../shared/types"
-import { Mode, DetailKind } from "./types"
+import { Mode, DetailKind, pathForMode, pathForColor, modeFromControlValue } from "./shared"
+import { Header, ColorPicker, Top } from "./top"
 import { trimPrefix, assertExhaustive, pathComponents, assert, hexDecode, hexEncode } from "../../shared/util"
-import { Header } from "./Header"
 import { Songs } from "../Songs"
 import { SegmentedControl } from "../SegmentedControl"
 import { CloseIcon } from "../CloseIcon"
-import { Color, ColorPicker } from "../colorpicker"
+import { Color } from "../colorpicker"
 import { State } from "../../redux/types/u"
 import { fetchAllScrobbles, fetchLovedScrobbles, fetchColorScrobbles } from "../../redux/actions/scrobbles"
 import { fetchSong } from "../../redux/actions/song"
@@ -17,44 +17,6 @@ import "../../scss/u.scss"
 import "../../scss/detail-modal.scss"
 import 'react-responsive-modal/styles.css';
 import { Modal } from 'react-responsive-modal';
-
-const controlValues = ["All", "Loved", "By color"] as const
-
-type ControlValue = typeof controlValues[number]
-
-const controlValueForMode = (m: Mode): ControlValue => {
-  switch (m) {
-    case Mode.All: return "All"
-    case Mode.Loved: return "Loved"
-    case Mode.Color: return "By color"
-    default: assertExhaustive(m)
-  }
-}
-
-const modeFromControlValue = (v: ControlValue): Mode => {
-  switch (v) {
-    case "All": return Mode.All
-    case "Loved": return Mode.Loved
-    case "By color": return Mode.Color
-    default: assertExhaustive(v)
-  }
-}
-
-const pathForMode = (m: Mode): string => {
-  switch (m) {
-    case Mode.All: return ""
-    case Mode.Loved: return "/loved"
-    case Mode.Color: return "/color"
-  }
-  assertExhaustive(m)
-}
-
-const pathForColor = (c: Color | undefined): string => {
-  if (c === undefined) {
-    return ""
-  }
-  return "/" + c
-}
 
 type UProps = UArgs & {
   wnd: Window
@@ -233,23 +195,9 @@ export const U: React.FC<UProps> = ({
 
   // ... render ...
 
-  const header = <Header username={profileUsername} signedIn={!!logoutURL} />
-
-  const colorPicker = <div className="colorPicker">
-    <ColorPicker initialSelection={color} prompt="Pick a color to see scrobbled artwork of that color." afterSelect={(c) => { onColorChange(c) }} />
-  </div>
-
-  const top = <>
-    {header}
-    <div className="control">
-      <SegmentedControl
-        afterChange={(v) => { onControlChange(modeFromControlValue(v)) }}
-        values={controlValues}
-        initialValue={controlValueForMode(mode)}
-      />
-    </div>
-    {mode === Mode.Color && colorPicker}
-  </>
+  const header = Header(profileUsername, logoutURL)
+  const colorPicker = ColorPicker(color, onColorChange)
+  const top = Top(header, colorPicker, mode, (v) => { onControlChange(modeFromControlValue(v)) })
 
   // Easy case. For private accounts that aren't the current user, render the
   // private info-message.
