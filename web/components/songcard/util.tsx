@@ -9,7 +9,7 @@ const TrackLink: React.SFC<{ previewURL: string }> = ({ previewURL }) => {
   useEffect(() => {
     // Stack Overflow says onclick enables :hover on iOS
     // TODO: is this really necessary?
-    if (trackLinkAreaElem != null) { trackLinkAreaElem.setAttribute("onclick", "") }
+    if (trackLinkAreaElem !== null) { trackLinkAreaElem.setAttribute("onclick", "") }
   }, [])
 
   return <a href={previewURL} title={previewURL} target="_blank" rel="noopener noreferrer">
