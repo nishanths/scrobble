@@ -64,7 +64,7 @@ func devScrobbledHandler(w http.ResponseWriter, r *http.Request) {
 		file = "scrobbled_loved.json" // jq "[.songs[] | select(.loved == true)]" scrobbled_all.json
 	}
 
-	if r.FormValue("ident") != "" {
+	if r.FormValue("song") != "" {
 		file = "scrobbled_ident.json"
 	}
 

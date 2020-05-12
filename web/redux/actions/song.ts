@@ -57,7 +57,7 @@ export const fetchSong = (username: string, ident: string): SongThunkResult<void
 }
 
 const _fetchSong = async (username: string, ident: string): Promise<FetchSongResult> => {
-  const url = "/api/v1/scrobbled?username=" + username + "&ident=" + encodeURIComponent(ident)
+  const url = "/api/v1/scrobbled?username=" + username + "&song=" + encodeURIComponent(ident)
   const r = await fetch(url)
   switch (r.status) {
     case 200: {
