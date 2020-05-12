@@ -4,6 +4,7 @@ import { RouteComponentProps, Redirect } from "react-router-dom";
 import { UArgs, Song, NProgress } from "../../shared/types"
 import { Mode, DetailKind, pathForMode, pathForColor, modeFromControlValue } from "./shared"
 import { Header, ColorPicker, Top } from "./top"
+import { Scrobbles } from "./Scrobbles"
 import { trimPrefix, assertExhaustive, pathComponents, assert, hexDecode, hexEncode } from "../../shared/util"
 import { Songs } from "../Songs"
 import { SegmentedControl } from "../SegmentedControl"
@@ -30,6 +31,20 @@ type UProps = UArgs & {
 
 declare var NProgress: NProgress
 
+// Divisble by 2, 3, and 4. This is appropriate because these are the number
+// of cards typically displayed per row. Using such a number ensures that
+// the last row isn't an incomplete row.
+const moreIncrement = 36;
+
+const limit = 504; // `moreIncrement` * 14
+
+const nextEndIdx = (currentEndIdx: number, total: number): number => {
+  // increment, but don't go over the number of items itself
+  const b = Math.min(currentEndIdx + moreIncrement, total)
+  // if there aren't sufficient items left for the next time, just include them now
+  return total - b < moreIncrement ? total : b;
+}
+
 // U is the root component for the username page, e.g.,
 // https://scrobble.littleroot.org/u/whatever.
 export const U: React.FC<UProps> = ({
@@ -46,12 +61,6 @@ export const U: React.FC<UProps> = ({
   detail,
   history,
 }) => {
-  // Divisble by 2, 3, and 4. This is appropriate because these are the number
-  // of cards typically displayed per row. Using such a number ensures that
-  // the last row isn't an incomplete row.
-  const moreIncrement = 36;
-  const limit = 504; // moreIncrement * 14
-
   const dispatch = useDispatch()
   const [endIdx, endIdxRef, setEndIdx] = useStateRef(0)
   const [lastColor, setLastColor] = useState(color) // save latest color when switching between other modes
@@ -83,13 +92,6 @@ export const U: React.FC<UProps> = ({
     console.log(newColor)
     assert(mode === Mode.Color, "mode should be Color")
     history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(newColor))
-  }
-
-  const nextEndIdx = (currentEndIdx: number, total: number): number => {
-    // increment, but don't go over the number of items itself
-    const b = Math.min(currentEndIdx + moreIncrement, total)
-    // if there aren't sufficient items left for the next time, just include them now
-    return total - b < moreIncrement ? total : b;
   }
 
   // scrobbles redux state
@@ -199,102 +201,22 @@ export const U: React.FC<UProps> = ({
   const colorPicker = ColorPicker(color, onColorChange)
   const top = Top(header, colorPicker, mode, (v) => { onControlChange(modeFromControlValue(v)) })
 
-  // Easy case. For private accounts that aren't the current user, render the
-  // private info-message.
-  if (priv === true && self === false) {
-    return <>
-      {header}
-      <div className="info">(This user's scrobbles are private.)</div>
-    </>
-  }
-
-  // If in the Color mode and no color is selected, render the top area and
-  // the color picker, and we're done.
-  if (mode === Mode.Color && color === undefined) {
-    return <>
-      {top}
-    </>
-  }
-
-  assert(scrobbles !== null, "scrobbles unexpectedly null")
-
-  NProgress.configure({ showSpinner: false, minimum: 0.1, trickleSpeed: 150, speed: 500 })
-
-  if (scrobbles.fetching === true) {
-    NProgress.start()
-    return <>{top}</>
-  }
-
-  if (scrobbles.error === true) {
-    NProgress.done()
-    return <>
-      {header}
-      <div className="info">(Failed to fetch scrobbles.)</div>
-    </>
-  }
-
-  // handle initial redux state
-  if (scrobbles.done === false) {
+  if (detail === undefined) {
+    return <Scrobbles
+      scrobbles={scrobbles}
+      artworkBaseURL={artworkBaseURL}
+      endIdx={endIdx}
+      private={priv}
+      self={self}
+      mode={mode}
+      color={color}
+      header={header}
+      top={top}
+      nProgress={NProgress}
+    />
+  } else {
+    // render detail
     return null
-  }
-
-  NProgress.done()
-
-  // can happen if the privacy was changed after the initial server page load
-  if (scrobbles.private) {
-    return <>
-      {header}
-      <div className="info">(This user's scrobbles are private.)</div>
-    </>
-  }
-
-  if (scrobbles.items.length === 0) {
-    return <>
-      {top}
-      <div className="info">({self ? "You haven't" : "This user hasn't"} scrobbled {mode != Mode.All ? "matching " : ""}songs yet.)</div>
-    </>
-  }
-
-  const itemsToShow = scrobbles.items.slice(0, endIdx);
-
-  switch (mode) {
-    case Mode.All:
-    case Mode.Loved: {
-      return <>
-        {top}
-        <div className="songs">
-          <Songs
-            songs={itemsToShow}
-            artworkBaseURL={artworkBaseURL}
-            albumCentric={false}
-            more={scrobbles.total! - itemsToShow.length}
-            // "showing all songs that are available on the client" && "more number of songs present for the user "
-            showMoreCard={(itemsToShow.length === scrobbles.items.length) && (scrobbles.total! > scrobbles.items.length)}
-            showDates={true}
-            now={() => new Date()}
-          />
-        </div>
-      </>
-    }
-
-    case Mode.Color: {
-      return <>
-        {top}
-        <div className="songs">
-          <Songs
-            songs={itemsToShow}
-            artworkBaseURL={artworkBaseURL}
-            albumCentric={true}
-            showMoreCard={false}
-            showDates={false}
-          />
-        </div>
-      </>
-    }
-
-    default: {
-      assertExhaustive(mode)
-    }
   }
 }
 

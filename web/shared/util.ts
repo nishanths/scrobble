@@ -102,7 +102,7 @@ export const copyMap = <K, V>(m: Map<K, V>): Map<K, V> => {
 }
 
 export class MapDefault<K, V> {
-  constructor(private readonly def: () => V, private readonly m: Map<K, V> = new Map()) {}
+  constructor(private readonly def: () => V, private readonly m: Map<K, V> = new Map()) { }
 
   getOrDefault(key: K): V {
     const v = this.m.get(key)
