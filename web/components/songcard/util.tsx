@@ -43,6 +43,18 @@ export const MorePicture: React.SFC<{ more: number }> = ({ more }) => {
   </div>
 }
 
+export const LargePicture: React.SFC<{ song: Song, artworkBaseURL: string, albumCentric: boolean }> = ({
+  song,
+  artworkBaseURL,
+  albumCentric,
+}) => {
+  const artworkURL = song.artworkHash ? artworkBaseURL + "/" + song.artworkHash : "";
+  const imgStyles = artworkURL ? { backgroundImage: `url(${artworkURL})` } : { backgroundColor: "#fff" }
+
+  return <div className="pict" style={imgStyles}>
+  </div>
+}
+
 // Meta is the metadata area for a SongCard.
 export const Meta: React.SFC<{
   song: Song
@@ -58,7 +70,7 @@ export const Meta: React.SFC<{
     const tooltip = metaTooltip(albumCentric, s.title, s.artistName, s.albumTitle)
     const title = albumCentric ? s.albumTitle : s.title
     const includeLoved = !albumCentric && s.loved
-    const includeDate = showDate && s.lastPlayed
+    const includeDate = !albumCentric && showDate && s.lastPlayed
 
     return <div className="meta" title={tooltip}>
       <div className="title">
@@ -72,6 +84,23 @@ export const Meta: React.SFC<{
 
       {includeDate && <time className="date">{dateDisplay(new Date(s.lastPlayed * 1000), now!())}</time>}
     </div>
+  }
+
+export const LargeMeta: React.SFC<{
+  song: Song
+  albumCentric: boolean
+  showDate: boolean
+  now?: () => Date
+}> = ({
+  song,
+  albumCentric,
+  showDate,
+  now,
+}) => {
+    // info to include
+    // [title], artist, album, [loved], [playCount], [lastPlayed], preview URL
+
+    return null
   }
 
 const trackViewURL = (songTrackViewURL: string, albumCentric: boolean): string => {

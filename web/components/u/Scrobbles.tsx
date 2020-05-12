@@ -1,34 +1,43 @@
 import React from "react"
 import { assertExhaustive, assert } from "../../shared/util"
 import { NProgress } from "../../shared/types"
-import { Mode } from "./shared"
+import { Mode, ControlValue } from "./shared"
 import { Color } from "../colorpicker"
 import { ScrobblesState } from "../../redux/types/scrobbles"
 import { Songs } from "../Songs"
+import { Header, ColorPicker, Top } from "./top"
 
 export const Scrobbles: React.StatelessComponent<{
   scrobbles: ScrobblesState | null
+  profileUsername: string
+  signedIn: boolean
   artworkBaseURL: string
   endIdx: number
   private: boolean
   self: boolean
   mode: Mode
   color: Color | undefined
-  header: JSX.Element
-  top: JSX.Element
   nProgress: NProgress
+  onColorChange: (c: Color) => void
+  onControlChange: (v: ControlValue) => void
 }> = ({
   scrobbles,
+  profileUsername,
+  signedIn,
   artworkBaseURL,
   endIdx,
   private: priv,
   self,
   mode,
   color,
-  header,
-  top,
-  nProgress
+  nProgress,
+  onColorChange,
+  onControlChange,
 }) => {
+    const header = Header(profileUsername, signedIn, true)
+    const colorPicker = ColorPicker(color, onColorChange)
+    const top = Top(header, colorPicker, mode, onControlChange)
+
     // Easy case. For private accounts that aren't the current user, render the
     // private info-message.
     if (priv === true && self === false) {

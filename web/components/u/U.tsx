@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { RouteComponentProps } from "react-router-dom";
 import { UArgs, NProgress } from "../../shared/types"
 import { Mode, DetailKind, pathForMode, pathForColor, modeFromControlValue } from "./shared"
-import { Header, ColorPicker, Top } from "./top"
 import { Scrobbles } from "./Scrobbles"
 import { Detail } from "./Detail"
 import { assertExhaustive, hexDecode, assert } from "../../shared/util"
@@ -187,25 +186,24 @@ export const U: React.FC<UProps> = ({
   // ... render ...
 
   if (detail === undefined) {
-    const header = Header(profileUsername, !!logoutURL, true)
-    const colorPicker = ColorPicker(color, onColorChange)
-    const top = Top(header, colorPicker, mode, (v) => { onControlChange(modeFromControlValue(v)) })
-
     return <Scrobbles
       scrobbles={scrobbles}
+      profileUsername={profileUsername}
+      signedIn={!!logoutURL}
       artworkBaseURL={artworkBaseURL}
       endIdx={endIdx}
       private={priv}
       self={self}
       mode={mode}
       color={color}
-      header={header}
-      top={top}
       nProgress={NProgress}
+      onColorChange={onColorChange}
+      onControlChange={(v) => { onControlChange(modeFromControlValue(v)) }}
     />
   } else {
     return <Detail
       song={detailSong!}
+      profileUsername={profileUsername}
       artworkBaseURL={artworkBaseURL}
       private={priv}
       self={self}

@@ -23,6 +23,7 @@ const nounForDetailKind = (k: DetailKind): string => {
 
 export const Detail: React.StatelessComponent<{
   song: SongState
+  profileUsername: string
   artworkBaseURL: string
   private: boolean
   self: boolean
@@ -31,6 +32,7 @@ export const Detail: React.StatelessComponent<{
   onDetailClose: () => void
 }> = ({
   song,
+  profileUsername,
   artworkBaseURL,
   private: priv,
   self,
@@ -38,7 +40,7 @@ export const Detail: React.StatelessComponent<{
   nProgress,
   onDetailClose,
 }) => {
-    const header = Header("devuser", false, false)
+    const header = Header(profileUsername, false /* value should not matter */, false)
 
     const modal = (content: React.ReactNode) => <Modal
       open={true}
