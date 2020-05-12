@@ -5,6 +5,7 @@ import { dateDisplay } from "../../shared/time"
 // TrackLink is the track link area of a Picture.
 const TrackLink: React.SFC<{ previewURL: string }> = ({ previewURL }) => {
   let trackLinkAreaElem: HTMLDivElement | null = null
+
   useEffect(() => {
     // Stack Overflow says onclick enables :hover on iOS
     // TODO: is this really necessary?
