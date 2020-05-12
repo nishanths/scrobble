@@ -1,5 +1,4 @@
 WEBPACK := npx webpack-cli
-TSFMT := npx tsfmt
 
 default:
 	@echo "the default target does nothing!"
@@ -23,7 +22,7 @@ fmt:
 		! -name '*.d.ts' \
 		! -regex '.*/node_modules/.*' \
 		! -regex '.*/static/.*' | \
-		xargs $(TSFMT) --replace --
+		xargs npx tsfmt --replace --
 	# lint
 	npx eslint . --ext .ts,.tsx
 
