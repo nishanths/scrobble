@@ -1,4 +1,4 @@
-// TODO: this file is ugly
+// TODO: the media queries section in this file is ugly
 
 @import "../vars.scss";
 @import "songcard.scss";
@@ -13,6 +13,8 @@
   @return app-width($n-cards, $songcard-dim) + (2 * $body-margin-w) + (2 * $app-padding-w)
 }
 
+// TODO: it's a bit gross that #app is in scrobbles.scss
+// instead of the higher-level u.scss
 #app {
   max-width: app-width(1, $dim);
   margin: 0 auto;

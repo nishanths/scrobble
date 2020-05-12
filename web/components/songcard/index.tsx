@@ -1,2 +1,2 @@
-export * from "./SongCard"
-export * from "./MoreSongCard"
+export { SongCard } from "./SongCard"
+export { MoreSongCard } from "./MoreSongCard"

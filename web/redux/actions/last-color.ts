@@ -1,5 +1,4 @@
 import { Color } from "../../components/colorpicker"
-import { PartialState } from "../types/u"
 
 export type LastColorAction = ReturnType<typeof setLastColor>
 

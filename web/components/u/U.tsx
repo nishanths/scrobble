@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react"
+import React, { useEffect, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux";
 import { RouteComponentProps } from "react-router-dom";
 import { UArgs, NProgress } from "../../shared/types"
@@ -206,7 +206,6 @@ export const U: React.FC<UProps> = ({
   } else {
     return <Detail
       song={detailSong!}
-      profileUsername={profileUsername}
       private={priv}
       self={self}
       detailKind={detail.kind}

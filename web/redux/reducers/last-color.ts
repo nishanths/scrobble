@@ -1,9 +1,8 @@
-import { Color } from "../../components/colorpicker"
 import { LastColorState } from "../types/last-color"
 import { LastColorAction } from "../actions/last-color"
 
 const defaultState: LastColorState = {
-	color: undefined
+  color: undefined
 }
 
 export const lastColorReducer = (state = defaultState, action: LastColorAction): LastColorState => {

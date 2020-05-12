@@ -4,15 +4,10 @@ import { NProgress } from "../../shared/types"
 import { assert, assertExhaustive } from "../../shared/util"
 import { DetailKind } from "./shared"
 import { CloseIcon } from "../CloseIcon"
-import { Mode, pathForMode, pathForColor } from "./shared"
-import { Color } from "../colorpicker"
 import { RouteComponentProps } from "react-router-dom";
 import "../../scss/u/detail.scss"
-
-import 'react-responsive-modal/styles.css';
 import { Modal } from 'react-responsive-modal';
-
-type History = RouteComponentProps["history"]
+import 'react-responsive-modal/styles.css';
 
 const nounForDetailKind = (k: DetailKind): string => {
   switch (k) {
@@ -27,7 +22,6 @@ const nounForDetailKind = (k: DetailKind): string => {
 
 export const Detail: React.StatelessComponent<{
   song: SongState
-  profileUsername: string
   private: boolean
   self: boolean
   detailKind: DetailKind
@@ -35,7 +29,6 @@ export const Detail: React.StatelessComponent<{
   onDetailClose: () => void
 }> = ({
   song,
-  profileUsername,
   private: priv,
   self,
   detailKind,
