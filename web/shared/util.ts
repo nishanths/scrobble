@@ -122,7 +122,6 @@ export class MapDefault<K, V> {
   }
 
   copy(): MapDefault<K, V> {
-    const s = copyMap(this.m)
-    return new MapDefault(this.def, s)
+    return new MapDefault(this.def, copyMap(this.m))
   }
 }

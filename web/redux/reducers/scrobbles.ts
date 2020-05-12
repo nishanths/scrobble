@@ -64,9 +64,7 @@ const defaultColorScrobblesState = (() => {
   return m
 })()
 
-type ColorScrobblesState = typeof defaultColorScrobblesState
-
-export const colorScrobblesReducer = (state = defaultColorScrobblesState, action: ColorScrobblesAction): ColorScrobblesState => {
+export const colorScrobblesReducer = (state = defaultColorScrobblesState, action: ColorScrobblesAction): typeof defaultColorScrobblesState => {
   const color = action.color
 
   switch (action.type) {
