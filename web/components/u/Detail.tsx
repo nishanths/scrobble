@@ -1,7 +1,7 @@
 import React from "react"
 import { SongState } from "../../redux/types/song"
 import { NProgress } from "../../shared/types"
-import { assert } from "../../shared/util"
+import { assert, assertExhaustive } from "../../shared/util"
 import { DetailKind } from "./shared"
 import { CloseIcon } from "../CloseIcon"
 import { Mode, pathForMode, pathForColor } from "./shared"
@@ -13,6 +13,17 @@ import 'react-responsive-modal/styles.css';
 import { Modal } from 'react-responsive-modal';
 
 type History = RouteComponentProps["history"]
+
+const nounForDetailKind = (k: DetailKind): string => {
+  switch (k) {
+    case DetailKind.Song:
+      return "song"
+    case DetailKind.Album:
+      return "album"
+    default:
+      assertExhaustive(k)
+  }
+}
 
 export const Detail: React.StatelessComponent<{
   song: SongState
@@ -48,6 +59,7 @@ export const Detail: React.StatelessComponent<{
       </div>
     </Modal>
 
+    const noun = nounForDetailKind(detailKind)
     const privateContent = <div className="info">(This user's songs are private.)</div>
 
     if (priv === true && self === false) {
@@ -72,11 +84,11 @@ export const Detail: React.StatelessComponent<{
       return modal(privateContent)
     }
     if (song.noSuchSong === true) {
-      return null // TODO
+      return modal(<div className="info">(Failed to find the specified {noun}.)</div>)
     }
 
     const item = song.item
     assert(item !== null, "item should not be null")
 
-    return <>{modal(null)}</>
+    return <>{modal(null)}</> // TODO
   }
