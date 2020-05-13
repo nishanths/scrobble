@@ -55,25 +55,21 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 	dest := r.RequestURI
 	title := "Scrobble"
 
-	// helper function
-	exec := func(tmpl *template.Template, a RootArgs) {
-		if err := tmpl.Execute(w, a); err != nil {
-			log.Errorf("failed to execute template: %v", err.Error())
-		}
-	}
-
 	u, err := s.currentUser(r)
 
 	if err != nil {
 		// either generic error or ErrNoUser
 		login := loginURLWithRedirect(dest)
-		exec(homeTmpl, RootArgs{
+		args := RootArgs{
 			Title: title,
 			Bootstrap: BootstrapArgs{
 				Host:     host,
 				LoginURL: login,
 			},
-		})
+		}
+		if err := homeTmpl.Execute(w, args); err != nil {
+			log.Errorf("failed to execute template: %v", err.Error())
+		}
 		return
 	}
 
@@ -85,7 +81,7 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	exec(rootTmpl, RootArgs{
+	args := RootArgs{
 		Title: title,
 		Bootstrap: BootstrapArgs{
 			Host:      host,
@@ -93,7 +89,10 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 			LogoutURL: logout,
 			Account:   a,
 		},
-	})
+	}
+	if err := rootTmpl.Execute(w, args); err != nil {
+		log.Errorf("failed to execute template: %v", err.Error())
+	}
 }
 
 func ensureAccount(ctx context.Context, email string, ds *datastore.Client) (Account, error) {

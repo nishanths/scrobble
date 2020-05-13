@@ -26,7 +26,7 @@ export const Home: React.FC<HomeProps> = ({ loginURL }) => {
     <div className="footer">
       <a href="/guide"><div className="item">Guide</div></a> ·
       <a href="https://github.com/nishanths/scrobble/releases/latest"><div className="item">macOS app</div></a> ·
-      <a href=""><div className="item">API (upcoming)</div></a>
+      <a href=""><div className="item">API doc (upcoming)</div></a>
     </div>
   </div>
 }
