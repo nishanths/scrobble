@@ -9,6 +9,6 @@ service, with a client app available for macOS.
 
 [![Build Status](https://travis-ci.org/nishanths/scrobble.svg?branch=master)](https://travis-ci.org/nishanths/scrobble)
 
-## Icons
+## Attribution
 
-The macOS app icon is _Flower_ by _nitut786_ from The Noun Project.
+The macOS app icon is Gramophone by Mahmure Alp from the Noun Project.
