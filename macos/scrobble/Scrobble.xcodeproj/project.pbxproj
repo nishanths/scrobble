@@ -197,6 +197,7 @@
 				TargetAttributes = {
 					856A05752133373D00CEFCC5 = {
 						CreatedOnToolsVersion = 9.4;
+						LastSwiftMigration = 1140;
 						SystemCapabilities = {
 							com.apple.Sandbox = {
 								enabled = 0;
@@ -205,10 +206,12 @@
 					};
 					856A05872133374100CEFCC5 = {
 						CreatedOnToolsVersion = 9.4;
+						LastSwiftMigration = 1140;
 						TestTargetID = 856A05752133373D00CEFCC5;
 					};
 					856A05922133374200CEFCC5 = {
 						CreatedOnToolsVersion = 9.4;
+						LastSwiftMigration = 1140;
 						TestTargetID = 856A05752133373D00CEFCC5;
 					};
 				};
@@ -446,7 +449,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/$(PROJECT_NAME)/$(PROJECT_NAME)-Bridging-Header.h";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -470,7 +473,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/$(PROJECT_NAME)/$(PROJECT_NAME)-Bridging-Header.h";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -490,7 +493,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.nishanths.ScrobbleTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Scrobble.app/Contents/MacOS/Scrobble";
 			};
 			name = Debug;
@@ -511,7 +514,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.nishanths.ScrobbleTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Scrobble.app/Contents/MacOS/Scrobble";
 			};
 			name = Release;
@@ -531,7 +534,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.nishanths.ScrobbleUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TEST_TARGET_NAME = Scrobble;
 			};
 			name = Debug;
@@ -551,7 +554,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.nishanths.ScrobbleUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TEST_TARGET_NAME = Scrobble;
 			};
 			name = Release;

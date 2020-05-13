@@ -92,7 +92,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         
         // make status bar item and menu
         let button = statusBarItem.button!
-        button.image = NSImage(named:NSImage.Name(AppDelegate.menuIconName))
+        button.image = NSImage(named:AppDelegate.menuIconName)
         button.image!.isTemplate = true
         statusBarItem.menu = makeMenu()
         
@@ -226,7 +226,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         } else if !alreadyRunning && state.running {
             DispatchQueue.global(qos: .userInitiated).async { self.scrobble() } // initial
             timer = Timer(timeInterval: AppDelegate.timerFreq, target: self, selector: #selector(timerFired(_:)), userInfo: nil, repeats: true)
-            RunLoop.current.add(timer!, forMode: .commonModes)
+            RunLoop.current.add(timer!, forMode: RunLoop.Mode.common)
         }
     }
     
@@ -486,7 +486,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
     }
     
     // uppercase API key input
-    override func controlTextDidChange(_ obj: Notification) {
+    func controlTextDidChange(_ obj: Notification) {
         if let text = obj.userInfo!["NSFieldEditor"] as? NSText {
             text.string = text.string.uppercased()
         }
