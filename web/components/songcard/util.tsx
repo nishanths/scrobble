@@ -1,7 +1,7 @@
 import React, { useEffect } from "react"
 import { Song } from "../../shared/types"
-import { dateDisplay } from "../../shared/time"
-import { pluralize } from "../../shared/util"
+import { dateDisplay, dateDisplayDesc, shortMonth } from "../../shared/time"
+import { pluralize, capitalize } from "../../shared/util"
 
 // TrackLink is the track link area of a Picture.
 const TrackLink: React.SFC<{ previewURL: string }> = ({ previewURL }) => {
@@ -89,7 +89,7 @@ export const Meta: React.SFC<{
         {s.artistName && <span className="artist">{s.artistName}</span>}
       </div>
 
-      {includeDate && <time className="date">{dateDisplay(new Date(s.lastPlayed * 1000), now!())}</time>}
+      {includeDate && <time className="date">{capitalize(dateDisplay(new Date(s.lastPlayed * 1000), now!()))}</time>}
     </div>
   }
 
@@ -97,18 +97,31 @@ export const Meta: React.SFC<{
 export const LargeMeta: React.SFC<{
   song: Song
   albumCentric: boolean
+  now: () => Date
 }> = ({
   song: s,
   albumCentric,
+  now,
 }) => {
     const includeLoved = !albumCentric && s.loved
-    const includePlayCount = !albumCentric
+    const includePlayMeta = !albumCentric
 
-    // const previewURL = trackViewURL(s.trackViewURL, albumCentric)
     const title = albumCentric ? s.albumTitle : s.title
-    let other = albumCentric ? `${s.artistName}` : `${s.artistName} – ${s.albumTitle}`
-    if (s.year) {
-      other += " – " + s.year
+    const other = albumCentric ? `${s.artistName}` : `${s.artistName} – ${s.albumTitle}`
+    const playCount = `Played ${s.playCount.toLocaleString()} ${pluralize("time", s.playCount)}`
+
+    let lastPlayed = ""
+    if (s.lastPlayed) {
+      const [str, agoForm] = dateDisplayDesc(new Date(s.lastPlayed * 1000), now())
+      lastPlayed = agoForm ? "last " + str : "last on " + str
+    }
+
+    let releaseDate = ""
+    if (s.releaseDate) {
+      const r = new Date(s.releaseDate * 1000)
+      releaseDate = shortMonth(r) + " " + r.getFullYear()
+    } else if (s.year) {
+      releaseDate = s.year.toString()
     }
 
     const meta = <div className="meta">
@@ -119,8 +132,13 @@ export const LargeMeta: React.SFC<{
       <div className="other">
         <span className="otherContent">{other}</span>
       </div>
-      {includePlayCount && <div className="lastLine">
-        <span className="playCount">Played {s.playCount.toLocaleString()} {pluralize("time", s.playCount)}.</span>
+      {(includePlayMeta || releaseDate) && <div className="lastLine">
+        <div className="releaseDate">
+          Released {releaseDate}.
+        </div>
+        <div className="playMeta">
+          {playCount}{lastPlayed && ", " + lastPlayed}.
+        </div>
       </div>}
     </div>
 

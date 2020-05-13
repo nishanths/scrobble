@@ -93,6 +93,7 @@ export const Detail: React.StatelessComponent<{
         song={item}
         artworkBaseURL={artworkBaseURL}
         albumCentric={detailKind === DetailKind.Album}
+        now={() => new Date()}
       />
     </>)
   }

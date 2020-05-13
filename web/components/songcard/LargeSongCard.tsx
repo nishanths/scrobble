@@ -6,15 +6,17 @@ interface LargeSongCardProps {
   song: Song
   artworkBaseURL: string
   albumCentric: boolean
+  now: () => Date
 }
 
 export const LargeSongCard: React.SFC<LargeSongCardProps> = ({
   song,
   artworkBaseURL,
   albumCentric,
+  now,
 }) => {
   return <div className="LargeSongCard">
     <LargePicture song={song} artworkBaseURL={artworkBaseURL} />
-    <LargeMeta song={song} albumCentric={albumCentric} />
+    <LargeMeta song={song} albumCentric={albumCentric} now={now} />
   </div>
 }

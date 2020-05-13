@@ -30,6 +30,7 @@ export interface Song {
   title: string
   totalTime: number
   year: number
+  releaseDate: number
   lastPlayed: number
   playCount: number
   artworkHash: ArtworkHash
