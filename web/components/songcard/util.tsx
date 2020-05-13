@@ -104,27 +104,31 @@ export const LargeMeta: React.SFC<{
     const includeLoved = !albumCentric && s.loved
     const includePlayCount = !albumCentric
 
-    const previewURL = trackViewURL(s.trackViewURL, albumCentric)
+    // const previewURL = trackViewURL(s.trackViewURL, albumCentric)
     const title = albumCentric ? s.albumTitle : s.title
     let other = albumCentric ? `${s.artistName}` : `${s.artistName} – ${s.albumTitle}`
     if (s.year) {
       other += " – " + s.year
     }
 
-    return <a className={"link"} href={previewURL} title={previewURL} target="_blank" rel="noopener noreferrer">
-      <div className="meta">
-        <div className="title">
-          <span className="titleContent">{title}</span>
-          {includeLoved && <span className="love"></span>}
-        </div>
-        <div className="other">
-          <span className="otherContent">{other}</span>
-        </div>
-        {includePlayCount && <div className="lastLine">
-          <span className="playCount">Played {s.playCount.toLocaleString()} {pluralize("time", s.playCount)}.</span>
-        </div>}
+    const meta = <div className="meta">
+      <div className="title">
+        <span className="titleContent">{title}</span>
+        {includeLoved && <span className="love"></span>}
       </div>
-    </a>
+      <div className="other">
+        <span className="otherContent">{other}</span>
+      </div>
+      {includePlayCount && <div className="lastLine">
+        <span className="playCount">Played {s.playCount.toLocaleString()} {pluralize("time", s.playCount)}.</span>
+      </div>}
+    </div>
+
+    // const withLink = <a className={"link"} href={previewURL} title={previewURL} target="_blank" rel="noopener noreferrer">
+    //   {meta}
+    // </a>
+
+    return meta
   }
 
 const trackViewURL = (songTrackViewURL: string, albumCentric: boolean): string => {

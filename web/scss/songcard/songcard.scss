@@ -190,11 +190,6 @@
       align-items: center;
     }
 
-    .titleContent {
-      display: block;
-      @include ellipsis();
-    }
-
     .love {
       background-image: url(/static/img/ios10-apple-music-love-icon.png);
       background-repeat: no-repeat;
@@ -209,15 +204,11 @@
     .other {
       font-size: 14px + $adjust-font-size;
       line-height: 1.5;
-      display: block;
-      @include ellipsis();
     }
 
     .lastLine {
       font-size: 14px + $adjust-font-size;
       margin-top: 20px;
-      display: block;
-      @include ellipsis();
     }
   }
 }
