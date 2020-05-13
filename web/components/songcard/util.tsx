@@ -103,9 +103,6 @@ export const LargeMeta: React.SFC<{
   albumCentric,
   now,
 }) => {
-    const includeLoved = !albumCentric && s.loved
-    const includePlayMeta = !albumCentric
-
     const title = albumCentric ? s.albumTitle : s.title
     const other = albumCentric ? `${s.artistName}` : `${s.artistName} – ${s.albumTitle}`
     const playCount = `Played ${s.playCount.toLocaleString()} ${pluralize("time", s.playCount)}`
@@ -124,6 +121,12 @@ export const LargeMeta: React.SFC<{
       releaseDate = s.year.toString()
     }
 
+    const includeLoved = !albumCentric && s.loved
+    const includePlayMeta = !albumCentric
+    // some songs in an album can be released before the entire album,
+    // so don't use the release date when albumCentric.
+    const includeReleaseDate = !albumCentric && releaseDate
+
     const meta = <div className="meta">
       <div className="title">
         <span className="titleContent">{title}</span>
@@ -132,8 +135,8 @@ export const LargeMeta: React.SFC<{
       <div className="other">
         <span className="otherContent">{other}</span>
       </div>
-      {(releaseDate || includePlayMeta) && <div className="lastLine">
-        {releaseDate && <div className="releaseDate">
+      {(includeReleaseDate || includePlayMeta) && <div className="lastLine">
+        {includeReleaseDate && <div className="releaseDate">
           Released {releaseDate}
         </div>}
         {includePlayMeta && <div className="playMeta">
