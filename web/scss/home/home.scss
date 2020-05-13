@@ -42,10 +42,11 @@ body {
     justify-content: center;
     flex-wrap: wrap;
     line-height: 1.7;
+    color: $meta-color;
 
     a {
       text-decoration: none;
-      color: $muted-color;
+      color: $meta-color;
       &:hover {
         text-decoration: underline;
       }
