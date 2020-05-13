@@ -70,7 +70,7 @@ $fa: 0;
   @include largeSongCardProps($pict, $love, $fa);
 }
 
-@media screen and (min-width: 420px) {
+@media screen and (min-width: 420px) and (min-height: 530px) {
   $pict: 300px;
   $love: 9px;
   $fa: 1px;
