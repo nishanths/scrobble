@@ -132,13 +132,13 @@ export const LargeMeta: React.SFC<{
       <div className="other">
         <span className="otherContent">{other}</span>
       </div>
-      {(includePlayMeta || releaseDate) && <div className="lastLine">
-        <div className="releaseDate">
+      {(releaseDate || includePlayMeta) && <div className="lastLine">
+        {releaseDate && <div className="releaseDate">
           Released {releaseDate}.
-        </div>
-        <div className="playMeta">
+        </div>}
+        {includePlayMeta && <div className="playMeta">
           {playCount}{lastPlayed && ", " + lastPlayed}.
-        </div>
+        </div>}
       </div>}
     </div>
 
