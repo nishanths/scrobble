@@ -16,12 +16,12 @@
       "size" : "32x32"
     },
     {
-      "filename" : "macos_icon_64x64.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "32x32"
     },
     {
+      "filename" : "macos_icon_128x128.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "128x128"
