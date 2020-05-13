@@ -5,6 +5,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
   entry: {
+    home: "./entrypoints/home.main.tsx",
     root: "./entrypoints/root.main.tsx",
     u: "./entrypoints/u.main.tsx",
   },

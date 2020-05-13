@@ -18,6 +18,7 @@ import (
 )
 
 var (
+	homeTmpl          = template.Must(template.New("").Parse(MustAssetString("appengine/template/home.html")))
 	rootTmpl          = template.Must(template.New("").Parse(MustAssetString("appengine/template/root.html")))
 	uTmpl             = template.Must(template.New("").Parse(MustAssetString("appengine/template/u.html")))
 	contentPageTmpl   = template.Must(template.New("").Parse(MustAssetString("appengine/template/content.html")))
@@ -55,8 +56,8 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 	title := "Scrobble"
 
 	// helper function
-	exec := func(a RootArgs) {
-		if err := rootTmpl.Execute(w, a); err != nil {
+	exec := func(tmpl *template.Template, a RootArgs) {
+		if err := tmpl.Execute(w, a); err != nil {
 			log.Errorf("failed to execute template: %v", err.Error())
 		}
 	}
@@ -66,7 +67,7 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// either generic error or ErrNoUser
 		login := loginURLWithRedirect(dest)
-		exec(RootArgs{
+		exec(homeTmpl, RootArgs{
 			Title: title,
 			Bootstrap: BootstrapArgs{
 				Host:     host,
@@ -84,7 +85,7 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	exec(RootArgs{
+	exec(rootTmpl, RootArgs{
 		Title: title,
 		Bootstrap: BootstrapArgs{
 			Host:      host,
