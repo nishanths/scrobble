@@ -11,8 +11,8 @@
 		856A057C2133373D00CEFCC5 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856A057B2133373D00CEFCC5 /* ViewController.swift */; };
 		856A057E2133374100CEFCC5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 856A057D2133374100CEFCC5 /* Assets.xcassets */; };
 		856A05812133374100CEFCC5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 856A057F2133374100CEFCC5 /* Main.storyboard */; };
-		856A058D2133374200CEFCC5 /* itunes_scrobbleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856A058C2133374200CEFCC5 /* itunes_scrobbleTests.swift */; };
-		856A05982133374200CEFCC5 /* itunes_scrobbleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856A05972133374200CEFCC5 /* itunes_scrobbleUITests.swift */; };
+		856A058D2133374200CEFCC5 /* ScrobbleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856A058C2133374200CEFCC5 /* ScrobbleTests.swift */; };
+		856A05982133374200CEFCC5 /* ScrobbleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856A05972133374200CEFCC5 /* ScrobbleUITests.swift */; };
 		856A05AC2136256200CEFCC5 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856A05AB2136256200CEFCC5 /* API.swift */; };
 /* End PBXBuildFile section */
 
@@ -22,14 +22,14 @@
 			containerPortal = 856A056E2133373D00CEFCC5 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 856A05752133373D00CEFCC5;
-			remoteInfo = "itunes-scrobble";
+			remoteInfo = "Scrobble";
 		};
 		856A05942133374200CEFCC5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 856A056E2133373D00CEFCC5 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 856A05752133373D00CEFCC5;
-			remoteInfo = "itunes-scrobble";
+			remoteInfo = "Scrobble";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -41,10 +41,10 @@
 		856A05802133374100CEFCC5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		856A05822133374100CEFCC5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		856A05882133374100CEFCC5 /* ScrobbleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScrobbleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		856A058C2133374200CEFCC5 /* itunes_scrobbleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = itunes_scrobbleTests.swift; sourceTree = "<group>"; };
+		856A058C2133374200CEFCC5 /* ScrobbleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrobbleTests.swift; sourceTree = "<group>"; };
 		856A058E2133374200CEFCC5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		856A05932133374200CEFCC5 /* ScrobbleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScrobbleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		856A05972133374200CEFCC5 /* itunes_scrobbleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = itunes_scrobbleUITests.swift; sourceTree = "<group>"; };
+		856A05972133374200CEFCC5 /* ScrobbleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrobbleUITests.swift; sourceTree = "<group>"; };
 		856A05992133374200CEFCC5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		856A05A92133AFBE00CEFCC5 /* Scrobble.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Scrobble.entitlements; sourceTree = "<group>"; };
 		856A05AA2134583900CEFCC5 /* Scrobble-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Scrobble-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -114,7 +114,7 @@
 		856A058B2133374200CEFCC5 /* ScrobbleTests */ = {
 			isa = PBXGroup;
 			children = (
-				856A058C2133374200CEFCC5 /* itunes_scrobbleTests.swift */,
+				856A058C2133374200CEFCC5 /* ScrobbleTests.swift */,
 				856A058E2133374200CEFCC5 /* Info.plist */,
 			);
 			path = ScrobbleTests;
@@ -123,7 +123,7 @@
 		856A05962133374200CEFCC5 /* ScrobbleUITests */ = {
 			isa = PBXGroup;
 			children = (
-				856A05972133374200CEFCC5 /* itunes_scrobbleUITests.swift */,
+				856A05972133374200CEFCC5 /* ScrobbleUITests.swift */,
 				856A05992133374200CEFCC5 /* Info.plist */,
 			);
 			path = ScrobbleUITests;
@@ -145,7 +145,7 @@
 			dependencies = (
 			);
 			name = Scrobble;
-			productName = "itunes-scrobble";
+			productName = "Scrobble";
 			productReference = 856A05762133373D00CEFCC5 /* Scrobble.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -163,7 +163,7 @@
 				856A058A2133374200CEFCC5 /* PBXTargetDependency */,
 			);
 			name = ScrobbleTests;
-			productName = "itunes-scrobbleTests";
+			productName = "ScrobbleTests";
 			productReference = 856A05882133374100CEFCC5 /* ScrobbleTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
@@ -181,7 +181,7 @@
 				856A05952133374200CEFCC5 /* PBXTargetDependency */,
 			);
 			name = ScrobbleUITests;
-			productName = "itunes-scrobbleUITests";
+			productName = "ScrobbleUITests";
 			productReference = 856A05932133374200CEFCC5 /* ScrobbleUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
@@ -277,7 +277,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				856A058D2133374200CEFCC5 /* itunes_scrobbleTests.swift in Sources */,
+				856A058D2133374200CEFCC5 /* ScrobbleTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,7 +285,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				856A05982133374200CEFCC5 /* itunes_scrobbleUITests.swift in Sources */,
+				856A05982133374200CEFCC5 /* ScrobbleUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -445,6 +445,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.6;
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.nishanths.Scrobble;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -469,6 +470,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.6;
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.nishanths.Scrobble;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

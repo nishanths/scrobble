@@ -5,8 +5,8 @@
       "scale" : "1x"
     },
     {
+      "filename" : "scrobble-menu-18x18.png",
       "idiom" : "universal",
-      "filename" : "itunes-scrobble-18x18.png",
       "scale" : "2x"
     },
     {
@@ -15,10 +15,7 @@
     }
   ],
   "info" : {
-    "version" : 1,
-    "author" : "xcode"
-  },
-  "properties" : {
-    "template-rendering-intent" : "template"
+    "author" : "xcode",
+    "version" : 1
   }
 }

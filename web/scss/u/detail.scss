@@ -49,7 +49,7 @@
   align-self: start;
 }
 
-$pict: 275px;
+$pict: 225px;
 $love: 9px;
 $fa: 0;
 
@@ -71,7 +71,7 @@ $fa: 0;
 }
 
 @media screen and (min-width: 420px) {
-  $pict: 350px;
+  $pict: 300px;
   $love: 9px;
   $fa: 1px;
 
@@ -84,7 +84,7 @@ $fa: 0;
 }
 
 @media screen and (min-width: 500px) and (min-height: 625px) {
-  $pict: 400px;
+  $pict: 350px;
   $love: 9px;
   $fa: 1px;
 
@@ -97,7 +97,7 @@ $fa: 0;
 }
 
 @media screen and (min-width: 640px) and (min-height: 720px) {
-  $pict: 500px;
+  $pict: 450px;
   $love: 9px;
   $fa: 1px;
 
@@ -110,7 +110,7 @@ $fa: 0;
 }
 
 @media screen and (min-width: 915px) and (min-height: 800px) {
-  $pict: 550px;
+  $pict: 500px;
   $love: 10px;
   $fa: 2px;
 
@@ -123,7 +123,7 @@ $fa: 0;
 }
 
 @media screen and (min-width: 1380px) and (min-height: 800px) {
-  $pict: 625px;
+  $pict: 600px;
   $love: 11px;
   $fa: 3px;
 
