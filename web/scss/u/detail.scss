@@ -83,7 +83,7 @@ $fa: 0;
   }
 }
 
-@media screen and (min-width: 500px) {
+@media screen and (min-width: 500px) and (min-height: 625px) {
   $pict: 400px;
   $love: 9px;
   $fa: 1px;
@@ -96,7 +96,7 @@ $fa: 0;
   }
 }
 
-@media screen and (min-width: 640px) {
+@media screen and (min-width: 640px) and (min-height: 720px) {
   $pict: 500px;
   $love: 9px;
   $fa: 1px;
