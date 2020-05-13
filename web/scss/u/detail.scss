@@ -6,10 +6,10 @@
 }
 
 .detailModal {
-  width: 90%;
+  width: 100%;
   height: 100%;
   max-width: 1200px !important;
-  max-height: 1000px;
+  max-height: 1200px;
   box-shadow: none !important;
   box-sizing: border-box;
 
@@ -26,7 +26,7 @@
     justify-content: center;
     align-items: center;
     height: 100%;
-    width: inherit; // inherit from modal
+    width: 100%;
   }
 }
 
@@ -55,9 +55,12 @@ $fa: 0;
 
 .LargeSongCard {
   width: inherit; // inherit from flexContainer
+  height: inherit; // inherit from flexContainer
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  margin-bottom: 30px;
 }
 
 .flexContainer {
@@ -86,7 +89,7 @@ $fa: 0;
   $fa: 1px;
 
   .flexContainer {
-    margin-top: 15px;
+    margin-top: 45px;
   }
   .LargeSongCard {
     @include largeSongCardProps($pict, $love, $fa);
@@ -99,28 +102,28 @@ $fa: 0;
   $fa: 1px;
 
   .flexContainer {
-    margin-top: 15px;
+    margin-top: 45px;
   }
   .LargeSongCard {
     @include largeSongCardProps($pict, $love, $fa);
   }
 }
 
-@media screen and (min-width: 915px) {
+@media screen and (min-width: 915px) and (min-height: 800px) {
   $pict: 600px;
   $love: 10px;
   $fa: 2px;
 
   .flexContainer {
-    margin-top: 15px;
+    margin-top: 45px;
   }
   .LargeSongCard {
     @include largeSongCardProps($pict, $love, $fa);
   }
 }
 
-@media screen and (min-width: 1380px) {
-  $pict: 725px;
+@media screen and (min-width: 1380px) and (min-height: 800px) {
+  $pict: 625px;
   $love: 11px;
   $fa: 3px;
 
