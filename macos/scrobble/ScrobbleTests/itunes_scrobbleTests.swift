@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import itunes_scrobble
+@testable import Scrobble
 
 class itunes_scrobbleTests: XCTestCase {
     
