@@ -110,7 +110,7 @@ export const LargeMeta: React.SFC<{
     let lastPlayed = ""
     if (s.lastPlayed) {
       const [str, agoForm] = dateDisplayDesc(new Date(s.lastPlayed * 1000), now())
-      lastPlayed = agoForm ? "last " + str : "last on " + str
+      lastPlayed = agoForm ?  str : "on " + str
     }
 
     let releaseDate = ""
@@ -140,7 +140,7 @@ export const LargeMeta: React.SFC<{
           Released {releaseDate}
         </div>}
         {includePlayMeta && <div className="playMeta">
-          {playCount}{lastPlayed && ", " + lastPlayed}
+          {playCount}{lastPlayed && ", " + (s.playCount === 1 ? "" : "last ")  + lastPlayed}
         </div>}
       </div>}
     </div>
