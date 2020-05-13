@@ -145,10 +145,6 @@ export const LargeMeta: React.SFC<{
       </div>}
     </div>
 
-    // const withLink = <a className={"link"} href={previewURL} title={previewURL} target="_blank" rel="noopener noreferrer">
-    //   {meta}
-    // </a>
-
     return meta
   }
 
