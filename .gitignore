@@ -17,3 +17,5 @@ macos/archive
 
 # scratchwork
 appengine/.scratch
+
+*.xcuserstate
