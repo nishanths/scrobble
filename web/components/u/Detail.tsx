@@ -52,7 +52,7 @@ export const Detail: React.StatelessComponent<{
 }) => {
     const dispatch = useDispatch()
 
-    // redux state
+    // song detail redux state
     const song = useSelector((s: State) => {
       const key = songIdent
       return s.songs.getOrDefault(key)

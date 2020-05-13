@@ -8,7 +8,7 @@ import { NProgress, Song } from "../../shared/types"
 import { Mode, DetailKind, pathForMode, pathForColor, pathForDetailKind, modeFromControlValue } from "./shared"
 import { Color } from "../colorpicker"
 import { Songs } from "../Songs"
-import { setLastColor } from "../../redux/actions/last-color"
+import { setLastColor, setLastScrobblesEndIdx } from "../../redux/actions/last"
 import { fetchAllScrobbles, fetchLovedScrobbles, fetchColorScrobbles } from "../../redux/actions/scrobbles"
 import { Header, ColorPicker, Top } from "./top"
 
@@ -52,8 +52,11 @@ export const Scrobbles: React.StatelessComponent<{
   wnd,
 }) => {
     const dispatch = useDispatch()
-    const [endIdx, endIdxRef, setEndIdx] = useStateRef(0)
-    const lastColor = useSelector((s: State) => s.lastColor)
+    const last = useSelector((s: State) => s.last)
+
+    const endIdx = last.scrobblesEndIdx || 0
+    const endIdxRef = useRef(endIdx)
+    useEffect(() => { endIdxRef.current = endIdx }, [endIdx])
 
     const onControlChange = (newMode: Mode) => {
       nProgress.done()
@@ -64,7 +67,7 @@ export const Scrobbles: React.StatelessComponent<{
           u = "/u/" + profileUsername + pathForMode(newMode)
           break
         case Mode.Color:
-          u = "/u/" + profileUsername + pathForMode(newMode) + pathForColor(lastColor.color)
+          u = "/u/" + profileUsername + pathForMode(newMode) + pathForColor(last.color)
           break
         default:
           assertExhaustive(newMode)
@@ -98,7 +101,7 @@ export const Scrobbles: React.StatelessComponent<{
       history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(color) + pathForDetailKind(kind) + "/" + hexEncode(s.ident))
     }
 
-    // redux state
+    // scrobbles redux state
     const scrobbles = useSelector((s: State) => {
       switch (mode) {
         case Mode.All: return s.allScrobbles
@@ -117,7 +120,7 @@ export const Scrobbles: React.StatelessComponent<{
         return
       }
       const e = s.error === false ? nextEndIdx(0, s.items.length) : 0
-      setEndIdx(e)
+      dispatch(setLastScrobblesEndIdx((e)))
     }, [scrobbles, mode])
 
     // fetch scrobbles
@@ -165,7 +168,7 @@ export const Scrobbles: React.StatelessComponent<{
         if ((wnd.innerHeight + wnd.pageYOffset) >= (wnd.document.body.offsetHeight - leeway)) {
           const newEnd = nextEndIdx(endIdxRef.current, s.items.length)
           const e = Math.max(newEnd, endIdxRef.current)
-          setEndIdx(e)
+          dispatch(setLastScrobblesEndIdx((e)))
         }
       }
 
