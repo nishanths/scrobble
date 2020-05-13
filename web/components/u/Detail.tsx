@@ -1,13 +1,17 @@
-import React from "react"
-import { SongState } from "../../redux/types/song"
+import React, { useRef, useEffect } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { RouteComponentProps } from "react-router-dom";
 import { NProgress } from "../../shared/types"
 import { assert, assertExhaustive } from "../../shared/util"
-import { DetailKind } from "./shared"
+import { DetailKind, pathForMode, pathForColor, Mode } from "./shared"
 import { Header } from "./top"
+import { State } from "../../redux/types/u"
 import { CloseIcon } from "../CloseIcon"
+import { Color } from "../colorpicker"
 import { LargeSongCard } from "../songcard"
-import { Modal } from 'react-responsive-modal';
-import 'react-responsive-modal/styles.css';
+import { fetchSong } from "../../redux/actions/song"
+import { Modal } from 'react-responsive-modal'
+import 'react-responsive-modal/styles.css'
 import "../../scss/u/detail.scss"
 
 const nounForDetailKind = (k: DetailKind): string => {
@@ -21,30 +25,56 @@ const nounForDetailKind = (k: DetailKind): string => {
   }
 }
 
+type History = RouteComponentProps["history"]
+
 export const Detail: React.StatelessComponent<{
-  song: SongState
   profileUsername: string
   artworkBaseURL: string
   private: boolean
   self: boolean
   detailKind: DetailKind
+  songIdent: string
   nProgress: NProgress
-  onDetailClose: () => void
+  mode: Mode
+  color: Color | undefined
+  history: History
 }> = ({
-  song,
   profileUsername,
   artworkBaseURL,
   private: priv,
   self,
   detailKind,
+  songIdent,
   nProgress,
-  onDetailClose,
+  mode,
+  color,
+  history,
 }) => {
+    const dispatch = useDispatch()
+
+    // redux state
+    const song = useSelector((s: State) => {
+      const key = songIdent
+      return s.songs.getOrDefault(key)
+    })
+    const songRef = useRef(song)
+    useEffect(() => { songRef.current = song }, [song])
+
+    // fetch song detail
+    useEffect(() => {
+      const song = songRef.current
+      if (song === null || (song.done === false && song.fetching === false) || song.error === true) {
+        dispatch(fetchSong(profileUsername, songIdent))
+      }
+    }, [profileUsername, songIdent])
+
+    // ... render ...
+
     const header = Header(profileUsername, false, false)
 
     const modal = (content: React.ReactNode) => <Modal
       open={true}
-      onClose={onDetailClose}
+      onClose={() => { nProgress.done(); history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(color)) }}
       center
       classNames={{ modal: "detailModal", overlay: "detailOverlay", closeButton: "detailCloseButton" }}
       closeOnOverlayClick={false}
