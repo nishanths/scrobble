@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { RouteComponentProps } from "react-router-dom";
 import { useStateRef } from "../../shared/hooks"
@@ -8,7 +8,7 @@ import { NProgress, Song } from "../../shared/types"
 import { Mode, DetailKind, pathForMode, pathForColor, pathForDetailKind, modeFromControlValue } from "./shared"
 import { Color } from "../colorpicker"
 import { Songs } from "../Songs"
-import { setLastColor, setLastScrobblesEndIdx } from "../../redux/actions/last"
+import { setLastColor, setLastScrobblesEndIdx, setLastScrobblesScrollY } from "../../redux/actions/last"
 import { fetchAllScrobbles, fetchLovedScrobbles, fetchColorScrobbles } from "../../redux/actions/scrobbles"
 import { Header, ColorPicker, Top } from "./top"
 
@@ -57,6 +57,13 @@ export const Scrobbles: React.StatelessComponent<{
     const endIdx = last.scrobblesEndIdx || 0
     const endIdxRef = useRef(endIdx)
     useEffect(() => { endIdxRef.current = endIdx }, [endIdx])
+
+    const shouldUpdateScrollTo = () => last.scrobblesScrollY !== undefined &&
+      Math.abs(wnd.pageYOffset - last.scrobblesScrollY) > 200 // throttle frequent updates
+
+    if (shouldUpdateScrollTo()) {
+      wnd.scrollTo({ top: last.scrobblesScrollY })
+    }
 
     const onControlChange = (newMode: Mode) => {
       nProgress.done()
@@ -158,14 +165,16 @@ export const Scrobbles: React.StatelessComponent<{
     // infinite scroll
     useEffect(() => {
       const f = () => {
+        const y = wnd.pageYOffset
+        dispatch(setLastScrobblesScrollY(y))
+
         const s = scrobblesRef.current
         if (s === null) {
           return
         }
 
         const leeway = 250
-
-        if ((wnd.innerHeight + wnd.pageYOffset) >= (wnd.document.body.offsetHeight - leeway)) {
+        if ((wnd.innerHeight + y) >= (wnd.document.body.offsetHeight - leeway)) {
           const newEnd = nextEndIdx(endIdxRef.current, s.items.length)
           const e = Math.max(newEnd, endIdxRef.current)
           dispatch(setLastScrobblesEndIdx((e)))
