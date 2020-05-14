@@ -1,4 +1,4 @@
-import React from "react";
+import React from "react"
 
 // Close by Shocho from the Noun Project
 // https://thenounproject.com/nivya.dharsha/collection/close/?i=1590739
