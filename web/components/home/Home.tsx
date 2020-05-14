@@ -1,6 +1,7 @@
 import React from "react"
 import { GoogleSignIn } from "../GoogleSignIn"
 import { randInt } from "../../shared/util"
+import { macOSAppLink, guideLink, apiDocLink } from "../../shared/const"
 
 interface HomeProps {
   loginURL: string
@@ -28,9 +29,9 @@ export const Home: React.FC<HomeProps> = ({ loginURL }) => {
     </div>
     <div className="footer">
       (
-        <a href="/guide"><div className="item">Guide</div></a> ·
-        <a href="https://github.com/nishanths/scrobble/releases/latest"><div className="item">macOS app</div></a> ·
-        <a href="/doc/api/v1"><div className="item">API doc</div></a>
+        <a href={guideLink}><div className="item">Guide</div></a> ·
+        <a href={macOSAppLink}><div className="item">macOS app</div></a> ·
+        <a href={apiDocLink}><div className="item">API doc</div></a>
       )
     </div>
   </div>

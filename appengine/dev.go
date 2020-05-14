@@ -24,26 +24,34 @@ func devRootHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// var loggedInArgs = RootArgs{
-	// 	Title: "Dev Scrobble",
-	// 	Bootstrap: BootstrapArgs{
-	// 		Host:      r.Host,
-	// 		Email:     "localdev@gmail.com",
-	// 		LogoutURL: "/fakelogouturl",
-	// 		Account:   devFakeAccount,
-	// 	},
-	// }
+	const loggedIn = true
 
-	var loggedOutArgs = RootArgs{
-		Title: "Dev Scrobble",
-		Bootstrap: BootstrapArgs{
-			Host:     r.Host,
-			LoginURL: "/fakeloginurl",
-		},
-	}
+	if loggedIn {
+		var loggedInArgs = RootArgs{
+			Title: "Dev Scrobble",
+			Bootstrap: BootstrapArgs{
+				Host:      r.Host,
+				Email:     "localdev@gmail.com",
+				LogoutURL: "/fakelogouturl",
+				Account:   devFakeAccount,
+			},
+		}
 
-	if err := homeTmpl.Execute(w, loggedOutArgs); err != nil {
-		log.Errorf("failed to execute template: %v", err.Error())
+		if err := dashboardTmpl.Execute(w, loggedInArgs); err != nil {
+			log.Errorf("failed to execute template: %v", err.Error())
+		}
+	} else {
+		var loggedOutArgs = RootArgs{
+			Title: "Dev Scrobble",
+			Bootstrap: BootstrapArgs{
+				Host:     r.Host,
+				LoginURL: "/fakeloginurl",
+			},
+		}
+
+		if err := homeTmpl.Execute(w, loggedOutArgs); err != nil {
+			log.Errorf("failed to execute template: %v", err.Error())
+		}
 	}
 }
 

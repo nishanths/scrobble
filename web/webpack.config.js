@@ -1,3 +1,4 @@
+// Resources:
 // https://github.com/webpack-contrib/sass-loader
 // https://www.typescriptlang.org/docs/handbook/react-&-webpack.html
 
@@ -6,6 +7,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 module.exports = {
   entry: {
     home: "./entrypoints/home.main.tsx",
+    dashboard: "./entrypoints/dashboard.main.tsx",
     root: "./entrypoints/root.main.tsx",
     u: "./entrypoints/u.main.tsx",
   },

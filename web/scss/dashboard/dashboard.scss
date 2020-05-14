@@ -1,0 +1,82 @@
+@import "../common.scss";
+@import "../vars.scss";
+
+$danger: #FF4136;
+
+body {
+  font-family: $font-family;
+  margin: 0 auto;
+  padding: 0 15px;
+  color: $muted-color;
+}
+
+a {
+  color: $muted-color;
+}
+
+.Dashboard {
+  max-width: 500px;
+  margin: 0 auto;
+
+  .start {
+    cursor: default;
+    font-size: 1rem;
+    margin-top: 30px;
+    display: flex;
+    padding: 3px 5px;
+    display: flex;
+    justify-content: flex-start;
+  }
+  .scrobble {
+    font-weight: 600;
+    margin-right: 5px;
+    a {
+      text-decoration: none;
+    }
+  }
+  .desc {
+    font-size: 14px;
+    margin-left: 5px;
+  }
+
+  .nav {
+    padding: 6px 5px 6px;
+    font-size: 14px;
+    border-top: 1px solid $muted-color;
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap-reverse;
+    margin-bottom: 60px;
+  }
+
+  .footer {
+    margin-top: 100px;
+    border-top: 1px solid $muted-color;
+    padding: 6px 5px 6px;
+    font-size: 14px;
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap-reverse;
+  }
+
+  .item {
+    margin-left: 10px;
+    margin-right: 10px;
+    &:first-child {
+      margin-left: 0;
+    }
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+
+  .danger a:hover {
+    color: $danger;
+  }
+
+  @media screen and (min-width: 500px) {
+    .start {
+      margin-top: 40px;
+    }
+  }
+}
