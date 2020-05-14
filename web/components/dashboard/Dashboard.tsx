@@ -62,7 +62,7 @@ export class Dashboard extends React.Component<DashboardProps, { account: Accoun
     let content: React.ReactNode
     switch (this.props.mode) {
       case Mode.Base:
-        content = <Base notie={this.props.notie} account={this.state.account} accountChange={(a) => { this.setState({ account: a }) }} />
+        content = <Base notie={this.props.notie} account={this.state.account} nSongs={this.props.totalSongs} accountChange={(a) => { this.setState({ account: a }) }} />
         break
       case Mode.Privacy:
         content = <Privacy notie={this.props.notie} privacy={this.state.account.private} privacyChange={(v) => {
@@ -110,18 +110,17 @@ export class Dashboard extends React.Component<DashboardProps, { account: Accoun
       </div>
 
       <div className="footer">
-        <div className="item"><a href="/">Home</a></div>
         <div className="item"><a href={guideLink}>Guide</a></div>
         <div className="item"><a href={macOSAppLink}>macOS app</a></div>
+        <div className="item"><a href="/">Home</a></div>
       </div>
     </div>
   }
 }
 
-const Base: React.SFC<{ notie: Notie, account: Account, accountChange: (a: Account) => void }> = ({ notie, account, accountChange }) => {
+const Base: React.SFC<{ notie: Notie, account: Account, nSongs: number, accountChange: (a: Account) => void }> = ({ notie, account, nSongs, accountChange }) => {
   if (account.username) {
-    // TODO
-    return <BaseComponent username={account.username} />
+    return <BaseComponent username={account.username} nSongs={nSongs} />
   }
 
   return <div className="setUsername">

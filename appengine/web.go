@@ -26,11 +26,12 @@ var (
 )
 
 type BootstrapArgs struct {
-	Host      string  `json:"host"`
-	Email     string  `json:"email"`
-	LoginURL  string  `json:"loginURL"`
-	LogoutURL string  `json:"logoutURL"`
-	Account   Account `json:"account"`
+	Host       string  `json:"host"`
+	Email      string  `json:"email"`
+	LoginURL   string  `json:"loginURL"`
+	LogoutURL  string  `json:"logoutURL"`
+	Account    Account `json:"account"`
+	TotalSongs int     `json:"totalSongs"` // -1 if failed to compute
 }
 
 type RootArgs struct {
@@ -91,13 +92,20 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	nSongs, err := countSongs(ctx, s.ds, namespaceID(u.Email))
+	if err != nil {
+		log.Errorf("failed to count songs (continuing): %v", err.Error())
+		nSongs = -1
+	}
+
 	args := RootArgs{
 		Title: "Scrobble · Dashboard",
 		Bootstrap: BootstrapArgs{
-			Host:      host,
-			Email:     u.Email,
-			LogoutURL: logout,
-			Account:   a,
+			Host:       host,
+			Email:      u.Email,
+			LogoutURL:  logout,
+			Account:    a,
+			TotalSongs: nSongs,
 		},
 	}
 	if err := dashboardTmpl.Execute(w, args); err != nil {
@@ -105,23 +113,45 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func ensureAccount(ctx context.Context, email string, ds *datastore.Client) (Account, error) {
+func countSongs(ctx context.Context, ds *datastore.Client, namespace string) (int, error) {
+	// Get the latest complete parent.
+	q := datastore.NewQuery(KindSongParent).
+		Namespace(namespace).
+		Order("-Created").Filter("Complete=", true).
+		Limit(1).KeysOnly()
+
+	parentKeys, err := ds.GetAll(ctx, q, nil)
+	if err != nil {
+		return 0, errors.Wrapf(err, "failed to do SongParent query")
+	}
+	if len(parentKeys) == 0 {
+		// no songs
+		return 0, nil
+	}
+
+	q = datastore.NewQuery(KindSong).
+		Namespace(namespace).
+		Ancestor(parentKeys[0])
+	return ds.Count(ctx, q)
+}
+
+func ensureAccount(ctx context.Context, accID string, ds *datastore.Client) (Account, error) {
 	var account Account
 
 	_, err := ds.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
-		aKey := datastore.NameKey(KindAccount, email, nil)
+		aKey := datastore.NameKey(KindAccount, accID, nil)
 
 		if err := tx.Get(aKey, &account); err != nil {
 			if err == datastore.ErrNoSuchEntity {
 				// account entity does not exists; create new account entity
 				if _, err := tx.Put(aKey, &account); err != nil {
-					return errors.Wrapf(err, "failed to put account for %s", email)
+					return errors.Wrapf(err, "failed to put account for %s", accID)
 				}
 				return nil
 			}
 
 			// generic error
-			return errors.Wrapf(err, "failed to get account for %s", email)
+			return errors.Wrapf(err, "failed to get account for %s", accID)
 		}
 
 		// account entity exists

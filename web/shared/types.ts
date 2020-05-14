@@ -10,6 +10,7 @@ export interface BootstrapArgs {
   loginURL: string
   logoutURL: string
   account: Account
+  totalSongs: number
 }
 
 export interface UArgs {
