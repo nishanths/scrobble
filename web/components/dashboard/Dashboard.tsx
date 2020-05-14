@@ -126,7 +126,7 @@ export class Dashboard extends React.Component<DashboardProps, { account: Accoun
       <div className="footer">
         <div className="item"><a href={guideLink}>Guide</a></div>
         <div className="item"><a href={macOSAppLink}>macOS app</a></div>
-        <div className="item"><a href="/">Home</a></div>
+        <div className="item"><Link to="/">Home</Link></div>
       </div>
     </div>
   }
