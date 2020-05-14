@@ -124,8 +124,8 @@ func songStats(ctx context.Context, ds *datastore.Client, namespace string) (int
 		Order("-Created").Filter("Complete=", true).
 		Limit(1)
 
-	var entity SongParent
-	parentKeys, err := ds.GetAll(ctx, q, &entity)
+	var sp []SongParent
+	parentKeys, err := ds.GetAll(ctx, q, &sp)
 	if err != nil {
 		return -1, -1, errors.Wrapf(err, "failed to do SongParent query")
 	}
@@ -139,9 +139,9 @@ func songStats(ctx context.Context, ds *datastore.Client, namespace string) (int
 		Ancestor(parentKeys[0])
 	count, err := ds.Count(ctx, q)
 	if err != nil {
-		return entity.Created, -1, errors.Wrapf(err, "failed to count songs")
+		return sp[0].Created, -1, errors.Wrapf(err, "failed to count songs")
 	}
-	return entity.Created, count, nil
+	return sp[0].Created, count, nil
 }
 
 func ensureAccount(ctx context.Context, accID string, ds *datastore.Client) (Account, error) {
