@@ -88,7 +88,7 @@ export const Detail: React.StatelessComponent<{
     </Modal>
 
     const noun = nounForDetailKind(detailKind)
-    const privateContent = <div className="info">(This user's songs are private.)</div>
+    const privateContent = <div className="info">(This user's {noun + "s"} are private.)</div>
 
     if (priv === true && self === false) {
       return modal(privateContent)
@@ -100,7 +100,7 @@ export const Detail: React.StatelessComponent<{
     }
     if (song.error === true) {
       nProgress.done()
-      return modal(<div className="info">(Failed to fetch scrobbles.)</div>)
+      return modal(<div className="info">(Failed to fetch the specified {noun}.)</div>)
     }
     // handle initial redux state
     if (song.done === false) {

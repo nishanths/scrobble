@@ -1,9 +1,9 @@
 import { Color } from "../../components/colorpicker"
 
 export type LastAction =
-	| ReturnType<typeof setLastColor>
-	| ReturnType<typeof setLastScrobblesEndIdx>
-	| ReturnType<typeof setLastScrobblesScrollY>
+  | ReturnType<typeof setLastColor>
+  | ReturnType<typeof setLastScrobblesEndIdx>
+  | ReturnType<typeof setLastScrobblesScrollY>
 
 export const setLastColor = (c: Color) => {
   return {

@@ -1,4 +1,4 @@
-import * as base64js from "base64-js";
+import * as base64js from "base64-js"
 
 export const cookieAuthErrorMessage = "Cookie authentication failed. Sign in again?"
 
@@ -100,7 +100,7 @@ export function assert(cond: boolean, message = "assertion failed"): asserts con
   }
 }
 
-export const copyMap = <K, V>(m: Map<K, V>): Map<K, V> => {
+export function copyMap<K, V>(m: Map<K, V>): Map<K, V> {
   const n = new Map<K, V>()
   for (const [key, value] of m.entries()) {
     n.set(key, value)
@@ -131,4 +131,12 @@ export class MapDefault<K, V> {
   copy(): MapDefault<K, V> {
     return new MapDefault(this.def, copyMap(this.m))
   }
+}
+
+// Returns a random integer in [min, max).
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random#Examples
+export function randInt(min: number, max: number): number {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min; // The maximum is exclusive and the minimum is inclusive
 }

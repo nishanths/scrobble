@@ -24,17 +24,25 @@ func devRootHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	a := RootArgs{
+	// var loggedInArgs = RootArgs{
+	// 	Title: "Dev Scrobble",
+	// 	Bootstrap: BootstrapArgs{
+	// 		Host:      r.Host,
+	// 		Email:     "localdev@gmail.com",
+	// 		LogoutURL: "/fakelogouturl",
+	// 		Account:   devFakeAccount,
+	// 	},
+	// }
+
+	var loggedOutArgs = RootArgs{
 		Title: "Dev Scrobble",
 		Bootstrap: BootstrapArgs{
-			Host:      r.Host,
-			Email:     "localdev@gmail.com",
-			LogoutURL: "/fakelogouturl",
-			Account:   devFakeAccount,
+			Host:     r.Host,
+			LoginURL: "/fakeloginurl",
 		},
 	}
 
-	if err := rootTmpl.Execute(w, a); err != nil {
+	if err := homeTmpl.Execute(w, loggedOutArgs); err != nil {
 		log.Errorf("failed to execute template: %v", err.Error())
 	}
 }

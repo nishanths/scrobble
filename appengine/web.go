@@ -18,6 +18,7 @@ import (
 )
 
 var (
+	homeTmpl          = template.Must(template.New("").Parse(MustAssetString("appengine/template/home.html")))
 	rootTmpl          = template.Must(template.New("").Parse(MustAssetString("appengine/template/root.html")))
 	uTmpl             = template.Must(template.New("").Parse(MustAssetString("appengine/template/u.html")))
 	contentPageTmpl   = template.Must(template.New("").Parse(MustAssetString("appengine/template/content.html")))
@@ -54,25 +55,21 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 	dest := r.RequestURI
 	title := "Scrobble"
 
-	// helper function
-	exec := func(a RootArgs) {
-		if err := rootTmpl.Execute(w, a); err != nil {
-			log.Errorf("failed to execute template: %v", err.Error())
-		}
-	}
-
 	u, err := s.currentUser(r)
 
 	if err != nil {
 		// either generic error or ErrNoUser
 		login := loginURLWithRedirect(dest)
-		exec(RootArgs{
+		args := RootArgs{
 			Title: title,
 			Bootstrap: BootstrapArgs{
 				Host:     host,
 				LoginURL: login,
 			},
-		})
+		}
+		if err := homeTmpl.Execute(w, args); err != nil {
+			log.Errorf("failed to execute template: %v", err.Error())
+		}
 		return
 	}
 
@@ -84,7 +81,7 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	exec(RootArgs{
+	args := RootArgs{
 		Title: title,
 		Bootstrap: BootstrapArgs{
 			Host:      host,
@@ -92,7 +89,10 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 			LogoutURL: logout,
 			Account:   a,
 		},
-	})
+	}
+	if err := rootTmpl.Execute(w, args); err != nil {
+		log.Errorf("failed to execute template: %v", err.Error())
+	}
 }
 
 func ensureAccount(ctx context.Context, email string, ds *datastore.Client) (Account, error) {
