@@ -122,7 +122,7 @@ $fa: 0;
   $fa: 3px;
 
   .flexContainer {
-    margin-top: 45px;
+    margin-top: 60px;
   }
   .LargeSongCard {
     @include largeSongCardProps($pict, $love, $fa);
