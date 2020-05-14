@@ -98,8 +98,8 @@ export class Dashboard extends React.Component<DashboardProps, { account: Accoun
 
       <div className="nav">
         {this.state.account.username && <>
-          <div className="item"><Link to="/dashboard/api-key">API key</Link></div>
           <div className="item"><Link to="/dashboard/privacy">Profile privacy</Link> <span className="privacyHint">({this.state.account.private ? "private" : "public"})</span></div>
+          <div className="item"><Link to="/dashboard/api-key">API key</Link></div>
           <div className="item danger"><a href="" onClick={this.onDeleteAccountClick.bind(this)}>Delete account…</a></div>
         </>}
         <div className="item"><a href={this.props.logoutURL} title={"Signed in as " + this.props.email}>Sign out</a></div>
