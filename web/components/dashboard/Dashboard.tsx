@@ -184,7 +184,7 @@ const APIKey: React.SFC<{ notie: Notie, apiKey: string, apiKeyChange: (s: string
           Enter the API key in the <a href={macOSAppLink} target="_blank" rel="noopener noreferrer">macOS application</a> to scrobble your Apple Music listening history.&nbsp;
         </p>
         <p>
-          Keep it safe — anyone with the API key can scrobble songs on your behalf and view your scrobbled songs, even if your profile private.
+          Keep it safe — anyone with the API key can scrobble songs on your behalf and view your scrobbled songs, even if your profile is private.
         </p>
         <NewAPIKey apiKeyChange={apiKeyChange} notie={notie} />
       </div>
