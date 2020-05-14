@@ -44,7 +44,7 @@ func devRootHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		var loggedOutArgs = RootArgs{
-			Title: "Dev Scrobble",
+			Title: "Dev Scrobble · Apple Music scrobbling",
 			Bootstrap: BootstrapArgs{
 				Host:     r.Host,
 				LoginURL: "/fakeloginurl",

@@ -80,7 +80,7 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 
 		login := loginURLWithRedirect(dest)
 		args := RootArgs{
-			Title: "Scrobble",
+			Title: "Scrobble · Apple Music scrobbling",
 			Bootstrap: BootstrapArgs{
 				Host:     host,
 				LoginURL: login,
