@@ -10,12 +10,12 @@ declare const notie: Notie
 
 ReactDOM.render(
   <Router>
-  	<Switch>
-  		<Route exact path="/" render={p => <Dashboard mode={Mode.Base} {...bootstrap} notie={notie} />} />
-  		<Route exact path="/dashboard"><Redirect to="/" /></Route>
-  		<Route exact path="/dashboard/privacy" render={p => <Dashboard mode={Mode.Privacy} {...bootstrap} notie={notie} />} />
-  		<Route exact path="/dashboard/api-key" render={p => <Dashboard mode={Mode.APIKey} {...bootstrap} notie={notie} />} />
-  	</Switch>
+    <Switch>
+      <Route exact path="/" render={() => <Dashboard mode={Mode.Base} {...bootstrap} notie={notie} />} />
+      <Route exact path="/dashboard"><Redirect to="/" /></Route>
+      <Route exact path="/dashboard/privacy" render={() => <Dashboard mode={Mode.Privacy} {...bootstrap} notie={notie} />} />
+      <Route exact path="/dashboard/api-key" render={() => <Dashboard mode={Mode.APIKey} {...bootstrap} notie={notie} />} />
+    </Switch>
   </Router>,
   document.querySelector("#app")
 );

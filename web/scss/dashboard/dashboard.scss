@@ -30,45 +30,61 @@ a {
     .scrobble {
       margin-right: 8px;
       font-weight: 600;
-      a {
-        color: $muted-color;
-        text-decoration: none;
-      }
     }
     .desc {
       font-size: 15px;
       margin-left: 8px;
     }
+    a {
+      color: $muted-color;
+      text-decoration: none;
+    }
   }
 
   .nav {
-    padding: 10px 5px 6px;
-    font-size: 14px;
     border-top: 1px solid $muted-color;
-    display: flex;
-    justify-content: flex-start;
-    flex-wrap: wrap-reverse;
     margin-bottom: 60px;
+
+    .item {
+      .privacyHint {
+        color: $meta-color;
+      }
+    }
   }
 
   .footer {
     margin-top: 100px;
     border-top: 1px solid $muted-color;
-    padding: 10px 5px 6px;
     font-size: 14px;
-    display: flex;
-    justify-content: flex-start;
-    flex-wrap: wrap-reverse;
   }
 
-  .item {
-    margin-left: 10px;
-    margin-right: 10px;
-    &:first-child {
-      margin-left: 0;
-    }
-    &:last-child {
-      margin-right: 0;
+  .nav, .footer {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    flex-direction: column;
+
+    font-size: 14px;
+    padding: 10px 5px 6px;
+
+    .item {
+      line-height: 1.7;
+
+      &:after {
+        margin-left: 10px;
+        content: "·";
+        margin-right: 10px;
+        display: none;
+      }
+      &:first-child {
+        margin-left: 0;
+      }
+      &:last-child {
+        margin-right: 0;
+        &:after {
+          display: none;
+        }
+      }
     }
   }
 
@@ -78,13 +94,28 @@ a {
 
   .main {
     padding: 10px 5px 10px;
-  }
 
-  .setUsername {
-    display: flex;
-    justify-content: space-evenly;
-    flex-direction: column;
-    max-width: 450px;
+    .setUsername {
+      display: flex;
+      justify-content: space-evenly;
+      flex-direction: column;
+      max-width: 450px;
+    }
+
+    .apiKey {
+      max-width: 450px;
+      pre {
+        background-color: #fdfad1;
+        padding: 5px 10px;
+        text-align: center;
+        margin-bottom: 40px;
+        color: $muted-color;
+      }
+    }
+
+    .privacy {
+      max-width: 450px;
+    }
 
     .instruction {
       .heading {
@@ -96,6 +127,7 @@ a {
       .desc {
         margin-top: 10px;
         font-size: 14px;
+        line-height: 1.5;
       }
       margin-bottom: 40px;
     }
@@ -104,6 +136,14 @@ a {
   @media screen and (min-width: 500px) {
     .start {
       margin-top: 40px;
+    }
+    .nav, .footer {
+      flex-direction: row;
+      .item {
+        &:after {
+          display: initial;
+        }
+      }
     }
   }
 }

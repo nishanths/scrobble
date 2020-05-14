@@ -1,5 +1,7 @@
 import React from "react"
 import { SetUsername } from "./SetUsername"
+import { SetPrivacy } from "./SetPrivacy"
+import { NewAPIKey } from "./NewAPIKey"
 import { BootstrapArgs, Account, Notie } from "../../shared/types"
 import { Mode } from "./shared"
 import { macOSAppLink, guideLink } from "../../shared/const"
@@ -59,13 +61,25 @@ export class Dashboard extends React.Component<DashboardProps, { account: Accoun
     let content: React.ReactNode
     switch (this.props.mode) {
       case Mode.Base:
-        content = <Base account={this.props.account} accountChange={(a) => this.setState({ account: a})} />
+        content = <Base account={this.state.account} accountChange={(a) => { this.setState({ account: a }) }} />
         break
       case Mode.Privacy:
-        content = null // TODO
+        content = <Privacy notie={this.props.notie} privacy={this.state.account.private} privacyChange={(v) => {
+          this.setState(s => {
+            return {
+              account: { ...s.account, private: v },
+            }
+          })
+        }} />
         break
       case Mode.APIKey:
-        content = null // TODO
+        content = <APIKey notie={this.props.notie} apiKey={this.state.account.apiKey} apiKeyChange={apiKey => {
+          this.setState(s => {
+            return {
+              account: { ...s.account, apiKey },
+            }
+          })
+        }} />
         break
       default:
         assertExhaustive(this.props.mode)
@@ -73,16 +87,19 @@ export class Dashboard extends React.Component<DashboardProps, { account: Accoun
 
     return <div className="Dashboard">
       <div className="start">
-        <div className="heading">
-          <span className="scrobble"><Link to="/">scrobble</Link></span>·
-          <span className="desc">Apple Music scrobbling.</span></div>
+        <Link to="/">
+          <div className="heading">
+            <span className="scrobble">scrobble</span>·
+            <span className="desc">Apple Music scrobbling.</span>
+          </div>
+        </Link>
       </div>
 
       <div className="nav">
         {this.state.account.username && <>
-          <div className="item"><Link to="/dashboard/api-key">API key</Link></div> ·
-          <div className="item"><Link to="/dashboard/privacy">Profile privacy</Link></div> ·
-          <div className="item danger"><a href="" onClick={this.onDeleteAccountClick.bind(this)}>Delete account…</a></div>·
+          <div className="item"><Link to="/dashboard/api-key">API key</Link></div>
+          <div className="item"><Link to="/dashboard/privacy">Profile privacy</Link> <span className="privacyHint">({this.state.account.private ? "private" : "public"})</span></div>
+          <div className="item danger"><a href="" onClick={this.onDeleteAccountClick.bind(this)}>Delete account…</a></div>
         </>}
         <div className="item"><a href={this.props.logoutURL} title={"Signed in as " + this.props.email}>Sign out</a></div>
       </div>
@@ -92,7 +109,8 @@ export class Dashboard extends React.Component<DashboardProps, { account: Accoun
       </div>
 
       <div className="footer">
-        <div className="item"><a href={guideLink}>Guide</a></div>·
+        <div className="item"><a href="/">Home</a></div>
+        <div className="item"><a href={guideLink}>Guide</a></div>
         <div className="item"><a href={macOSAppLink}>macOS app</a></div>
       </div>
     </div>
@@ -111,5 +129,43 @@ const Base: React.SFC<{ account: Account, accountChange: (a: Account) => void }>
       <div className="desc">The username will be displayed on your profile, and will be present in hyperlinks to your profile.</div>
     </div>
     <SetUsername accountChange={(a) => { accountChange(a) }} />
+  </div>
+}
+
+const Privacy: React.SFC<{ notie: Notie, privacy: boolean, privacyChange: (v: boolean) => void }> = ({ notie, privacy, privacyChange }) => {
+  return <div className="privacy">
+    <div className="instruction">
+      <div className="heading">Profile Privacy</div>
+      <div className="desc">
+        <p>
+          Your profile's privacy determines whether others can see the songs you scrobble on your profile.&nbsp;
+          Your profile is currently <i>{privacy ? "private" : "public"}</i>
+          {privacy ? " — only you may see your scrobbled songs when signed in." : " — others can see your scrobbled songs."}
+        </p>
+        <SetPrivacy privacy={privacy} privacyChange={privacyChange} notie={notie} />
+      </div>
+    </div>
+  </div>
+}
+
+const APIKey: React.SFC<{ notie: Notie, apiKey: string, apiKeyChange: (s: string) => void }> = ({ notie, apiKey, apiKeyChange }) => {
+  return <div className="apiKey">
+    <div className="instruction">
+      <div className="heading">API Key</div>
+      <div className="desc">
+        <p>
+          Your API key is:
+        </p>
+        <pre><code>{apiKey}</code></pre>
+        <p></p>
+        <p>
+          Enter the API key in the <a href={macOSAppLink} target="_blank" rel="noopener noreferrer">macOS application</a> to scrobble your Apple Music listening history.&nbsp;
+        </p>
+        <p>
+          Keep it safe, anyone with the API key can scrobble songs on your behalf and view your scrobbles, even if private.
+        </p>
+        <NewAPIKey apiKeyChange={apiKeyChange} notie={notie} />
+      </div>
+    </div>
   </div>
 }

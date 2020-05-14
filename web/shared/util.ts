@@ -1,6 +1,6 @@
 import * as base64js from "base64-js"
 
-export const cookieAuthErrorMessage = "Cookie authentication failed. Sign in again?"
+export const cookieAuthErrorMessage = "Cookie authentication failed. Try signing in again."
 
 export function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);

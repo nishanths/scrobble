@@ -23,7 +23,7 @@
     width: 18ch;
     padding: 2px 3px 2px;
     font-size: 17px;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: $font-family-monospace;
     color: $muted-color;
     display: flex;
   }
