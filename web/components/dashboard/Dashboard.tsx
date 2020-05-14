@@ -2,6 +2,7 @@ import React from "react"
 import { SetUsername } from "./SetUsername"
 import { SetPrivacy } from "./SetPrivacy"
 import { NewAPIKey } from "./NewAPIKey"
+import { Base as BaseComponent } from "./Base"
 import { BootstrapArgs, Account, Notie } from "../../shared/types"
 import { Mode } from "./shared"
 import { macOSAppLink, guideLink } from "../../shared/const"
@@ -120,7 +121,7 @@ export class Dashboard extends React.Component<DashboardProps, { account: Accoun
 const Base: React.SFC<{ account: Account, accountChange: (a: Account) => void }> = ({ account, accountChange }) => {
   if (account.username) {
     // TODO
-    return <div></div>
+    return <BaseComponent />
   }
 
   return <div className="setUsername">
