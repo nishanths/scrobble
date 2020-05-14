@@ -7,12 +7,15 @@ import { BootstrapArgs, Account, Notie } from "../../shared/types"
 import { Mode } from "./shared"
 import { macOSAppLink, guideLink } from "../../shared/const"
 import { assertExhaustive } from "../../shared/util"
-import { Link } from "react-router-dom"
+import { Link, RouteComponentProps, Redirect } from "react-router-dom"
 import "../../scss/dashboard/dashboard.scss"
+
+type History = RouteComponentProps["history"]
 
 type DashboardProps = BootstrapArgs & {
   mode: Mode
   notie: Notie
+  history: History
 }
 
 const deletePrompt = `Deleting your account will remove your account and the list of scrobbled songs. \
@@ -59,6 +62,11 @@ export class Dashboard extends React.Component<DashboardProps, { account: Accoun
   }
 
   render() {
+    // disallow other modes (besides base) if username isn't set
+    if (this.props.mode !== Mode.Base && !this.state.account.username) {
+      return <Redirect to="/" />
+    }
+
     let content: React.ReactNode
     switch (this.props.mode) {
       case Mode.Base:
