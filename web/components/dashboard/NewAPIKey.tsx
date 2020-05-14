@@ -14,6 +14,10 @@ export const NewAPIKey: React.SFC<NewAPIKeyProps> = ({ apiKeyChange, notie }) =>
 
   const onClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()
+    const ok = window.confirm("Go ahead and regenerate API key? (Old keys will no longer function after.)")
+    if (!ok) {
+      return
+    }
     if (generating) { return }
     newAPIKey()
   }
