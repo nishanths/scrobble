@@ -125,10 +125,10 @@ export class Dashboard extends React.Component<DashboardProps, { account: Accoun
 }
 
 const Base: React.SFC<{
-  notie: Notie,
-  account: Account,
-  nSongs: number,
-  lastScrobbleTime: number,
+  notie: Notie
+  account: Account
+  nSongs: number
+  lastScrobbleTime: number
   accountChange: (a: Account) => void
 }> = ({ notie, account, nSongs, lastScrobbleTime, accountChange }) => {
   if (account.username) {
