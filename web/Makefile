@@ -5,11 +5,11 @@ default:
 	@echo "the default target does nothing!"
 
 .PHONY: dev
-dev: sass
+dev:
 	$(WEBPACK) --mode=development --watch
 
 .PHONY: dist
-dist: sass
+dist:
 	$(WEBPACK) --no-color --mode=production
 
 .PHONY: clean
@@ -36,8 +36,3 @@ sb:
 	npx start-storybook -p 9001 -c .storybook \
 		-s static # https://storybook.js.org/docs/configurations/serving-static-files/
 
-.PHONY: sass
-sass:
-	# content page wants same styles as root page, so need a compiled copy
-	# of the css
-	npx sass --embed-source-map scss/root.scss static/css/root.css

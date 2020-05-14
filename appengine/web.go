@@ -19,7 +19,7 @@ import (
 
 var (
 	homeTmpl          = template.Must(template.New("").Parse(MustAssetString("appengine/template/home.html")))
-	rootTmpl          = template.Must(template.New("").Parse(MustAssetString("appengine/template/root.html")))
+	dashboardTmpl     = template.Must(template.New("").Parse(MustAssetString("appengine/template/dashboard.html")))
 	uTmpl             = template.Must(template.New("").Parse(MustAssetString("appengine/template/u.html")))
 	contentPageTmpl   = template.Must(template.New("").Parse(MustAssetString("appengine/template/content.html")))
 	helpGuideMarkdown = MustAsset("appengine/helpguide.md")
@@ -38,6 +38,17 @@ type RootArgs struct {
 	Bootstrap BootstrapArgs
 }
 
+func validRootPath(p string) bool {
+	if p == "/" {
+		return true
+	}
+	c := pathComponents(p)
+	if len(c) > 0 && c[0] == "dashboard" {
+		return true
+	}
+	return false
+}
+
 func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -46,14 +57,13 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.URL.Path != "/" {
+	if !validRootPath(r.URL.Path) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 
 	host := r.Host
 	dest := r.RequestURI
-	title := "Scrobble"
 
 	u, err := s.currentUser(r)
 
@@ -61,7 +71,7 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 		// either generic error or ErrNoUser
 		login := loginURLWithRedirect(dest)
 		args := RootArgs{
-			Title: title,
+			Title: "Scrobble",
 			Bootstrap: BootstrapArgs{
 				Host:     host,
 				LoginURL: login,
@@ -82,7 +92,7 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	args := RootArgs{
-		Title: title,
+		Title: "Scrobble · Dashboard",
 		Bootstrap: BootstrapArgs{
 			Host:      host,
 			Email:     u.Email,
@@ -90,7 +100,7 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 			Account:   a,
 		},
 	}
-	if err := rootTmpl.Execute(w, args); err != nil {
+	if err := dashboardTmpl.Execute(w, args); err != nil {
 		log.Errorf("failed to execute template: %v", err.Error())
 	}
 }

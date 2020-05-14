@@ -1,0 +1,149 @@
+@import "../common.scss";
+@import "../vars.scss";
+
+body {
+  font-family: $font-family;
+  margin: 0 auto;
+  padding: 0 15px;
+  color: $muted-color;
+}
+
+a {
+  color: $blue;
+  &:hover {
+    color: $blue;
+  }
+}
+
+.Dashboard {
+  max-width: 500px;
+  margin: 0 auto;
+
+  .start {
+    cursor: default;
+    font-size: 1rem;
+    margin-top: 30px;
+    display: flex;
+    padding: 6px 5px;
+    display: flex;
+    justify-content: flex-start;
+    .scrobble {
+      margin-right: 8px;
+      font-weight: 600;
+    }
+    .desc {
+      font-size: 15px;
+      margin-left: 8px;
+    }
+    a {
+      color: $muted-color;
+      text-decoration: none;
+    }
+  }
+
+  .nav {
+    border-top: 1px solid $muted-color;
+    margin-bottom: 60px;
+
+    .item {
+      .privacyHint {
+        color: $meta-color;
+      }
+    }
+  }
+
+  .footer {
+    margin-top: 100px;
+    border-top: 1px solid $muted-color;
+    font-size: 14px;
+  }
+
+  .nav, .footer {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    flex-direction: column;
+
+    font-size: 14px;
+    padding: 10px 5px 6px;
+
+    .item {
+      line-height: 1.7;
+
+      &:after {
+        margin-left: 10px;
+        content: "·";
+        margin-right: 10px;
+        display: none;
+      }
+      &:first-child {
+        margin-left: 0;
+      }
+      &:last-child {
+        margin-right: 0;
+        &:after {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .danger a:hover {
+    color: $danger;
+  }
+
+  .main {
+    padding: 10px 5px 10px;
+
+    .setUsername {
+      display: flex;
+      justify-content: space-evenly;
+      flex-direction: column;
+      max-width: 475px;
+    }
+
+    .apiKey {
+      max-width: 475px;
+      pre {
+        background-color: #fdfad1;
+        padding: 5px 10px;
+        text-align: center;
+        margin-bottom: 40px;
+        color: $muted-color;
+      }
+    }
+
+    .privacy {
+      max-width: 475px;
+    }
+
+    .instruction {
+      .heading {
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+      }
+      .desc {
+        margin-top: 10px;
+        font-size: 15px;
+        line-height: 1.5;
+      }
+      margin-bottom: 40px;
+    }
+  }
+
+  @media screen and (min-width: 500px) {
+    .start {
+      margin-top: 40px;
+    }
+    .nav, .footer {
+      flex-direction: row;
+      .item {
+        &:after {
+          display: initial;
+        }
+      }
+    }
+  }
+}

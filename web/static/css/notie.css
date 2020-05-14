@@ -17,10 +17,10 @@
       font-size: .9rem; } }
   @media screen and (max-width: 750px) {
     .notie-container {
-      font-size: 1rem; } }
+      font-size: .9rem; } }
   @media screen and (max-width: 400px) {
     .notie-container {
-      font-size: 1rem; } }
+      font-size: .9rem; } }
 
 .notie-background-success {
   background-color: #3D9970; }
@@ -41,8 +41,8 @@
   background-color: #FFFFFF; }
 
 .notie-textbox {
-  color: #FFFFFF;
-  font-weight: bold;
+  color: #f7f7f7;
+  font-weight: normal;
   padding: 3px; }
 
 .notie-textbox-inner {
