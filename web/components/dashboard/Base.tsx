@@ -50,16 +50,17 @@ const lastScrobbledDisplay = (d: Date): string => {
   const now = new Date()
 
   if (sameDate(now, d)) {
-    let h = d.getHours()
+    const h = d.getHours()
+    let hString = ""
     let ampm = ""
     if (h > 12) {
-      h = h - 12
+      hString = (h - 12).toString()
       ampm = "pm"
     } else {
+      hString = "0" + h
       ampm = "am"
     }
-    console.log(h, d.getMinutes())
-    return `${h}:${d.getMinutes()} ${ampm}`
+    return `${hString}:${d.getMinutes()} ${ampm}`
   }
 
   return d.getFullYear() != now.getFullYear() ?

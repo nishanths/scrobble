@@ -5,7 +5,7 @@ import { NewAPIKey } from "./NewAPIKey"
 import { Base as BaseComponent } from "./Base"
 import { BootstrapArgs, Account, Notie } from "../../shared/types"
 import { Mode } from "./shared"
-import { macOSAppLink, guideLink } from "../../shared/const"
+import { macOSAppLink, guideLink, apiDocLink } from "../../shared/const"
 import { assertExhaustive } from "../../shared/util"
 import { Link, RouteComponentProps, Redirect } from "react-router-dom"
 import "../../scss/dashboard/dashboard.scss"
@@ -182,9 +182,10 @@ const APIKey: React.SFC<{ notie: Notie, apiKey: string, apiKeyChange: (s: string
         <p></p>
         <p>
           Enter the API key in the <a href={macOSAppLink} target="_blank" rel="noopener noreferrer">macOS application</a> to scrobble your Apple Music listening history.&nbsp;
+          You may also be interested in the <a href={apiDocLink}>API documentation</a>.
         </p>
         <p>
-          Keep it safe — anyone with the API key can scrobble songs on your behalf and view your scrobbled songs, even if your profile is private.
+          Keep the key safe — anyone with the API key can scrobble songs on your behalf and view your scrobbled songs, even if your profile is private.
         </p>
         <NewAPIKey apiKeyChange={apiKeyChange} notie={notie} />
       </div>

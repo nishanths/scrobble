@@ -57,8 +57,8 @@ export const Scrobbles: React.StatelessComponent<{
     const endIdxRef = useRef(endIdx)
     useEffect(() => { endIdxRef.current = endIdx }, [endIdx])
 
-    const shouldUpdateScrollTo = () => last.scrobblesScrollY !== undefined &&
-      Math.abs(wnd.pageYOffset - last.scrobblesScrollY) > 200 // throttle frequent updates
+    const shouldUpdateScrollTo = () => last.scrobblesScrollY !== undefined
+      && Math.abs(wnd.pageYOffset - last.scrobblesScrollY) > 200 // throttle frequent updates
 
     if (shouldUpdateScrollTo()) {
       wnd.scrollTo({ top: last.scrobblesScrollY })
