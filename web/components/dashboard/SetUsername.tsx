@@ -5,11 +5,10 @@ import "../../scss/dashboard/set-username.scss"
 
 interface SetUsernameProps {
   accountChange: (a: Account) => void
+  notie: Notie
 }
 
-declare const notie: Notie
-
-export const SetUsername: React.FC<SetUsernameProps> = ({ accountChange }) => {
+export const SetUsername: React.FC<SetUsernameProps> = ({ accountChange, notie }) => {
   const [username, setUsername] = useState("")
   const [error, setError] = useState("")
 

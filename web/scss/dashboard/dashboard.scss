@@ -99,11 +99,11 @@ a {
       display: flex;
       justify-content: space-evenly;
       flex-direction: column;
-      max-width: 450px;
+      max-width: 475px;
     }
 
     .apiKey {
-      max-width: 450px;
+      max-width: 475px;
       pre {
         background-color: #fdfad1;
         padding: 5px 10px;
@@ -114,7 +114,7 @@ a {
     }
 
     .privacy {
-      max-width: 450px;
+      max-width: 475px;
     }
 
     .instruction {
@@ -126,7 +126,7 @@ a {
       }
       .desc {
         margin-top: 10px;
-        font-size: 14px;
+        font-size: 15px;
         line-height: 1.5;
       }
       margin-bottom: 40px;

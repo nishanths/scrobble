@@ -62,7 +62,7 @@ export class Dashboard extends React.Component<DashboardProps, { account: Accoun
     let content: React.ReactNode
     switch (this.props.mode) {
       case Mode.Base:
-        content = <Base account={this.state.account} accountChange={(a) => { this.setState({ account: a }) }} />
+        content = <Base notie={this.props.notie} account={this.state.account} accountChange={(a) => { this.setState({ account: a }) }} />
         break
       case Mode.Privacy:
         content = <Privacy notie={this.props.notie} privacy={this.state.account.private} privacyChange={(v) => {
@@ -118,10 +118,10 @@ export class Dashboard extends React.Component<DashboardProps, { account: Accoun
   }
 }
 
-const Base: React.SFC<{ account: Account, accountChange: (a: Account) => void }> = ({ account, accountChange }) => {
+const Base: React.SFC<{ notie: Notie, account: Account, accountChange: (a: Account) => void }> = ({ notie, account, accountChange }) => {
   if (account.username) {
     // TODO
-    return <BaseComponent />
+    return <BaseComponent username={account.username} />
   }
 
   return <div className="setUsername">
@@ -129,7 +129,7 @@ const Base: React.SFC<{ account: Account, accountChange: (a: Account) => void }>
       <div className="heading">Set a username</div>
       <div className="desc">The username will be displayed on your profile, and will be present in hyperlinks to your profile.</div>
     </div>
-    <SetUsername accountChange={(a) => { accountChange(a) }} />
+    <SetUsername accountChange={(a) => { accountChange(a) }} notie={notie} />
   </div>
 }
 
@@ -163,7 +163,7 @@ const APIKey: React.SFC<{ notie: Notie, apiKey: string, apiKeyChange: (s: string
           Enter the API key in the <a href={macOSAppLink} target="_blank" rel="noopener noreferrer">macOS application</a> to scrobble your Apple Music listening history.&nbsp;
         </p>
         <p>
-          Keep it safe, anyone with the API key can scrobble songs on your behalf and view your scrobbles, even if private.
+          Keep it safe — anyone with the API key can scrobble songs on your behalf and view your scrobbled songs, even if your profile private.
         </p>
         <NewAPIKey apiKeyChange={apiKeyChange} notie={notie} />
       </div>
