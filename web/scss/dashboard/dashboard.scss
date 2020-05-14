@@ -1,8 +1,6 @@
 @import "../common.scss";
 @import "../vars.scss";
 
-$danger: #FF4136;
-
 body {
   font-family: $font-family;
   margin: 0 auto;
@@ -11,7 +9,10 @@ body {
 }
 
 a {
-  color: $muted-color;
+  color: $blue;
+  &:hover {
+    color: $blue;
+  }
 }
 
 .Dashboard {
@@ -23,24 +24,25 @@ a {
     font-size: 1rem;
     margin-top: 30px;
     display: flex;
-    padding: 3px 5px;
+    padding: 6px 5px;
     display: flex;
     justify-content: flex-start;
-  }
-  .scrobble {
-    font-weight: 600;
-    margin-right: 5px;
-    a {
-      text-decoration: none;
+    .scrobble {
+      margin-right: 8px;
+      font-weight: 600;
+      a {
+        color: $muted-color;
+        text-decoration: none;
+      }
     }
-  }
-  .desc {
-    font-size: 14px;
-    margin-left: 5px;
+    .desc {
+      font-size: 15px;
+      margin-left: 8px;
+    }
   }
 
   .nav {
-    padding: 6px 5px 6px;
+    padding: 10px 5px 6px;
     font-size: 14px;
     border-top: 1px solid $muted-color;
     display: flex;
@@ -52,7 +54,7 @@ a {
   .footer {
     margin-top: 100px;
     border-top: 1px solid $muted-color;
-    padding: 6px 5px 6px;
+    padding: 10px 5px 6px;
     font-size: 14px;
     display: flex;
     justify-content: flex-start;
@@ -72,6 +74,31 @@ a {
 
   .danger a:hover {
     color: $danger;
+  }
+
+  .main {
+    padding: 10px 5px 10px;
+  }
+
+  .setUsername {
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: column;
+    max-width: 450px;
+
+    .instruction {
+      .heading {
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+      }
+      .desc {
+        margin-top: 10px;
+        font-size: 14px;
+      }
+      margin-bottom: 40px;
+    }
   }
 
   @media screen and (min-width: 500px) {

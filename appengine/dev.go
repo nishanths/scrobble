@@ -10,7 +10,7 @@ import (
 	"github.com/nishanths/scrobble/appengine/log"
 )
 
-const devSignedInUsername = "devuser"
+const devSignedInUsername = ""
 
 var devFakeAccount = Account{
 	Username: devSignedInUsername,

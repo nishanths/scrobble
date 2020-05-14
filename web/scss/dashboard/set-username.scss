@@ -1,0 +1,69 @@
+@import "../vars.scss";
+
+.SetUsername {
+  form {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: nowrap; // consciously enforce against submit button moving to next line
+  }
+
+  input[type=text] {
+    border: none;
+    background-image: none;
+    background-color: transparent;
+    box-shadow: none;
+    outline: none;
+
+    border-bottom: 1px dashed #aaa;
+    &:focus {
+      border-bottom-style: solid;
+      border-bottom-color: #006699; // ibm blue
+    }
+
+    width: 18ch;
+    padding: 2px 3px 2px;
+    font-size: 17px;
+    font-family: 'IBM Plex Mono', monospace;
+    color: $muted-color;
+    display: flex;
+  }
+
+  input[type=submit] {
+    margin-left: 15px;
+    padding: 0;
+    outline: none;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: $muted-color;
+  }
+
+  .label {
+    color: $meta-color;
+    font-size: 13px;
+    margin-top: 8px;
+    margin-left: 1px;
+    line-height: 1.5;
+
+    &.secondary {
+      margin-top: 0;
+    }
+
+    &.error {
+      color: $red;
+    }
+  }
+
+  @media screen and (min-width: 320px) {
+    input[type=text] {
+      width: 21ch;
+    }
+  }
+
+  @media screen and (min-width: 340px) {
+    input[type=text] {
+      width: 24ch;
+      font-size: 18px;
+    }
+  }
+}

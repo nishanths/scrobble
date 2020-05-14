@@ -11,3 +11,8 @@ $ease-out-back: cubic-bezier(0.17, 0.89, 0.12, 1.49); // modified
 $transition-enter-func: $ease-out-back;
 $transition-exit-func: $ease-out-back;
 $font-family: proxima-nova, -apple-system, BlinkMacSystemFont, sans-serif;
+
+$red: #FF4136;
+$danger: $red;
+$blue: #0074D9;
+$teal: #39CCCC;
