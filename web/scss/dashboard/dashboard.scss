@@ -95,6 +95,10 @@ a {
   .main {
     padding: 10px 5px 10px;
 
+    .base {
+      max-width: 475px;
+    }
+
     .setUsername {
       display: flex;
       justify-content: space-evenly;

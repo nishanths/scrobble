@@ -132,7 +132,9 @@ const Base: React.SFC<{
   accountChange: (a: Account) => void
 }> = ({ notie, account, nSongs, lastScrobbleTime, accountChange }) => {
   if (account.username) {
-    return <BaseComponent username={account.username} nSongs={nSongs} lastScrobbleTime={lastScrobbleTime} />
+    return <div className="base">
+      <BaseComponent username={account.username} nSongs={nSongs} lastScrobbleTime={lastScrobbleTime} />
+    </div>
   }
 
   return <div className="setUsername">
