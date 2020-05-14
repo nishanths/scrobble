@@ -71,6 +71,13 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		// either generic error or ErrNoUser
+
+		// redirect any "/dashboard/" paths to "/"
+		if r.URL.Path != "/" {
+			http.Redirect(w, r, "/", http.StatusFound)
+			return
+		}
+
 		login := loginURLWithRedirect(dest)
 		args := RootArgs{
 			Title: "Scrobble",
