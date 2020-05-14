@@ -22,9 +22,6 @@
   }
 
   .flexContainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
     height: 100%;
     width: 100%;
   }
@@ -56,13 +53,8 @@ $love: 9px;
 $fa: 0;
 
 .LargeSongCard {
-  width: inherit; // inherit from flexContainer
-  height: inherit; // inherit from flexContainer
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 30px;
+  height: inherit;
+  margin: 0 auto 30px;
 }
 
 .flexContainer {
