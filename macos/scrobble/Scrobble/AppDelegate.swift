@@ -172,10 +172,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
             } else if let err = state.error {
                 switch err {
                 case .Auth:
-                    multiItem.title = String(format: "Re-enter API Key")
+                    multiItem.title = String(format: "Re-enter API key")
                     multiItem.action = #selector(clearThenEnterAPIKeyAction(_:))
                 case .Other:
-                    multiItem.title = String(format: "Remove API Key and Sign out")
+                    multiItem.title = String(format: "Remove API key and Sign out")
                     multiItem.action = #selector(clearAPIKeyAction(_:))
                 }
                 profileLinkItem.isHidden = true
@@ -194,7 +194,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         if let err = state.error {
             switch err {
             case .Auth:
-                statusItem.title = "Error: API Key outdated?"
+                statusItem.title = "Error: API key outdated?"
             case .Other:
                 statusItem.title = "Error: Failed to scrobble"
             }
@@ -375,7 +375,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         a.showsHelp = true
         a.delegate = self
         a.addButton(withTitle: "Close")
-        a.addButton(withTitle: "Remove API Key and Sign out")
+        a.addButton(withTitle: "Remove API key and Sign out")
         
         let result = a.runModal()
         switch result {
@@ -396,7 +396,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
     @objc private func enterAPIKeyAction(_ sender: Any?) {
         alert = NSAlert()
         alert.alertStyle = .informational
-        alert.messageText = "Enter API Key"
+        alert.messageText = "Enter API key"
         alert.showsSuppressionButton = false
         alert.showsHelp = true
         alert.delegate = self
@@ -462,7 +462,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                         return
                     } else if rr.statusCode == 404 {
                         DispatchQueue.main.async {
-                            self.alert.informativeText = String(format: "Invalid API Key.")
+                            self.alert.informativeText = String(format: "Invalid API key.")
                         }
                         return
                     }

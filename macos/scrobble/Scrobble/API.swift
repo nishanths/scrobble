@@ -11,7 +11,7 @@ import iTunesLibrary
 
 class API {
     static let headerAPIKey = "X-Scrobble-API-Key"
-    
+
     static func scrobbleRequest(_ apiKey: String, _ body: Data) -> URLRequest {
         let url = URL(string: String(format: "https://%@/api/v1/scrobble", Constants.BaseUrl))!
         var r = URLRequest(url: url)
@@ -21,7 +21,7 @@ class API {
         setStandardHeaders(&r, apiKey)
         return r
     }
-    
+
     static func accountRequest(_ apiKey: String) -> URLRequest {
         let url = URL(string: String(format: "https://%@/api/v1/account", Constants.BaseUrl))!
         var r = URLRequest(url: url)
@@ -29,21 +29,21 @@ class API {
         setStandardHeaders(&r, apiKey)
         return r
     }
-    
+
     static func artworkRequest(_ apiKey: String, _ artworkFormat: ITLibArtworkFormat, _ artwork: Data) -> URLRequest {
         var c = URLComponents()
         c.scheme = "https"
         c.host = Constants.BaseUrl
         c.path = "/api/v1/artwork"
         c.queryItems = [URLQueryItem(name: "format", value: artworkFormatString(artworkFormat))]
-        
+
         var r = URLRequest(url: c.url!)
         r.httpMethod = "POST"
         r.httpBody = artwork
         setStandardHeaders(&r, apiKey)
         return r
     }
-    
+
     static func missingArtworkRequest(_ apiKey: String) -> URLRequest {
         let url = URL(string: String(format: "https://%@/api/v1/artwork/missing", Constants.BaseUrl))
         var r = URLRequest(url: url!)
@@ -51,20 +51,20 @@ class API {
         setStandardHeaders(&r, apiKey)
         return r
     }
-    
+
     private static func setStandardHeaders(_ r: inout URLRequest, _ apiKey: String) {
         r.setValue(apiKey, forHTTPHeaderField: headerAPIKey)
     }
-    
+
     struct Account: Decodable {
         var username: String
     }
-    
+
     struct MediaItem: Encodable, Hashable {
         var hashValue: Int {
             return persistentID.hashValue
         }
-        
+
         var added: Double?
         var albumTitle: String?
         var sortAlbumTitle: String?
@@ -82,9 +82,9 @@ class API {
         var year: UInt
         var persistentID: String
         var artworkHash: String?
-        
+
         var loved = false
-        
+
         init(fromITLibMediaItem i: ITLibMediaItem) {
             self.added = i.addedDate?.timeIntervalSince1970
             self.albumTitle = i.album.title
@@ -102,7 +102,7 @@ class API {
             self.totalTime = UInt(i.totalTime)
             self.year = UInt(i.year)
             self.persistentID = i.persistentID.stringValue
-            
+
             // artwork hash
             guard let a = i.artwork?.imageData else { return }
             guard let f = i.artwork?.imageDataFormat else { return }

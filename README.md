@@ -13,4 +13,4 @@ service, with a client app available for macOS.
 
 The macOS app icon is Gramophone by Mahmure Alp from the Noun Project.
 
-The macOS menu bar icon is Flower by nitut786 from The Noun Project.
+The macOS menu bar icon is Flower by nitut786 from the Noun Project.

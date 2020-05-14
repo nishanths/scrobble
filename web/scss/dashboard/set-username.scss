@@ -3,7 +3,7 @@
 .SetUsername {
   form {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     flex-wrap: nowrap; // consciously enforce against submit button moving to next line
   }
 
