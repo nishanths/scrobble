@@ -62,7 +62,13 @@ export class Dashboard extends React.Component<DashboardProps, { account: Accoun
     let content: React.ReactNode
     switch (this.props.mode) {
       case Mode.Base:
-        content = <Base notie={this.props.notie} account={this.state.account} nSongs={this.props.totalSongs} accountChange={(a) => { this.setState({ account: a }) }} />
+        content = <Base
+          notie={this.props.notie}
+          account={this.state.account}
+          nSongs={this.props.totalSongs}
+          lastScrobbleTime={this.props.lastScrobbleTime}
+          accountChange={(a) => { this.setState({ account: a }) }}
+        />
         break
       case Mode.Privacy:
         content = <Privacy notie={this.props.notie} privacy={this.state.account.private} privacyChange={(v) => {
@@ -118,9 +124,15 @@ export class Dashboard extends React.Component<DashboardProps, { account: Accoun
   }
 }
 
-const Base: React.SFC<{ notie: Notie, account: Account, nSongs: number, accountChange: (a: Account) => void }> = ({ notie, account, nSongs, accountChange }) => {
+const Base: React.SFC<{
+  notie: Notie,
+  account: Account,
+  nSongs: number,
+  lastScrobbleTime: number,
+  accountChange: (a: Account) => void
+}> = ({ notie, account, nSongs, lastScrobbleTime, accountChange }) => {
   if (account.username) {
-    return <BaseComponent username={account.username} nSongs={nSongs} />
+    return <BaseComponent username={account.username} nSongs={nSongs} lastScrobbleTime={lastScrobbleTime} />
   }
 
   return <div className="setUsername">

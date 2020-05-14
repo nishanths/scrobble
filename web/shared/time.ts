@@ -40,7 +40,9 @@ export function dateDisplayDesc(d: Date, now: Date): [string, boolean] {
   return [out, false]
 }
 
-function sameDate(a: Date, b: Date): boolean {
+// sameDate returns whether the given dates have the same date,
+// month, and year.
+export function sameDate(a: Date, b: Date): boolean {
   return a.getDate() == b.getDate() &&
     a.getMonth() == b.getMonth() &&
     a.getFullYear() == b.getFullYear()

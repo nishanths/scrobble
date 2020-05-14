@@ -26,12 +26,13 @@ var (
 )
 
 type BootstrapArgs struct {
-	Host       string  `json:"host"`
-	Email      string  `json:"email"`
-	LoginURL   string  `json:"loginURL"`
-	LogoutURL  string  `json:"logoutURL"`
-	Account    Account `json:"account"`
-	TotalSongs int     `json:"totalSongs"` // -1 if failed to compute
+	Host             string  `json:"host"`
+	Email            string  `json:"email"`
+	LoginURL         string  `json:"loginURL"`
+	LogoutURL        string  `json:"logoutURL"`
+	Account          Account `json:"account"`
+	TotalSongs       int     `json:"totalSongs"`       // -1 if failed to compute
+	LastScrobbleTime int64   `json:"lastScrobbleTime"` // unix seconds; -1 if failed to compute
 }
 
 type RootArgs struct {
@@ -92,20 +93,20 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	nSongs, err := countSongs(ctx, s.ds, namespaceID(u.Email))
+	lastScrobbled, nSongs, err := songStats(ctx, s.ds, namespaceID(u.Email))
 	if err != nil {
 		log.Errorf("failed to count songs (continuing): %v", err.Error())
-		nSongs = -1
 	}
 
 	args := RootArgs{
 		Title: "Scrobble · Dashboard",
 		Bootstrap: BootstrapArgs{
-			Host:       host,
-			Email:      u.Email,
-			LogoutURL:  logout,
-			Account:    a,
-			TotalSongs: nSongs,
+			Host:             host,
+			Email:            u.Email,
+			LogoutURL:        logout,
+			Account:          a,
+			TotalSongs:       nSongs,
+			LastScrobbleTime: lastScrobbled,
 		},
 	}
 	if err := dashboardTmpl.Execute(w, args); err != nil {
@@ -113,26 +114,34 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func countSongs(ctx context.Context, ds *datastore.Client, namespace string) (int, error) {
+// Returns the last scrobble time and the count of scrobbled songs.
+// Partial results may be returned even if the error is non-nil.
+// Returns -1 for results that could not be computed.
+func songStats(ctx context.Context, ds *datastore.Client, namespace string) (int64, int, error) {
 	// Get the latest complete parent.
 	q := datastore.NewQuery(KindSongParent).
 		Namespace(namespace).
 		Order("-Created").Filter("Complete=", true).
-		Limit(1).KeysOnly()
+		Limit(1)
 
-	parentKeys, err := ds.GetAll(ctx, q, nil)
+	var entity SongParent
+	parentKeys, err := ds.GetAll(ctx, q, &entity)
 	if err != nil {
-		return 0, errors.Wrapf(err, "failed to do SongParent query")
+		return -1, -1, errors.Wrapf(err, "failed to do SongParent query")
 	}
 	if len(parentKeys) == 0 {
 		// no songs
-		return 0, nil
+		return 0, 0, nil
 	}
 
 	q = datastore.NewQuery(KindSong).
 		Namespace(namespace).
 		Ancestor(parentKeys[0])
-	return ds.Count(ctx, q)
+	count, err := ds.Count(ctx, q)
+	if err != nil {
+		return entity.Created, -1, errors.Wrapf(err, "failed to count songs")
+	}
+	return entity.Created, count, nil
 }
 
 func ensureAccount(ctx context.Context, accID string, ds *datastore.Client) (Account, error) {

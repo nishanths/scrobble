@@ -11,6 +11,7 @@ export interface BootstrapArgs {
   logoutURL: string
   account: Account
   totalSongs: number
+  lastScrobbleTime: number
 }
 
 export interface UArgs {

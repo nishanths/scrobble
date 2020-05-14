@@ -30,11 +30,12 @@ func devRootHandler(w http.ResponseWriter, r *http.Request) {
 		var loggedInArgs = RootArgs{
 			Title: "Dev Scrobble · Dashboard",
 			Bootstrap: BootstrapArgs{
-				Host:       r.Host,
-				Email:      "localdev@gmail.com",
-				LogoutURL:  "/fakelogouturl",
-				Account:    devFakeAccount,
-				TotalSongs: 1337,
+				Host:             r.Host,
+				Email:            "localdev@gmail.com",
+				LogoutURL:        "/fakelogouturl",
+				Account:          devFakeAccount,
+				TotalSongs:       1337,
+				LastScrobbleTime: time.Now().Unix(),
 			},
 		}
 
