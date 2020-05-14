@@ -10,7 +10,7 @@ import (
 	"github.com/nishanths/scrobble/appengine/log"
 )
 
-const devSignedInUsername = ""
+const devSignedInUsername = "devuser"
 
 var devFakeAccount = Account{
 	Username: devSignedInUsername,
@@ -19,7 +19,7 @@ var devFakeAccount = Account{
 }
 
 func devRootHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
+	if !validRootPath(r.URL.Path) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}

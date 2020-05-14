@@ -38,6 +38,17 @@ type RootArgs struct {
 	Bootstrap BootstrapArgs
 }
 
+func validRootPath(p string) bool {
+	if p == "/" {
+		return true
+	}
+	c := pathComponents(p)
+	if len(c) > 0 && c[0] == "dashboard" {
+		return true
+	}
+	return false
+}
+
 func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -46,7 +57,7 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.URL.Path != "/" {
+	if !validRootPath(r.URL.Path) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}

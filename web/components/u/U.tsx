@@ -16,9 +16,8 @@ type UProps = UArgs & {
     kind: DetailKind
     hexIdent: string // hex-encoded song ident
   }
+  nProgress: NProgress
 } & RouteComponentProps;
-
-declare const NProgress: NProgress
 
 // U is the root component for the username page, e.g.,
 // https://scrobble.littleroot.org/u/whatever.
@@ -33,6 +32,7 @@ export const U: React.FC<UProps> = ({
   color,
   detail,
   history,
+  nProgress,
 }) => {
   if (detail === undefined) {
     return <Scrobbles
@@ -43,7 +43,7 @@ export const U: React.FC<UProps> = ({
       self={self}
       mode={mode}
       color={color}
-      nProgress={NProgress}
+      nProgress={nProgress}
       history={history}
       wnd={wnd}
     />
@@ -55,7 +55,7 @@ export const U: React.FC<UProps> = ({
       self={self}
       detailKind={detail.kind}
       songIdent={hexDecode(detail.hexIdent)}
-      nProgress={NProgress}
+      nProgress={nProgress}
       mode={mode}
       color={color}
       history={history}

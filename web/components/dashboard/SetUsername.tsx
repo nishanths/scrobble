@@ -33,7 +33,7 @@ export const SetUsername: React.FC<SetUsernameProps> = ({ accountChange }) => {
       return
     }
 
-    const genericError = "Something went wrong. Try again?"
+    const genericError = "Failed to set username. Try again."
 
     // TODO: clean up the control flow
     let success = false;
