@@ -126,6 +126,11 @@ func run(ctx context.Context) error {
 		// in production these are handled by app.yaml
 		http.Handle("/dist/", http.StripPrefix("/dist/", http.FileServer(http.Dir(filepath.Join("web", "dist")))))
 		http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(filepath.Join("web", "static")))))
+		http.Handle("/doc/api/v1/", http.StripPrefix("/doc/api/v1/", http.FileServer(http.Dir(filepath.Join("doccontent", "api", "dst")))))
+		http.Handle("/doc/guide/", http.StripPrefix("/doc/guide/", http.FileServer(http.Dir(filepath.Join("doccontent", "guide", "dst")))))
+		http.HandleFunc("/doc/style.css", func(w http.ResponseWriter, r *http.Request) {
+			http.ServeFile(w, r, filepath.Join("doccontent", "style.css"))
+		})
 	}
 
 	// Serve.

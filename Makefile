@@ -15,7 +15,7 @@ default:
 	@echo "the default target does nothing!"
 
 .PHONY: all
-all: clean bootstrap bindata go web
+all: clean bootstrap doc bindata go web
 
 .PHONY: indexes
 indexes:
@@ -32,6 +32,7 @@ bindata:
 .PHONY: dev-deps
 dev-deps:
 	go get github.com/kevinburke/go-bindata/...
+	go get gopkg.in/russross/blackfriday.v2
 
 .PHONY: go
 go:
@@ -42,11 +43,12 @@ go:
 web:
 	@cd web && $(MAKE) dist
 
-.PHONY: ln-web
-ln-web:
+.PHONY: ln
+ln:
 	mkdir -p appengine/web
-	ln -s $(PWD)/web/dist $(PWD)/appengine/web
-	ln -s $(PWD)/web/static $(PWD)/appengine/web
+	ln -sfn $(PWD)/web/dist $(PWD)/appengine/web
+	ln -sfn $(PWD)/web/static $(PWD)/appengine/web
+	ln -sfn $(PWD)/doc/content $(PWD)/appengine/doccontent
 
 .PHONY: clean
 clean:
@@ -55,14 +57,14 @@ clean:
 	rm -rf appengine/web
 
 .PHONY: bootstrap
-bootstrap: ln-web _bootstrap
+bootstrap: ln _bootstrap
 
 .PHONY: _bootstrap
 _bootstrap:
 	mkdir -p web/dist
 
 .PHONY: dev
-dev: bindata go
+dev: doc bindata go
 	cd appengine && ./main
 
 .PHONY: test
@@ -71,3 +73,7 @@ test: go-test
 .PHONY: go-test
 go-test:
 	cd appengine && go test -mod=vendor -race ./...
+
+.PHONY: doc
+doc:
+	cd doc && $(MAKE) build

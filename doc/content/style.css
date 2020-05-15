@@ -1,0 +1,19 @@
+html {
+  -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape while allowing user zoom */
+}
+
+body {
+	color: #333;
+	max-width: 650px;
+	line-height: 1.2;
+	margin: 0 auto;
+	padding: 10px;
+}
+
+img {
+	max-width: 100%;
+}
+
+a {
+	color: #0074D9;
+}

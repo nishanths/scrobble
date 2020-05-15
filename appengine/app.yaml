@@ -12,6 +12,16 @@ handlers:
 - url: /static
   static_dir: web/static
 
+- url: /doc/api/v1
+  static_dir: doccontent/api/dst
+
+- url: /doc/guide
+  static_dir: doccontent/guide/dst
+
+- url: /doc/style.css
+  static_files: doccontent/style.css
+  upload: doccontent/style.css
+
 - url: /.*
   secure: always
   redirect_http_response_code: 302

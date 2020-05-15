@@ -137,7 +137,7 @@ func (s *server) accountHandler(w http.ResponseWriter, r *http.Request) {
 
 	key := r.Header.Get(headerAPIKey)
 	if key == "" {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
@@ -173,7 +173,7 @@ func (s *server) deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 		key := r.Header.Get(headerAPIKey)
 		if key == "" {
 			log.Errorf("not signed-in and missing API key header")
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 		var ok bool

@@ -5,24 +5,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"cloud.google.com/go/datastore"
-	"github.com/gomarkdown/markdown"
-	"github.com/gomarkdown/markdown/html"
-	"github.com/gomarkdown/markdown/parser"
 	"github.com/nishanths/scrobble/appengine/log"
 	"github.com/pkg/errors"
 )
 
 var (
-	homeTmpl          = template.Must(template.New("").Parse(MustAssetString("appengine/template/home.html")))
-	dashboardTmpl     = template.Must(template.New("").Parse(MustAssetString("appengine/template/dashboard.html")))
-	uTmpl             = template.Must(template.New("").Parse(MustAssetString("appengine/template/u.html")))
-	contentPageTmpl   = template.Must(template.New("").Parse(MustAssetString("appengine/template/content.html")))
-	helpGuideMarkdown = MustAsset("appengine/helpguide.md")
+	homeTmpl      = template.Must(template.New("").Parse(MustAssetString("appengine/template/home.html")))
+	dashboardTmpl = template.Must(template.New("").Parse(MustAssetString("appengine/template/dashboard.html")))
+	uTmpl         = template.Must(template.New("").Parse(MustAssetString("appengine/template/u.html")))
 )
 
 type BootstrapArgs struct {
@@ -505,23 +501,7 @@ func (s *server) privacyPolicyHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
-
-	extensions := parser.CommonExtensions | parser.AutoHeadingIDs
-	p := parser.NewWithExtensions(extensions)
-	htmlFlags := html.CommonFlags | html.HrefTargetBlank
-	opts := html.RendererOptions{Flags: htmlFlags}
-	renderer := html.NewRenderer(opts)
-	content := markdown.ToHTML([]byte(privacyPolicy), p, renderer)
-
-	args := ContentPageArgs{
-		Title:   "Scrobble · Privacy policy",
-		Heading: template.HTML("scrobble · <strong>privacy policy</strong>"),
-		Content: template.HTML(content),
-	}
-
-	if err := contentPageTmpl.Execute(w, args); err != nil {
-		log.Errorf("failed to execute template: %v", err.Error())
-	}
+	io.WriteString(w, privacyPolicy)
 }
 
 func (s *server) helpGuideHandler(w http.ResponseWriter, r *http.Request) {
@@ -529,27 +509,4 @@ func (s *server) helpGuideHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
-
-	extensions := parser.CommonExtensions | parser.AutoHeadingIDs
-	p := parser.NewWithExtensions(extensions)
-	htmlFlags := html.CommonFlags | html.HrefTargetBlank
-	opts := html.RendererOptions{Flags: htmlFlags}
-	renderer := html.NewRenderer(opts)
-	content := markdown.ToHTML(helpGuideMarkdown, p, renderer)
-
-	args := ContentPageArgs{
-		Title:   "Scrobble · Guide",
-		Heading: template.HTML("scrobble · <strong>guide</strong>"),
-		Content: template.HTML(content),
-	}
-
-	if err := contentPageTmpl.Execute(w, args); err != nil {
-		log.Errorf("failed to execute template: %v", err.Error())
-	}
-}
-
-type ContentPageArgs struct {
-	Title   string
-	Heading template.HTML
-	Content template.HTML
 }
