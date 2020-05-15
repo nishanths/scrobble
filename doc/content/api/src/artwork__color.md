@@ -11,7 +11,7 @@ GET
 
 ### Request header
 
-Requires authentication header. See [Authentication](/index.html).
+Requires authentication header. See [Authentication](/).
 
 ### Request query parameters
 
@@ -42,4 +42,4 @@ application/json
 SongResponse[]
 ```
 
-See [Types](/types.html).
+See [Types](/types).

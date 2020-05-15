@@ -12,10 +12,12 @@ handlers:
 - url: /static
   static_dir: web/static
 
-- url: /doc/api/v1
+  # exists solely so that we can make the dir available to Go code
+- url: /garbage/doc/api/v1
   static_dir: doccontent/api/dst
 
-- url: /doc/guide
+  # exists solely so that we can make the dir available to Go code
+- url: /garbage/doc/guide
   static_dir: doccontent/guide/dst
 
 - url: /doc/style.css

@@ -67,6 +67,10 @@ func run(ctx context.Context) error {
 		if i.IsDir() {
 			return nil // skip directories; only consider top-level files
 		}
+		if filepath.Ext(i.Name()) != ".md" {
+			return fmt.Errorf("non-md extension: %s", i.Name())
+		}
+
 		b, err := ioutil.ReadFile(path)
 		if err != nil {
 			return err
@@ -88,8 +92,14 @@ func run(ctx context.Context) error {
 			return fmt.Errorf("execute template: %s", err)
 		}
 
-		outPath := filepath.Join(*fDst, name+".html")
-		if err := ioutil.WriteFile(outPath, buf.Bytes(), permFile); err != nil {
+		outDir := filepath.Join(*fDst, name)
+		if name == "index" {
+			outDir = filepath.Join(*fDst)
+		}
+		if err := os.MkdirAll(outDir, 0755); err != nil {
+			return fmt.Errorf("make directory %s: %s", outDir, err)
+		}
+		if err := ioutil.WriteFile(filepath.Join(outDir, "index.html"), buf.Bytes(), permFile); err != nil {
 			return fmt.Errorf("write file: %s", err)
 		}
 		return nil

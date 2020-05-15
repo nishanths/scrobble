@@ -8,7 +8,7 @@ GET
 
 ### Request header
 
-Requires authentication header. See [Authentication](/index.html).
+Requires authentication header. See [Authentication](/).
 
 ### Status code
 
