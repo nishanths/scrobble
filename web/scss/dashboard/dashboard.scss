@@ -13,6 +13,9 @@ a {
   &:hover {
     color: $blue;
   }
+  &.danger:hover {
+    color: $danger;
+  }
 }
 
 .Dashboard {
@@ -86,12 +89,6 @@ a {
         }
       }
     }
-  }
-
-  .danger,
-  .danger-hover a:hover,
-  a.danger-hover:hover {
-    color: $danger;
   }
 
   .main {
