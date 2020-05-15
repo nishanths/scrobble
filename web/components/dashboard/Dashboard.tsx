@@ -2,6 +2,7 @@ import React from "react"
 import { SetUsername } from "./SetUsername"
 import { SetPrivacy } from "./SetPrivacy"
 import { NewAPIKey } from "./NewAPIKey"
+import { DeleteAccount as DeleteAccountComponent } from "./DeleteAccount"
 import { Base as BaseComponent } from "./Base"
 import { BootstrapArgs, Account, Notie } from "../../shared/types"
 import { Mode } from "./shared"
@@ -13,18 +14,11 @@ import "../../scss/dashboard/dashboard.scss"
 type History = RouteComponentProps["history"]
 
 type DashboardProps = BootstrapArgs & {
+  wnd: Window
   mode: Mode
   notie: Notie
   history: History
 }
-
-const deletePrompt = `Deleting your account will remove your account and the list of scrobbled songs. \
-Artwork you may have uploaded might not be removed, and your username can be reused. \
-
-
-Delete account?`
-
-const failedDelete = `Failed to delete account. Try again.`
 
 export class Dashboard extends React.Component<DashboardProps, { account: Account }> {
   constructor(props: DashboardProps) {
@@ -32,33 +26,6 @@ export class Dashboard extends React.Component<DashboardProps, { account: Accoun
     this.state = {
       account: this.props.account,
     }
-  }
-
-  private doDelete() {
-    fetch(`/api/v1/account/delete`, { method: "POST" })
-      .then(
-        r => {
-          if (r.status === 200) {
-            window.location.assign(this.props.logoutURL)
-            return
-          }
-          console.log("failed to delete: status=%d", r.status)
-          this.props.notie.alert({ type: "error", text: failedDelete, stay: true })
-        },
-        err => {
-          console.error(err)
-          this.props.notie.alert({ type: "error", text: failedDelete, stay: true })
-        }
-      )
-  }
-
-  private onDeleteAccountClick(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
-    e.preventDefault()
-    const ok = window.confirm(deletePrompt)
-    if (!ok) {
-      return
-    }
-    this.doDelete()
   }
 
   render() {
@@ -96,6 +63,9 @@ export class Dashboard extends React.Component<DashboardProps, { account: Accoun
           })
         }} />
         break
+      case Mode.DeleteAccount:
+        content = <DeleteAccount notie={this.props.notie} wnd={this.props.wnd} logoutURL={this.props.logoutURL} />
+        break
       default:
         assertExhaustive(this.props.mode)
     }
@@ -114,7 +84,7 @@ export class Dashboard extends React.Component<DashboardProps, { account: Accoun
         {this.state.account.username && <>
           <div className="item"><Link to="/dashboard/privacy">Profile privacy</Link> <span className="privacyHint">({this.state.account.private ? "private" : "public"})</span></div>
           <div className="item"><Link to="/dashboard/api-key">API key</Link></div>
-          <div className="item danger"><a href="" onClick={this.onDeleteAccountClick.bind(this)}>Delete account…</a></div>
+          <div className="item danger"><Link to="/dashboard/delete-account">Delete account…</Link></div>
         </>}
         <div className="item"><a href={this.props.logoutURL} title={"Signed in as " + this.props.email}>Sign out</a></div>
       </div>
@@ -148,7 +118,7 @@ const Base: React.SFC<{
   return <div className="setUsername">
     <div className="instruction">
       <div className="heading">Set a username</div>
-      <div className="desc">The username will be displayed on your profile, and will be present in hyperlinks to your profile.</div>
+      <div className="desc">The username will be displayed on your profile, and will be present in links to your profile.</div>
     </div>
     <SetUsername accountChange={(a) => { accountChange(a) }} notie={notie} />
   </div>
@@ -161,7 +131,7 @@ const Privacy: React.SFC<{ notie: Notie, privacy: boolean, privacyChange: (v: bo
       <div className="desc">
         <p>
           Your profile's privacy determines whether others can see the songs you scrobble on your profile.&nbsp;
-          Your profile is currently <i>{privacy ? "private" : "public"}</i>
+          Your profile is <i>currently {privacy ? "private" : "public"}</i>
           {privacy ? " — only you may see your scrobbled songs when signed in." : " — others can see your scrobbled songs."}
         </p>
         <SetPrivacy privacy={privacy} privacyChange={privacyChange} notie={notie} />
@@ -188,6 +158,22 @@ const APIKey: React.SFC<{ notie: Notie, apiKey: string, apiKeyChange: (s: string
           Keep the key safe — anyone with the API key can scrobble songs on your behalf and view your scrobbled songs, even if your profile is private.
         </p>
         <NewAPIKey apiKeyChange={apiKeyChange} notie={notie} />
+      </div>
+    </div>
+  </div>
+}
+
+const DeleteAccount: React.SFC<{ notie: Notie, wnd: Window, logoutURL: string }> = ({ notie, wnd, logoutURL }) => {
+  return <div className="deleteAccount">
+    <div className="instruction">
+      <div className="heading">Delete account</div>
+      <div className="desc">
+        <p>
+          Deleting your account will remove your account and the list of scrobbled songs.&nbsp;
+          Artwork you may have uploaded might not be removed, and your username can be reused.
+        </p>
+        <p>You will be logged out after.</p>
+        <DeleteAccountComponent logoutURL={logoutURL} wnd={wnd} notie={notie} />
       </div>
     </div>
   </div>
