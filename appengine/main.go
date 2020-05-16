@@ -101,8 +101,16 @@ func run(ctx context.Context) error {
 	http.Handle("/login", webMiddleware(http.HandlerFunc(s.loginHandler)))
 	http.Handle("/googleAuth", webMiddleware(http.HandlerFunc(s.googleAuthHandler)))
 	http.Handle("/logout", webMiddleware(http.HandlerFunc(s.logoutHandler)))
-	http.Handle("/guide", webMiddleware(http.HandlerFunc(s.helpGuideHandler)))
 	http.Handle("/privacy-policy", webMiddleware(http.HandlerFunc(s.privacyPolicyHandler)))
+
+	http.Handle("/doc/api/v1/", http.StripPrefix("/doc/api/v1/", http.FileServer(http.Dir(filepath.Join("doccontent", "api", "dst")))))
+	http.Handle("/doc/guide/", http.StripPrefix("/doc/guide/", http.FileServer(http.Dir(filepath.Join("doccontent", "guide", "dst")))))
+	if isDev() {
+		// in production this is handled by app.yaml
+		http.HandleFunc("/doc/style.css", func(w http.ResponseWriter, r *http.Request) {
+			http.ServeFile(w, r, filepath.Join("doccontent", "style.css"))
+		})
+	}
 
 	if isDev() {
 		http.HandleFunc("/api/v1/scrobbled", devScrobbledHandler)

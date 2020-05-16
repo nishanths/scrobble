@@ -1,0 +1,63 @@
+:root {
+	--muted-color: #333;
+	--meta-color: rgb(130, 130, 130);
+	--border-color: #ccc;
+}
+
+html {
+	-webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape while allowing user zoom */
+}
+
+body {
+	max-width: 575px;
+	line-height: 1.45;
+	margin: 0 auto;
+	padding: 10px;
+	font-family: sans-serif;
+	font-size: 14px;
+}
+
+img {
+	max-width: 100%;
+}
+
+body.api a {
+	color: #3D9970;
+}
+
+pre {
+	background-color: #fdfad1;
+	padding: 10px;
+	overflow-x: auto;
+	margin-bottom: 10px;
+	font-size: 13px;
+}
+
+table th {
+	font-weight: normal;
+	text-align: left;
+}
+
+table {
+  margin-bottom: 1rem;
+  width: 100%;
+  border: 0 solid var(--border-color);
+  border-collapse: collapse;
+}
+
+td,
+th {
+  padding: .25rem .5rem;
+  border-color: inherit;
+  border-style: solid;
+  border-width: 0;
+  border-bottom-width: 1px;
+}
+
+th {
+  text-align: left;
+}
+
+thead th {
+  border-bottom-color: currentColor;
+}

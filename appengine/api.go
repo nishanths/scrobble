@@ -101,7 +101,7 @@ type Song struct {
 	ArtworkHash string `datastore:",noindex" json:"artworkHash"`
 
 	// The following two fields may be empty in responses to clients, if the
-	// data hasn't been obtained for external sources (e.g., iTunes) yet.
+	// data hasn't been obtained from external sources (e.g., iTunes) yet.
 	PreviewURL   string `datastore:",noindex" json:"previewURL"`
 	TrackViewURL string `datastore:",noindex" json:"trackViewURL"`
 
@@ -137,7 +137,7 @@ func (s *server) accountHandler(w http.ResponseWriter, r *http.Request) {
 
 	key := r.Header.Get(headerAPIKey)
 	if key == "" {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
@@ -148,7 +148,8 @@ func (s *server) accountHandler(w http.ResponseWriter, r *http.Request) {
 
 	b, err := json.Marshal(struct {
 		Username string `json:"username"`
-	}{acc.Username})
+		Private  bool   `json:"private"`
+	}{acc.Username, acc.Private})
 
 	if err != nil {
 		log.Errorf("%v", err.Error())
@@ -173,7 +174,7 @@ func (s *server) deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 		key := r.Header.Get(headerAPIKey)
 		if key == "" {
 			log.Errorf("not signed-in and missing API key header")
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 		var ok bool

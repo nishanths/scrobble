@@ -3,6 +3,7 @@ web/node_modules
 
 # symlink
 appengine/web
+appengine/doccontent
 
 # binary
 appengine/main
