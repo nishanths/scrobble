@@ -123,7 +123,7 @@ class in the `iTunesLibrary` framework.
 
 ```
 type MediaItem struct {
-  added          number
+  added          number // timestamp in unix seconds
   albumTitle     string
   sortAlbumTitle string
   artistName     string
@@ -131,9 +131,9 @@ type MediaItem struct {
   genre          string
   hasArtwork     boolean
   kind           string
-  lastPlayed     number
+  lastPlayed     number // timestamp in unix seconds
   playCount      number
-  releaseDate    number
+  releaseDate    number // timestamp in unix seconds
   sortTitle      string
   title          string
   totalTime      number // milliseconds
