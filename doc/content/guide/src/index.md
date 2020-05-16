@@ -5,20 +5,20 @@ album art.
 
 The term 'scrobbling' refers to uploading the music you listen to, to an online feed.
 
-Scrobble's macOS app can scrobble your music listening history. Your listening
+Scrobble's macOS app can scrobble what your listen to. Your listening
 history can then be seen by you, and optionally others, on the Scrobble website.
 
 # How do I sign up?
 
-Vist https://scrobble.littleroot.org, and click "Sign in with Google".
+Visit https://scrobble.littleroot.org, and click "Sign in with Google".
 
-Follow the prompts to set a username.
+Follow the prompt to set a username.
 
 # How do I scrobble my songs?
 
-Get the menu bar [macOS app](https://github.com/nishanths/scrobble/releases/latest).
+Get the [macOS app](https://github.com/nishanths/scrobble/releases/latest). (It's unintrusive and lives in the menu bar.)
 
-Open the app and click on "Start scrobbling..." from the menu bar.
+Open the app, and click on "Start scrobbling..." from the menu bar.
 
 Follow the prompt to enter your API key, which can be found in the [dashboard](/dashboard/api-key) when you're signed in.
 
@@ -48,7 +48,7 @@ Scrobbling isn't instantaneous due to limitations in how soon your Apple Music l
 in the Apple Music desktop app.
 
 Additionally the Scrobble macOS app by default scrobbles only once every 24 hours.
-So your listening history on the Scrobble website may be behind by a day.
+So your listening history on the Scrobble website may be behind by a day or more.
 
 # Contact/Report issues
 

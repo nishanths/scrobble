@@ -14,18 +14,18 @@ A `Song` represents a scrobbled song.
 
 ```
 type Song = {
-  albumTitle   string
-  artistName   string
-  title        string
-  totalTime    number // length of song in nanoseconds
-  year         number
-  releaseDate  number // timestamp in unix seconds
-  lastPlayed   number // timestamp in unix seconds
-  playCount    number
-  artworkHash  ArtworkHash
-  loved        bool
-  previewURL   string
-  trackViewURL string
+  albumTitle:   string
+  artistName:   string
+  title:        string
+  totalTime:    number // length of song in nanoseconds
+  year:         number
+  releaseDate:  number // timestamp in unix seconds
+  lastPlayed:   number // timestamp in unix seconds
+  playCount:    number
+  artworkHash:  ArtworkHash
+  loved:        bool
+  previewURL:   string
+  trackViewURL: string
 }
 ```
 
@@ -123,23 +123,23 @@ class in the `iTunesLibrary` framework.
 
 ```
 type MediaItem struct {
-  added          number // timestamp in unix seconds
-  albumTitle     string
-  sortAlbumTitle string
-  artistName     string
-  sortArtistName string
-  genre          string
-  hasArtwork     boolean
-  kind           string
-  lastPlayed     number // timestamp in unix seconds
-  playCount      number
-  releaseDate    number // timestamp in unix seconds
-  sortTitle      string
-  title          string
-  totalTime      number // milliseconds
-  year           number
-  persistentID   string
-  artworkHash    string
-  loved          boolean
+  added:          number // timestamp in unix seconds
+  albumTitle:     string
+  sortAlbumTitle: string
+  artistName:     string
+  sortArtistName: string
+  genre:          string
+  hasArtwork:     boolean
+  kind:           string
+  lastPlayed:     number // timestamp in unix seconds
+  playCount:      number
+  releaseDate:    number // timestamp in unix seconds
+  sortTitle:      string
+  title:          string
+  totalTime:      number // milliseconds
+  year:           number
+  persistentID:   string
+  artworkHash:    string
+  loved:          boolean
 }
 ```
