@@ -23,7 +23,7 @@ type Song = {
   lastPlayed:   number // timestamp in unix seconds
   playCount:    number
   artworkHash:  ArtworkHash
-  loved:        bool
+  loved:        boolean
   previewURL:   string
   trackViewURL: string
 }

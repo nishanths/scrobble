@@ -7,7 +7,7 @@ service, with a client app available for macOS.
 
 ## Getting Started
 
-See [the Guide](https://scrobble.littleroot.org/doc/guide) on the website.
+See the [Guide](https://scrobble.littleroot.org/doc/guide) on the website.
 
 ## HTTP API
 
