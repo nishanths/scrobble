@@ -30,7 +30,7 @@ See [Authentication](/#authentication).
 |------|-------------|
 |200 | success |
 |400 | missing or invalid 'color' query parameter, or missing 'username' query parameter |
-|403 | insufficient credentials to view private account |
+|403 | insufficient authentication credentials to view private account, or bad credentials |
 |404 | no user exists for specified username |
 |405 | HTTP method not allowed |
 |500 | various internal server errors |

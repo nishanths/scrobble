@@ -452,7 +452,7 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 
 	key := r.Header.Get(headerAPIKey)
 	if key == "" {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
@@ -757,7 +757,7 @@ func (s *server) artworkHandler(w http.ResponseWriter, r *http.Request) {
 
 	key := r.Header.Get(headerAPIKey)
 	if key == "" {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
@@ -797,7 +797,7 @@ func (s *server) artworkHandler(w http.ResponseWriter, r *http.Request) {
 	img, _, err := image.Decode(bytes.NewReader(artworkBytes))
 	if err != nil {
 		log.Errorf("failed to decode image: %s", err)
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	pal := vibrant.NewPaletteBuilder(img).Generate()
@@ -849,7 +849,7 @@ func (s *server) artworkMissingHandler(w http.ResponseWriter, r *http.Request) {
 
 	key := r.Header.Get(headerAPIKey)
 	if key == "" {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
@@ -991,7 +991,7 @@ func accountForKey(ctx context.Context, apiKey string, ds *datastore.Client) (Ac
 	}
 
 	if len(keys) == 0 {
-		return Account{}, "", http.StatusNotFound, fmt.Errorf("no accounts for API key: %s", apiKey)
+		return Account{}, "", http.StatusForbidden, fmt.Errorf("no accounts for API key: %s", apiKey)
 	}
 
 	return as[0], keys[0].Name, 0, nil

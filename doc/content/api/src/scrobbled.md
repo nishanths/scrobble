@@ -42,7 +42,7 @@ The second form can be used to fetch a specific song.
 |------|-------------|
 |200 | success |
 |400 | missing 'username' query parameter, or incorrect combination of query parameters |
-|403 | insufficient credentials to view private account |
+|403 | insufficient authentication credentials to view private account, or bad credentials |
 |404 | no user exists for specified username |
 |405 | HTTP method not allowed |
 |500 | various internal server errors |

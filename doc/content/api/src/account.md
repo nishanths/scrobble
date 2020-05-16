@@ -18,6 +18,7 @@ Requires authentication header. See [Authentication](/#authentication).
 |------|-------------|
 |200 | success |
 |401 | missing authentication credentials |
+|403 | bad authentication credentials |
 |405 | HTTP method not allowed |
 |500 | various internal server errors |
 

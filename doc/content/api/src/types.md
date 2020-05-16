@@ -2,22 +2,28 @@
 
 # Types
 
-## Song
+* [Song](./#type-song)
+* [SongResponse](./#type-songresponse)
+* [SongIdentifier](./#type-songidentifier)
+* [ArtworkHash](./#type-artworkhash)
+* [MediaItem](./#types-mediaitem)
+
+## Type: Song
 
 A `Song` represents a scrobbled song.
 
 ```
 type Song = {
-  albumTitle  string
-  artistName  string
-  title       string
-  totalTime   number // length of song in nanoseconds
-  year        number
-  releaseDate number // timestamp in unix seconds
-  lastPlayed  number // timestamp in unix seconds
-  playCount   number
-  artworkHash ArtworkHash
-  loved       bool
+  albumTitle   string
+  artistName   string
+  title        string
+  totalTime    number // length of song in nanoseconds
+  year         number
+  releaseDate  number // timestamp in unix seconds
+  lastPlayed   number // timestamp in unix seconds
+  playCount    number
+  artworkHash  ArtworkHash
+  loved        bool
   previewURL   string
   trackViewURL string
 }
@@ -28,13 +34,13 @@ are represented by the Go zero value representation for the type. For example,
 if the `year` property is unavailable for a song, the `year` key will be present
 but will have value `0`.
 
-## SongResponse
+## Type: SongResponse
 
 ```
 type SongResponse = Song & { ident: SongIdentifier }
 ```
 
-## SongIdentifer
+## Type: SongIdentifer
 
 A SongIdentifier represents the id for a song.
 
@@ -63,7 +69,7 @@ is
 VHJpY2sgb2YgdGhlIExpZ2h0IC0gU2luZ2xl|TGEgTWFy|VHJpY2sgb2YgdGhlIExpZ2h0|MjAxNQ==
 ```
 
-## ArtworkHash
+## Type: ArtworkHash
 
 ```
 type ArtworkHash = string
@@ -106,4 +112,34 @@ type ArtworkFormat =
   | "JPEG"
   | "JPEG2000"
   | "PNG"
+```
+
+## Type: MediaItem
+
+A `MediaItem` represents a song in requests.
+
+The properties correspond to those in the [`ITLibMediaItem`](https://developer.apple.com/documentation/ituneslibrary/itlibmediaitem)
+class in the `iTunesLibrary` framework.
+
+```
+type MediaItem struct {
+  added          number
+  albumTitle     string
+  sortAlbumTitle string
+  artistName     string
+  sortArtistName string
+  genre          string
+  hasArtwork     boolean
+  kind           string
+  lastPlayed     number
+  playCount      number
+  releaseDate    number
+  sortTitle      string
+  title          string
+  totalTime      number // milliseconds
+  year           number
+  persistentID   string
+  artworkHash    string
+  loved          boolean
+}
 ```

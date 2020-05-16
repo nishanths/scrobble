@@ -24,7 +24,7 @@ dist:
 		-template=cmd/page.template.html \
 		-src=content/guide/src \
 		-dst=content/guide/dst \
-		-indexTitle="Scrobble · Guide" \
+		-indexTitle="Scrobble · Guide"
 
 .PHONY: go
 go:
