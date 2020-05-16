@@ -84,7 +84,9 @@ func run(ctx context.Context) error {
 			HeadingLevelOffset: 1,
 			Flags:              blackfriday.CommonHTMLFlags,
 		})
-		out := blackfriday.Run(b, blackfriday.WithExtensions(blackfriday.CommonExtensions|blackfriday.AutoHeadingIDs), blackfriday.WithRenderer(rend))
+		out := blackfriday.Run(b,
+			blackfriday.WithExtensions(blackfriday.CommonExtensions | blackfriday.AutoHeadingIDs & ^blackfriday.Autolink),
+			blackfriday.WithRenderer(rend))
 
 		var buf bytes.Buffer
 		if err := tmpl.Execute(&buf, TemplateArgs{
