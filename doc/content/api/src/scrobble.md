@@ -20,7 +20,7 @@ application/json
 ## Request body
 
 ```
-[]MediaItem
+MediaItem[]
 ```
 
 See [Types](/types).
