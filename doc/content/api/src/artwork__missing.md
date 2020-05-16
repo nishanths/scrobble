@@ -28,10 +28,11 @@ application/json
 
 ## Response body
 
-The list of artwork hashes corresponding to missing artwork.
+An object whose keys are the artwork hashes corresponding to missing artwork.
+The values are always `true`.
 
 ```
-ArtworkHash[]
+{ [hash: ArtworkHash]: true }
 ```
 
 See [Types](/types).
