@@ -5,7 +5,7 @@ album art.
 
 The term 'scrobbling' refers to uploading the music you listen to, to an online feed.
 
-Scrobble's macOS app can scrobble what your listen to. Your listening
+Scrobble's macOS app can scrobble what you listen to. Your listening
 history can then be seen by you, and optionally others, on the Scrobble website.
 
 # How do I sign up?
