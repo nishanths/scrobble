@@ -1,6 +1,8 @@
-# API documentation
+# Scrobble API documentation
 
-Welcome to the documentation for v1 of Scrobble's HTTP API.
+Welcome to the documentation for v1 of Scrobble's HTTP API. The API primarily uses
+JSON. The API provides ways to fetch account details, fetch a user's scrobbled
+songs, and scrobble new songs, among other things.
 
 ## Base URL
 
@@ -8,18 +10,18 @@ The base URL for the API is https://selective-scrobble.appspot.com.
 
 ## Authentication
 
-Most endpoints listed below require authentication. Authentication is done by
-including the following HTTP header in requests.
+Most endpoints listed below require authentication (see each endpoint for details).
+Authentication is done by including the following HTTP header in requests.
 
 ```
 X-Scrobble-API-Key: <your API key>
 ```
 
-The API key can be found on the [dashboard](https://scrobble.littleroot.org/dashboard/api-key) when signed in.
+Your API key can be found in the [dashboard](https://scrobble.littleroot.org/dashboard/api-key) when signed in.
 
 ## Types
 
-The request and response structures for some endpoints refer to types such as
+The request and response bodies for some endpoints refer to named types such as
 `Song`. These types are described in the [Types](/types) page.
 
 ## Endpoints

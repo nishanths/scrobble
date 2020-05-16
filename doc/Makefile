@@ -4,17 +4,21 @@ default:
 
 .PHONY: clean
 clean:
-	rm -rf content/api/dst content/guide/dst
+	rm -rf content/{api/dst,guide/dst}
 
-.PHONY: build
-build: clean go
+.PHONY: hammer
+hammer: clean go dist
+
+.PHONY: dist
+dist:
 	./cmd/docgen \
 		-template=cmd/page.template.html \
 		-src=content/api/src \
 		-dst=content/api/dst \
 		-indexTitle="Scrobble · API" \
 		-titlePrefix="/api/v1/" \
-		-linkPrefix="/doc/api/v1"
+		-linkPrefix="/doc/api/v1" \
+		-bodyClass="api"
 
 	./cmd/docgen \
 		-template=cmd/page.template.html \

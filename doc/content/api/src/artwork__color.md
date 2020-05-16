@@ -1,34 +1,37 @@
+[Back to index](/)
+
 # /api/v1/artwork/color
 
 Fetch a user's scrobbled albums by artwork color.
 
-The response is a list of `SongResponse` objects. Each song in the response
-corresponds to any one of the songs in matching albums.
-
-### HTTP method
+## HTTP method
 
 GET
 
-### Request header
+## Request header
 
-Requires authentication header. See [Authentication](/).
+The authentication header is required if the requested profile is private;
+otherwise it is optional. For private profiles only the API keys of the profile
+owner will work.
 
-### Request query parameters
+See [Authentication](/#authentication).
 
+## Request query parameters
 
-	username: string
-	color:    "red" | "orange" | "brown" | "yellow" | "green" | "blue" | "violet" | "pink" | "black" | "gray" | "white"
-	limit:    number // optional
+| Key | Value | Notes |
+|-----|-------|-------|
+| username | string | required |
+| color | "red" \| "orange" \| "brown" \| "yellow" \| "green" \| "blue" \| "violet" \| "pink" \| "black" \| "gray" \| "white" | required |
+| limit | number | optional |
 
-
-### Response status code
+## Response status code
 
 | Code | Description |
 |------|-------------|
 |200 | success |
 |400 | missing or invalid 'color' query parameter, or missing 'username' query parameter |
 |403 | insufficient credentials to view private account |
-|404 | no user found for specified username |
+|404 | no user exists for specified username |
 |405 | HTTP method not allowed |
 |500 | various internal server errors |
 
@@ -41,5 +44,7 @@ application/json
 ```
 SongResponse[]
 ```
+The response is a list of `SongResponse` objects. Each song in the response
+corresponds one of the songs in albums with matching artwork.
 
 See [Types](/types).

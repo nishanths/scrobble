@@ -23,6 +23,7 @@ var (
 	fLinkPrefix  = flag.String("linkPrefix", "", "title prefix")
 	fIndexTitle  = flag.String("indexTitle", "", "title for index page")
 	fTemplate    = flag.String("template", "", "path to template file")
+	fBodyClass   = flag.String("bodyClass", "", "class name for body")
 )
 
 const (
@@ -38,8 +39,9 @@ func main() {
 }
 
 type TemplateArgs struct {
-	Title   string
-	Content template.HTML
+	Title     string
+	Content   template.HTML
+	BodyClass string
 }
 
 func run(ctx context.Context) error {
@@ -86,8 +88,9 @@ func run(ctx context.Context) error {
 
 		var buf bytes.Buffer
 		if err := tmpl.Execute(&buf, TemplateArgs{
-			Title:   convertNameToTitle(name),
-			Content: template.HTML(out),
+			Title:     convertNameToTitle(name),
+			Content:   template.HTML(out),
+			BodyClass: *fBodyClass,
 		}); err != nil {
 			return fmt.Errorf("execute template: %s", err)
 		}

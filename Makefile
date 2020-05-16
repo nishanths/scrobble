@@ -76,4 +76,4 @@ go-test:
 
 .PHONY: doc
 doc:
-	cd doc && $(MAKE) build
+	cd doc && $(MAKE) hammer
