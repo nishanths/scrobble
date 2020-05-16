@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"html/template"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -69,46 +70,73 @@ func run(ctx context.Context) error {
 		if i.IsDir() {
 			return nil // skip directories; only consider top-level files
 		}
-		if filepath.Ext(i.Name()) != ".md" {
-			return fmt.Errorf("non-md extension: %s", i.Name())
+
+		if filepath.Ext(i.Name()) == ".md" {
+			name := strings.TrimSuffix(i.Name(), filepath.Ext(i.Name()))
+			b, err := ioutil.ReadFile(path)
+			if err != nil {
+				return err
+			}
+
+			// convert markdown to html
+			rend := blackfriday.NewHTMLRenderer(blackfriday.HTMLRendererParameters{
+				AbsolutePrefix:     *fLinkPrefix,
+				HeadingLevelOffset: 1,
+				Flags:              blackfriday.CommonHTMLFlags,
+			})
+			out := blackfriday.Run(b,
+				blackfriday.WithExtensions(blackfriday.CommonExtensions | blackfriday.AutoHeadingIDs & ^blackfriday.Autolink),
+				blackfriday.WithRenderer(rend))
+
+			// render the html
+			var buf bytes.Buffer
+			if err := tmpl.Execute(&buf, TemplateArgs{
+				Title:     convertNameToTitle(name),
+				Content:   template.HTML(out),
+				BodyClass: *fBodyClass,
+			}); err != nil {
+				return fmt.Errorf("execute template: %s", err)
+			}
+
+			outDir := filepath.Join(*fDst, name)
+			if name == "index" {
+				outDir = filepath.Join(*fDst)
+			}
+			if err := os.MkdirAll(outDir, 0755); err != nil {
+				return fmt.Errorf("make directory %s: %s", outDir, err)
+			}
+			if err := ioutil.WriteFile(filepath.Join(outDir, "index.html"), buf.Bytes(), permFile); err != nil {
+				return fmt.Errorf("write file: %s", err)
+			}
+		} else {
+			// copy the file directly to dst
+			if err := copyFile(path, filepath.Join(*fDst, i.Name())); err != nil {
+				return fmt.Errorf("copy file: %s", err)
+			}
 		}
 
-		b, err := ioutil.ReadFile(path)
-		if err != nil {
-			return err
-		}
-
-		name := strings.TrimSuffix(i.Name(), filepath.Ext(i.Name()))
-		rend := blackfriday.NewHTMLRenderer(blackfriday.HTMLRendererParameters{
-			AbsolutePrefix:     *fLinkPrefix,
-			HeadingLevelOffset: 1,
-			Flags:              blackfriday.CommonHTMLFlags,
-		})
-		out := blackfriday.Run(b,
-			blackfriday.WithExtensions(blackfriday.CommonExtensions | blackfriday.AutoHeadingIDs & ^blackfriday.Autolink),
-			blackfriday.WithRenderer(rend))
-
-		var buf bytes.Buffer
-		if err := tmpl.Execute(&buf, TemplateArgs{
-			Title:     convertNameToTitle(name),
-			Content:   template.HTML(out),
-			BodyClass: *fBodyClass,
-		}); err != nil {
-			return fmt.Errorf("execute template: %s", err)
-		}
-
-		outDir := filepath.Join(*fDst, name)
-		if name == "index" {
-			outDir = filepath.Join(*fDst)
-		}
-		if err := os.MkdirAll(outDir, 0755); err != nil {
-			return fmt.Errorf("make directory %s: %s", outDir, err)
-		}
-		if err := ioutil.WriteFile(filepath.Join(outDir, "index.html"), buf.Bytes(), permFile); err != nil {
-			return fmt.Errorf("write file: %s", err)
-		}
 		return nil
 	})
+}
+
+func copyFile(src, dst string) error {
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, in)
+	if err != nil {
+		return err
+	}
+	return out.Close()
 }
 
 func convertNameToTitle(f string) string {
