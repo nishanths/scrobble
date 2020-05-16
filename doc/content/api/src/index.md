@@ -29,7 +29,7 @@ The request and response bodies for some endpoints refer to named types such as
 * [`/api/v1/account`](/account)
 * [`/api/v1/account/delete`](/account__delete)
 * [`/api/v1/scrobbled`](/scrobbled)
-* [`/api/v1/artwork/color`](/artwork__color)
+* [`/api/v1/scrobbled/color`](/scrobbled__color)
 * [`/api/v1/scrobble`](/scrobble)
 * [`/api/v1/artwork`](/artwork)
 * [`/api/v1/artwork/missing`](/artwork__missing)

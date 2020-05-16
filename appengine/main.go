@@ -114,10 +114,10 @@ func run(ctx context.Context) error {
 
 	if isDev() {
 		http.HandleFunc("/api/v1/scrobbled", devScrobbledHandler)
-		http.HandleFunc("/api/v1/artwork/color", devArtworkColorHandler)
+		http.HandleFunc("/api/v1/scrobbled/color", devScrobbledColorHandler)
 	} else {
 		http.HandleFunc("/api/v1/scrobbled", s.scrobbledHandler)
-		http.HandleFunc("/api/v1/artwork/color", s.artworkColorHandler)
+		http.HandleFunc("/api/v1/scrobbled/color", s.scrobbledColorHandler)
 	}
 	http.HandleFunc("/api/v1/scrobble", s.scrobbleHandler)
 	http.HandleFunc("/api/v1/account", s.accountHandler)

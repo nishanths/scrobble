@@ -173,7 +173,7 @@ type FetchColorResult = {
 }
 
 const _fetchColorScrobbles = async (color: string, username: string): Promise<FetchColorResult> => {
-  const url = "/api/v1/artwork/color?username=" + username + "&color=" + color;
+  const url = "/api/v1/scrobbled/color?username=" + username + "&color=" + color;
 
   const r = await fetch(url)
   switch (r.status) {

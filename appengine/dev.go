@@ -97,7 +97,7 @@ func devScrobbledHandler(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, data)
 }
 
-func devArtworkColorHandler(w http.ResponseWriter, r *http.Request) {
+func devScrobbledColorHandler(w http.ResponseWriter, r *http.Request) {
 	time.Sleep(1 * time.Second)
 
 	data := func() string {

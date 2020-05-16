@@ -28,7 +28,7 @@ var validColors = [...]basiccolor.Color{
 	basiccolor.White,
 }
 
-func (s *server) artworkColorHandler(w http.ResponseWriter, r *http.Request) {
+func (s *server) scrobbledColorHandler(w http.ResponseWriter, r *http.Request) {
 	writeSuccessRsp := func(s []SongResponse) {
 		w.Header().Set("Content-Type", "application/json")
 		if err := json.NewEncoder(w).Encode(s); err != nil {

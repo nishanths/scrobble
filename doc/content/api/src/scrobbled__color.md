@@ -1,6 +1,6 @@
 [Back to index](/)
 
-# /api/v1/artwork/color
+# /api/v1/scrobbled/color
 
 Fetch a user's scrobbled albums by artwork color.
 
@@ -45,6 +45,6 @@ application/json
 SongResponse[]
 ```
 The response is a list of `SongResponse` objects. Each song in the response
-corresponds one of the songs in albums with matching artwork.
+corresponds any one of the songs in albums with matching artwork.
 
 See [Types](/types).
