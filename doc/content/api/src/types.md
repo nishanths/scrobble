@@ -6,7 +6,7 @@
 * [SongResponse](./#type-songresponse)
 * [SongIdentifier](./#type-songidentifier)
 * [ArtworkHash](./#type-artworkhash)
-* [MediaItem](./#types-mediaitem)
+* [MediaItem](./#type-mediaitem)
 
 ## Type: Song
 
