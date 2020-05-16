@@ -2,6 +2,8 @@
 
 # /api/v1/artwork
 
+Upload any missing artwork, previously determined using [`/api/v1/artwork/missing`](/artwork__missing).
+
 ## HTTP method
 
 POST

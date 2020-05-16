@@ -2,6 +2,9 @@
 
 # /api/v1/scrobble
 
+Scrobble your listening history. The list of scrobbled items in the request
+is used to _entirely replace_ your old listening history.
+
 ## HTTP method
 
 POST
