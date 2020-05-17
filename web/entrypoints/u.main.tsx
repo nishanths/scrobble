@@ -15,6 +15,7 @@ declare const NProgress: NProgress
 
 const store = createStore(reducer, { uargs }, applyMiddleware(thunk))
 const loupe = new Loupe({
+  magnification: 2,
   style: { boxShadow: "4px 5px 5px 4px rgba(0,0,0,0.5)" },
 })
 
