@@ -62,11 +62,7 @@ export const LargePicture: React.SFC<{ song: Song, artworkBaseURL: string, loupe
 
   useEffect(() => {
     if (pictureRef.current !== null && artworkURL !== "") {
-      const remove = enableLoupe(pictureRef.current, artworkURL, loupe)
-      return () => {
-        console.log("cleaning up")
-        remove()
-      }
+      return enableLoupe(pictureRef.current, artworkURL, loupe)
     }
     return () => {}
   }, [pictureRef, artworkURL, loupe])
