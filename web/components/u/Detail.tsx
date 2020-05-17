@@ -10,6 +10,7 @@ import { CloseIcon } from "../CloseIcon"
 import { Color } from "../colorpicker"
 import { LargeSongCard } from "../songcard"
 import { fetchSong } from "../../redux/actions/song"
+import { Loupe } from 'loupe-js'
 import { Modal } from 'react-responsive-modal'
 import 'react-responsive-modal/styles.css'
 import "../../scss/u/detail.scss"
@@ -38,6 +39,7 @@ export const Detail: React.StatelessComponent<{
   mode: Mode
   color: Color | undefined
   history: History
+  loupe: Loupe
 }> = ({
   profileUsername,
   artworkBaseURL,
@@ -49,6 +51,7 @@ export const Detail: React.StatelessComponent<{
   mode,
   color,
   history,
+  loupe,
 }) => {
     const dispatch = useDispatch()
 
@@ -124,6 +127,7 @@ export const Detail: React.StatelessComponent<{
         artworkBaseURL={artworkBaseURL}
         albumCentric={detailKind === DetailKind.Album}
         now={() => new Date()}
+        loupe={loupe}
       />
     </>)
   }

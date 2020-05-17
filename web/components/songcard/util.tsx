@@ -1,7 +1,9 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useRef } from "react"
 import { Song } from "../../shared/types"
 import { dateDisplay, dateDisplayDesc, shortMonth } from "../../shared/time"
 import { pluralize, capitalize } from "../../shared/util"
+import { Loupe, enableLoupe } from 'loupe-js'
+import 'loupe-js/dist/style.css'
 
 // TrackLink is the track link area of a Picture.
 const TrackLink: React.SFC<{ previewURL: string }> = ({ previewURL }) => {
@@ -49,14 +51,27 @@ export const MorePicture: React.SFC<{ more: number }> = ({ more }) => {
 }
 
 // LargePicture is the picture area for a LargeSongCard.
-export const LargePicture: React.SFC<{ song: Song, artworkBaseURL: string }> = ({
+export const LargePicture: React.SFC<{ song: Song, artworkBaseURL: string, loupe: Loupe }> = ({
   song,
   artworkBaseURL,
+  loupe,
 }) => {
+  const pictureRef = useRef<HTMLDivElement | null>(null)
   const artworkURL = song.artworkHash ? artworkBaseURL + "/" + song.artworkHash : "";
   const imgStyles = artworkURL ? { backgroundImage: `url(${artworkURL})` } : { backgroundColor: "#fff" }
 
-  return <div className="pict" style={imgStyles}>
+  useEffect(() => {
+    if (pictureRef.current !== null && artworkURL !== "") {
+      const remove = enableLoupe(pictureRef.current, artworkURL, loupe)
+      return () => {
+        console.log("cleaning up")
+        remove()
+      }
+    }
+    return () => {}
+  }, [pictureRef, artworkURL, loupe])
+
+  return <div className="pict" style={imgStyles} ref={r => { pictureRef.current = r }}>
   </div>
 }
 

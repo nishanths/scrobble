@@ -6,6 +6,7 @@ import { Scrobbles } from "./Scrobbles"
 import { Detail } from "./Detail"
 import { hexDecode } from "../../shared/util"
 import { Color } from "../colorpicker"
+import { Loupe } from 'loupe-js'
 import "../../scss/u/u.scss"
 
 type UProps = UArgs & {
@@ -17,6 +18,7 @@ type UProps = UArgs & {
     hexIdent: string // hex-encoded song ident
   }
   nProgress: NProgress
+  loupe: Loupe
 } & RouteComponentProps;
 
 // U is the root component for the username page, e.g.,
@@ -33,6 +35,7 @@ export const U: React.FC<UProps> = ({
   detail,
   history,
   nProgress,
+  loupe,
 }) => {
   if (detail === undefined) {
     return <Scrobbles
@@ -59,6 +62,7 @@ export const U: React.FC<UProps> = ({
       mode={mode}
       color={color}
       history={history}
+      loupe={loupe}
     />
   }
 }
