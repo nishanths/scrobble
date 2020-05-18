@@ -51,10 +51,9 @@ export const MorePicture: React.SFC<{ more: number }> = ({ more }) => {
 }
 
 // LargePicture is the picture area for a LargeSongCard.
-export const LargePicture: React.SFC<{ song: Song, artworkBaseURL: string, loupe: Loupe }> = ({
+export const LargePicture: React.SFC<{ song: Song, artworkBaseURL: string }> = ({
   song,
   artworkBaseURL,
-  loupe,
 }) => {
   const pictureRef = useRef<HTMLDivElement | null>(null)
   const artworkURL = song.artworkHash ? artworkBaseURL + "/" + song.artworkHash : "";
@@ -62,10 +61,17 @@ export const LargePicture: React.SFC<{ song: Song, artworkBaseURL: string, loupe
 
   useEffect(() => {
     if (pictureRef.current !== null && artworkURL !== "") {
-      return enableLoupe(pictureRef.current, artworkURL, loupe)
+      const loupe = new Loupe({
+        magnification: 1.5,
+        style: { boxShadow: "4px 5px 5px 4px rgba(0,0,0,0.5)" },
+      })
+      const disable = enableLoupe(pictureRef.current, artworkURL, loupe)
+      return () => {
+        disable()
+        loupe.unmount()
+      }
     }
-    return () => {}
-  }, [pictureRef, artworkURL, loupe])
+  }, [pictureRef, artworkURL])
 
   return <div className="pict" style={imgStyles} ref={r => { pictureRef.current = r }}>
   </div>
