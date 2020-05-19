@@ -22,17 +22,18 @@ export const Home: React.FC<HomeProps> = ({ loginURL }) => {
         <img src={`/static/img/home/${artwork.img}.jpeg`} />
         <div className="caption">{artwork.caption}</div>
       </div>
-      <div className="line"><b>scrobble</b>, an Apple Music scrobbling service.</div>
+      <div className="line"><b>scrobble</b>, an Apple Music scrobbling service that showcases album art.</div>
     </div>
     <div className="sign-in">
       <GoogleSignIn loginURL={loginURL} />
     </div>
     <div className="footer">
-      (
-        <a href={guideLink}><div className="item">Guide</div></a> ·
-        <a href={macOSAppLink}><div className="item">macOS app</div></a> ·
-        <a href={apiDocLink}><div className="item">API doc</div></a>
-      )
+        <div>
+          <a href={"https://scrobble.littleroot.org/u/nishanth"}><div className="item">Example profile</div></a>
+          <a href={guideLink}><div className="item">How do I use Scrobble?</div></a>
+          <a href={apiDocLink}><div className="item">API doc</div></a>
+          <a href={macOSAppLink}><div className="item">macOS app</div></a>
+        </div>
     </div>
   </div>
 }

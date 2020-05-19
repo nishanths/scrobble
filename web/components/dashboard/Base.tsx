@@ -1,5 +1,5 @@
 import React from "react"
-import { guideLink } from "../../shared/const"
+import { guideLink, macOSAppLink } from "../../shared/const"
 import { sameDate, shortMonth } from "../../shared/time"
 import "../../scss/dashboard/base.scss"
 
@@ -20,7 +20,8 @@ export class Base extends React.Component<BaseProps> {
     if (this.props.nSongs === 0) {
       return <>
         <p>{profile}</p>
-        <p>You do not have any scrobbled songs. Find out <a href={guideLink} target="_blank" rel="noopener noreferrer">how to scrobble</a> in the guide.</p>
+        <p>You do not have any scrobbled songs.</p>
+        <p>Download the <a href={macOSAppLink} target="_blank" rel="noopener noreferrer">macOS app</a> and find out <a href={guideLink} target="_blank" rel="noopener noreferrer">how to scrobble</a> in the guide.</p>
       </>
     }
 

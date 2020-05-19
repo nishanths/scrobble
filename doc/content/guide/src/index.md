@@ -1,3 +1,15 @@
+# Guide
+
+* [What is Scrobble?](#what-is-scrobble)
+* [How do I sign up?](#how-do-i-sign-up)
+* [How do I scrobble my songs?](#how-do-i-scrobble-my-songs)
+* [How do I see scrobbled songs?](#how-do-i-see-scrobbled-songs)
+* [Will my listening history on other devices (eg. iPhone) be scrobbled?](#will-my-listening-history-on-other-devices-eg-iphone-be-scrobbled)
+* [Is there a HTTP API?](#is-there-a-http-api)
+* [Limitations](#limitations)
+* [Contact/Report issues](#contact-report-issues)
+
+
 # What is _Scrobble_?
 
 Scrobble is a music scrobbling service for Apple Music — with a focus on showcasing

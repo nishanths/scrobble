@@ -24,7 +24,7 @@ func devRootHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	const loggedIn = true
+	const loggedIn = false
 
 	if loggedIn {
 		var loggedInArgs = RootArgs{
