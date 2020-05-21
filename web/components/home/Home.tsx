@@ -14,9 +14,9 @@ const artworks = [
 ]
 
 const taglines = [
-  "Apple Music scrobbling service that showcases album art.",
+  "an Apple Music scrobbling service.",
   "showcase your Apple Music library like never before.",
-  "a beautiful way to share your Apple Music.",
+  "a beautiful way to scrobble your Apple Music songs.",
 ]
 
 export const Home: React.FC<HomeProps> = ({ loginURL }) => {
