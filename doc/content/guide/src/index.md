@@ -57,10 +57,10 @@ Yes. Check out the [API documentation](/doc/api/v1).
 # Limitations
 
 Scrobbling isn't instantaneous due to limitations in how soon your Apple Music listening history is available
-in the Apple Music desktop app.
-
-Additionally the Scrobble macOS app by default scrobbles only once every 24 hours.
+in the Apple Music desktop app. Additionally the Scrobble macOS app by default scrobbles only once every 24 hours.
 So your listening history on the Scrobble website may be behind by a day or more.
+
+Songs have to be present in your Apple Music library to be scrobbled and to appear on the website.
 
 # Contact/Report issues
 
