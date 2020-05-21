@@ -15,7 +15,7 @@
 Scrobble is a music scrobbling service for Apple Music — with a focus on showcasing
 album art.
 
-The term 'scrobbling' refers to sharing the names of songs you listen to, to an online feed.
+The term 'scrobbling' refers to sharing the details of songs you listen to, to an online feed.
 
 Scrobble's macOS app can scrobble what you listen to. Your listening
 history can then be seen by you, and optionally others, on the Scrobble website.
