@@ -61,7 +61,10 @@ const lastScrobbledDisplay = (d: Date): string => {
       hString = "0" + h
       ampm = "am"
     }
-    return `${hString}:${d.getMinutes()} ${ampm}`
+
+    const m = d.getMinutes()
+    const mString = m < 10 ? "0" + m : "" + m
+    return `${hString}:${mString} ${ampm}`
   }
 
   return d.getFullYear() != now.getFullYear() ?

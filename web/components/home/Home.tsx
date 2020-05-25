@@ -35,12 +35,12 @@ export const Home: React.FC<HomeProps> = ({ loginURL }) => {
       <GoogleSignIn loginURL={loginURL} />
     </div>
     <div className="footer">
-        <div>
-          <a href={guideLink}><div className="item">How do I use Scrobble?</div></a>
-          <a href={"https://scrobble.littleroot.org/u/nishanth"}><div className="item">Example profile</div></a>
-          <a href={apiDocLink}><div className="item">API doc</div></a>
-          <a href={macOSAppLink}><div className="item">macOS app</div></a>
-        </div>
+      <div>
+        <a href={guideLink}><div className="item">How do I use Scrobble?</div></a>
+        <a href={"https://scrobble.littleroot.org/u/nishanth"}><div className="item">Example profile</div></a>
+        <a href={apiDocLink}><div className="item">API doc</div></a>
+        <a href={macOSAppLink}><div className="item">macOS app</div></a>
+      </div>
     </div>
   </div>
 }
