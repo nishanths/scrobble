@@ -10,8 +10,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"image"
+	"image/gif"
 	_ "image/gif"
+	"image/jpeg"
 	_ "image/jpeg"
+	"image/png"
 	_ "image/png"
 	"io/ioutil"
 	"net/http"
@@ -30,6 +33,13 @@ import (
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/iterator"
 	tasks "google.golang.org/genproto/googleapis/cloud/tasks/v2"
+)
+
+var (
+	// prevent accidental removal of package imports that are required for side effects
+	_ = gif.Decode
+	_ = jpeg.Decode
+	_ = png.Decode
 )
 
 const (

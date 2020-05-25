@@ -3,6 +3,8 @@
 [`scrobble.littleroot.org`](https://scrobble.littleroot.org) is an Apple Music scrobbling
 service, with a client app available for macOS.
 
+See an [example profile](https://scrobble.littleroot.org/u/nishanth).
+
 ![Scrobbled by color: white](assets/scrobbled_color_white.png)
 
 ## Getting Started
