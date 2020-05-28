@@ -29,7 +29,7 @@ type Song = {
 }
 ```
 
-All properties will be present in a resonse. Values that are not available
+All properties will be present in a response. Values that are not available
 are represented by the Go zero value representation for the type. For example,
 if the `year` property is unavailable for a song, the `year` key will be present
 but will have value `0`.
