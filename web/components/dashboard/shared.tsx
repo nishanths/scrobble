@@ -1,6 +1,6 @@
 export enum Mode {
-    Base,
-    Privacy,
-    APIKey,
-    DeleteAccount,
+	Base,
+	Privacy,
+	APIKey,
+	DeleteAccount,
 }

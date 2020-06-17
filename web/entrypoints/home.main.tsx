@@ -7,6 +7,6 @@ import "../scss/home/home.scss"
 declare const bootstrap: BootstrapArgs;
 
 ReactDOM.render(
-    <Home loginURL={bootstrap.loginURL} />,
-    document.querySelector("#app")
+	<Home loginURL={bootstrap.loginURL} />,
+	document.querySelector("#app")
 );
