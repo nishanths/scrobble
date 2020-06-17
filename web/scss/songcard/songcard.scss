@@ -212,6 +212,10 @@
       font-size: 14px + $adjust-font-size;
       margin-top: 20px;
       line-height: 1.5;
+
+      .previewURL {
+        margin-top: 5px;
+      }
     }
   }
 }

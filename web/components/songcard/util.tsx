@@ -28,7 +28,7 @@ export const Picture: React.SFC<{
 	artworkBaseURL: string
 	albumCentric: boolean
 }> = ({ song, artworkBaseURL, albumCentric }) => {
-	const previewURL = trackViewURL(song.trackViewURL, albumCentric)
+	const previewURL = computeTrackViewURL(song.trackViewURL, albumCentric)
 	const artworkURL = song.artworkHash ? artworkBaseURL + "/" + song.artworkHash : "";
 	const imgStyles = artworkURL ? { backgroundImage: `url(${artworkURL})` } : { backgroundColor: "#fff" }
 
@@ -123,6 +123,7 @@ export const LargeMeta: React.SFC<{
 		const title = albumCentric ? s.albumTitle : s.title
 		const other = albumCentric ? `${s.artistName}` : `${s.artistName} – ${s.albumTitle}`
 		const playCount = `Played ${s.playCount.toLocaleString()} ${pluralize("time", s.playCount)}`
+		const previewURL = computeTrackViewURL(s.trackViewURL, albumCentric)
 
 		let lastPlayed = ""
 		if (s.lastPlayed) {
@@ -143,6 +144,7 @@ export const LargeMeta: React.SFC<{
 		// some songs in an album can be released before the entire album,
 		// so don't use the release date when albumCentric.
 		const includeReleaseDate = !albumCentric && releaseDate
+		const includePreviewURL = !!previewURL
 
 		const meta = <div className="meta">
 			<div className="title">
@@ -152,12 +154,15 @@ export const LargeMeta: React.SFC<{
 			<div className="other">
 				<span className="otherContent">{other}</span>
 			</div>
-			{(includeReleaseDate || includePlayMeta) && <div className="lastLine">
+			{(includeReleaseDate || includePlayMeta || includePreviewURL) && <div className="lastLine">
 				{includeReleaseDate && <div className="releaseDate">
 					Released {releaseDate}
 				</div>}
 				{includePlayMeta && <div className="playMeta">
 					{playCount}{lastPlayed && ", " + (s.playCount === 1 ? "" : "last ") + lastPlayed}
+				</div>}
+				{includePreviewURL && <div className="previewURL">
+					<a className="link" href={previewURL} title={previewURL} target="_blank" rel="noopener noreferrer">{"See in Apple Music ↗︎"}</a>
 				</div>}
 			</div>}
 		</div>
@@ -165,7 +170,7 @@ export const LargeMeta: React.SFC<{
 		return meta
 	}
 
-const trackViewURL = (songTrackViewURL: string, albumCentric: boolean): string => {
+const computeTrackViewURL = (songTrackViewURL: string, albumCentric: boolean): string => {
 	if (songTrackViewURL === "" || albumCentric === false) {
 		return songTrackViewURL
 	}

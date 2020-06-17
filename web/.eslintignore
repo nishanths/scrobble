@@ -6,3 +6,5 @@ dist
 
 # don't lint static directory
 static
+
+types/

@@ -4,6 +4,7 @@ import { RouteComponentProps } from "react-router-dom";
 import { Index } from "flexsearch"
 import { State } from "../../redux/types/u"
 import { assertExhaustive, assert, hexEncode, debounce } from "../../shared/util"
+import { useStateRef } from "../../shared/hooks"
 import { NProgress, Song } from "../../shared/types"
 import { Mode, DetailKind, pathForMode, pathForColor, pathForDetailKind, modeFromControlValue } from "./shared"
 import { Color } from "../colorpicker"
@@ -58,9 +59,7 @@ export const Scrobbles: React.StatelessComponent<{
 		const dispatch = useDispatch()
 		const last = useSelector((s: State) => s.last)
 
-		const [endIdx, setEndIdx] = useState(last.scrobblesEndIdx || 0)
-		const endIdxRef = useRef(endIdx)
-		useEffect(() => { endIdxRef.current = endIdx }, [endIdx])
+		const [endIdx, endIdxRef, setEndIdx] = useStateRef(last.scrobblesEndIdx || 0)
 
 		const [scrollY, setScrollY] = useState(wnd.pageYOffset)
 
@@ -73,8 +72,8 @@ export const Scrobbles: React.StatelessComponent<{
 		})
 
 		const [searchValue, setSearchValue] = useState("")
-		const [searchIndex, setSearchIndex] = useState<Index<Doc> | undefined>(undefined)
-		const [songsByIdent, setSongsByIdent] = useState<Map<string, Song>>(new Map())
+		const [searchIndex, searchIndexRef, setSearchIndex] = useStateRef<Index<Doc> | undefined>(undefined)
+		const [, songsByIdentRef, setSongsByIdent] = useStateRef<Map<string, Song>>(new Map())
 		const [filteredSongs, setFilteredSongs] = useState<Song[] | undefined>(undefined)
 
 		const onControlChange = (newMode: Mode) => {
@@ -254,16 +253,16 @@ export const Scrobbles: React.StatelessComponent<{
 			setSongsByIdent(m)
 		}, [mode, scrobbles])
 
-		const doSearch = (v: string) => {
-			if (searchIndex === undefined) {
+		const [debouncedSearch,] = useState(() => debounce((v) => {
+			if (searchIndexRef.current === undefined) {
 				return
 			}
 			const query = v.trim().length === 0 ? "" : v
-			searchIndex.search({ query }, (docs: Doc[]) => {
-				setFilteredSongs(docs.map(doc => songsByIdent.get(doc.songIdent)!))
+			searchIndexRef.current.search({ query }, (docs: Doc[]) => {
+				setFilteredSongs(docs.map(doc => songsByIdentRef.current.get(doc.songIdent)!))
 			})
-		}
-		const debouncedSearch = debounce(doSearch, 500)
+		}, 300))
+
 		const onSearchValueChange = (v: string): void => {
 			setSearchValue(v)
 			setFilteredSongs(undefined)
