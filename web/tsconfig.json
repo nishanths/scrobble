@@ -8,18 +8,13 @@
     "downlevelIteration": true,
     "lib": ["es5", "es6", "dom"],
     "jsx": "react",
-    "esModuleInterop": true,
-    "baseUrl": "./",
-    "paths": {
-        // fix incorrect types for flexsearch
-        // https://github.com/microsoft/TypeScript/issues/22217#issuecomment-369783776
-        "*": ["types/*"]
-    }
+    "esModuleInterop": true
   },
   "include": [
     "./components/**/*",
     "./entrypoints/**/*",
     "./redux/**/*",
-    "./shared/**/*"
+    "./shared/**/*",
+    "./types/**/*"
   ]
 }

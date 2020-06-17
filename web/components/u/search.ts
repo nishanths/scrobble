@@ -24,6 +24,9 @@ const createOptions: CreateOptions = {
 		id: "id",
 		field: indexFields,
 	},
+	threshold: 0,
+	resolution: 9,
+	depth: 4,
 
 	// TODO: make these options work
 	//
