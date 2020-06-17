@@ -53,7 +53,6 @@ export const Scrobbles: React.StatelessComponent<{
     const dispatch = useDispatch()
     const last = useSelector((s: State) => s.last)
 
-    console.log("preserved end idx", last.scrobblesEndIdx)
     const [endIdx, setEndIdx] = useState(last.scrobblesEndIdx || 0)
     const endIdxRef = useRef(endIdx)
     useEffect(() => { endIdxRef.current = endIdx }, [endIdx])
@@ -64,7 +63,6 @@ export const Scrobbles: React.StatelessComponent<{
 
     useEffect(() => {
       if (shouldUpdateScrollTo()) {
-        console.log("update scroll", endIdx, last.scrobblesScrollY)
         wnd.scrollTo({ top: last.scrobblesScrollY })
         dispatch(setLastScrobblesScrollY(undefined))
       }
@@ -99,7 +97,6 @@ export const Scrobbles: React.StatelessComponent<{
 
     const onSongClick = (s: Song) => {
       nProgress.done()
-      console.log("on song click", endIdx, scrollY)
       dispatch(setLastScrobblesEndIdx(endIdx))
       dispatch(setLastScrobblesScrollY(Math.floor(scrollY)))
 
@@ -138,7 +135,6 @@ export const Scrobbles: React.StatelessComponent<{
         return
       }
       const e = s.error === false ? nextEndIdx(0, s.items.length) : 0
-      console.log("initial end idx", endIdx, e)
       if (e > endIdx) {
         setEndIdx(e)
       }
