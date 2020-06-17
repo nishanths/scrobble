@@ -12,7 +12,12 @@ export const ColorPicker = (color?: Color, onColorChange?: (c: Color) => void) =
 		<ColorPickerComponent initialSelection={color} prompt="Pick a color to see scrobbled artwork of that color." afterSelect={onColorChange} />
 	</div>
 
-export const Top = (header: JSX.Element, colorPicker: JSX.Element, mode: Mode, onControlChange: (v: ControlValue) => void) =>
+export const Top = (
+	header: JSX.Element,
+	colorPicker: JSX.Element,
+	mode: Mode,
+	onControlChange: (v: ControlValue) => void
+) =>
 	<>
 		{header}
 		<div className="control">

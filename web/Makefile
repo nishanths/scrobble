@@ -36,3 +36,8 @@ sb:
 	npx start-storybook -p 9001 -c .storybook \
 		-s static # https://storybook.js.org/docs/configurations/serving-static-files/
 
+.PHONY: deps
+deps:
+	npm i
+	# remove bad types file
+	rm node_modules/flexsearch/index.d.ts

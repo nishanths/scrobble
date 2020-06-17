@@ -24,11 +24,6 @@
  * © 2015 MyFonts Inc
 */
 
-/* @import must be at top of file, otherwise CSS will not work */
-@import url("//hello.myfonts.net/count/2f00b2");
-
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital@0;1&display=swap');
-
 @font-face {
   font-family: cooper-hewitt;
   font-weight: 400;

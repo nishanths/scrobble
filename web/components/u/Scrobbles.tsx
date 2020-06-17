@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { RouteComponentProps } from "react-router-dom";
+import { Index } from "flexsearch"
 import { State } from "../../redux/types/u"
-import { assertExhaustive, assert, hexEncode } from "../../shared/util"
+import { assertExhaustive, assert, hexEncode, debounce } from "../../shared/util"
+import { useStateRef } from "../../shared/hooks"
 import { NProgress, Song } from "../../shared/types"
 import { Mode, DetailKind, pathForMode, pathForColor, pathForDetailKind, modeFromControlValue } from "./shared"
 import { Color } from "../colorpicker"
@@ -10,6 +12,8 @@ import { Songs } from "../Songs"
 import { setLastColor, setLastScrobblesEndIdx, setLastScrobblesScrollY } from "../../redux/actions/last"
 import { fetchAllScrobbles, fetchLovedScrobbles, fetchColorScrobbles } from "../../redux/actions/scrobbles"
 import { Header, ColorPicker, Top } from "./top"
+import { SearchBox } from "../searchbox"
+import { createIndex, Doc, toIndexID, hasActiveSearch } from "./search"
 
 // Divisble by 2, 3, and 4. This is appropriate because these are the number
 // of cards typically displayed per row. Using such a number ensures that
@@ -26,6 +30,8 @@ const nextEndIdx = (currentEndIdx: number, total: number): number => {
 }
 
 type History = RouteComponentProps["history"]
+
+const searchPlaceholder = "Filter by album, artist, or song title…"
 
 export const Scrobbles: React.StatelessComponent<{
 	profileUsername: string
@@ -53,20 +59,22 @@ export const Scrobbles: React.StatelessComponent<{
 		const dispatch = useDispatch()
 		const last = useSelector((s: State) => s.last)
 
-		const [endIdx, setEndIdx] = useState(last.scrobblesEndIdx || 0)
-		const endIdxRef = useRef(endIdx)
-		useEffect(() => { endIdxRef.current = endIdx }, [endIdx])
+		const [endIdx, endIdxRef, setEndIdx] = useStateRef(last.scrobblesEndIdx || 0)
 
 		const [scrollY, setScrollY] = useState(wnd.pageYOffset)
 
 		const shouldUpdateScrollTo = () => last.scrobblesScrollY !== undefined
-
 		useEffect(() => {
 			if (shouldUpdateScrollTo()) {
 				wnd.scrollTo({ top: last.scrobblesScrollY })
 				dispatch(setLastScrobblesScrollY(undefined))
 			}
 		})
+
+		const [searchValue, setSearchValue] = useState("")
+		const [searchIndex, searchIndexRef, setSearchIndex] = useStateRef<Index<Doc> | undefined>(undefined)
+		const [, songsByIdentRef, setSongsByIdent] = useStateRef<Map<string, Song>>(new Map())
+		const [filteredSongs, setFilteredSongs] = useState<Song[] | undefined>(undefined)
 
 		const onControlChange = (newMode: Mode) => {
 			nProgress.done()
@@ -187,13 +195,84 @@ export const Scrobbles: React.StatelessComponent<{
 				if ((wnd.innerHeight + y) >= (wnd.document.body.offsetHeight - leeway)) {
 					const newEnd = nextEndIdx(endIdxRef.current, s.items.length)
 					const e = Math.max(newEnd, endIdxRef.current)
-					setEndIdx(e)
+					if (e > endIdxRef.current) {
+						setEndIdx(e)
+					}
 				}
 			}
 
 			wnd.addEventListener("scroll", f)
 			return () => { wnd.removeEventListener("scroll", f) }
 		}, [scrobbles, mode])
+
+		// reset search value when mode changes
+		useEffect(() => {
+			setSearchValue("")
+		}, [mode])
+
+		// search
+		useEffect(() => {
+			if (mode !== Mode.All && mode !== Mode.Loved) {
+				return
+			}
+
+			if (scrobbles === null) {
+				return
+			}
+			if (scrobbles.fetching === true) {
+				return
+			}
+			if (scrobbles.error === true) {
+				return
+			}
+			// handle initial redux state
+			if (scrobbles.done === false) {
+				return
+			}
+
+			if (searchIndex !== undefined) {
+				searchIndex.destroy()
+			}
+
+			const index = createIndex()
+			const m = new Map<string, Song>()
+
+			for (const s of scrobbles.items) {
+				const d: Doc = {
+					id: toIndexID(s.ident),
+					songIdent: s.ident,
+					title: s.title,
+					artist: s.artistName,
+					album: s.albumTitle,
+				}
+				index.add(d)
+				m.set(s.ident, s)
+			}
+
+			setSearchIndex(index)
+			setSongsByIdent(m)
+		}, [mode, scrobbles])
+
+		const [debouncedSearch,] = useState(() => debounce((v) => {
+			if (searchIndexRef.current === undefined) {
+				return
+			}
+			const query = v.trim().length === 0 ? "" : v
+			searchIndexRef.current.search({ query }, (docs: Doc[]) => {
+				setFilteredSongs(docs.map(doc => songsByIdentRef.current.get(doc.songIdent)!))
+			})
+		}, 300))
+
+		const onSearchValueChange = (v: string): void => {
+			setSearchValue(v)
+			setFilteredSongs(undefined)
+			if (hasActiveSearch(v) && scrobbles !== null && scrobbles.done === true) {
+				// extend end index to all songs
+				setEndIdx(scrobbles.items.length)
+			}
+
+			debouncedSearch(v)
+		}
 
 		// ... render ...
 
@@ -248,20 +327,51 @@ export const Scrobbles: React.StatelessComponent<{
 			</>
 		}
 
-		if (scrobbles.items.length === 0) {
-			return <>
-				{top}
-				<div className="info">({self ? "You haven't" : "This user hasn't"} scrobbled {mode != Mode.All ? "matching " : ""}songs yet.)</div>
-			</>
-		}
+		const noMatchingScrobbles = <>
+			{top}
+			<div className="info">({self ? "You haven't" : "This user hasn't"} scrobbled {mode != Mode.All ? "matching " : ""}songs yet.)</div>
+		</>
 
-		const itemsToShow = scrobbles.items.slice(0, endIdx);
+		const searchBox = <div className="searchBox">
+			<SearchBox
+				value={searchValue}
+				onChange={onSearchValueChange}
+				placeholder={searchPlaceholder}
+			/>
+		</div>
 
 		switch (mode) {
 			case Mode.All:
 			case Mode.Loved: {
+				if (hasActiveSearch(searchValue)) {
+					if (filteredSongs === undefined) {
+						// waiting for search results state
+						return <>
+							{top}
+							{searchBox}
+						</>
+					}
+					if (filteredSongs.length === 0) {
+						return <>
+							{top}
+							{searchBox}
+							<div className="info">(No matching songs.)</div>
+						</>
+					}
+				} else {
+					// should render all scrobbles; no filtering
+					if (scrobbles.items.length === 0) {
+						return noMatchingScrobbles
+					}
+				}
+
+				const itemsToShow = hasActiveSearch(searchValue) ?
+					filteredSongs! :
+					scrobbles.items.slice(0, endIdx)
+
 				return <>
 					{top}
+					{searchBox}
 					<div className="songs">
 						<Songs
 							songs={itemsToShow}
@@ -279,6 +389,10 @@ export const Scrobbles: React.StatelessComponent<{
 			}
 
 			case Mode.Color: {
+				if (scrobbles.items.length === 0) {
+					return noMatchingScrobbles
+				}
+				const itemsToShow = scrobbles.items.slice(0, endIdx)
 				return <>
 					{top}
 					<div className="songs">
