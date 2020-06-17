@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { RouteComponentProps } from "react-router-dom";
 import { Index } from "flexsearch"
 import { State } from "../../redux/types/u"
-import { assertExhaustive, assert, hexEncode, debounce } from "../../shared/util"
+import { assertExhaustive, assert, hexEncode, debounce, copyMap } from "../../shared/util"
 import { useStateRef } from "../../shared/hooks"
 import { NProgress, Song } from "../../shared/types"
 import { Mode, DetailKind, pathForMode, pathForColor, pathForDetailKind, modeFromControlValue } from "./shared"
@@ -33,6 +33,12 @@ type History = RouteComponentProps["history"]
 
 const searchPlaceholder = "Filter by album, artist, or song title"
 
+// required search index data for a given mode.
+type IndexForMode = {
+	songIdents: Map<string, Song> // song ident -> Song
+	searchIndex: Index<Doc>       // actual search index
+}
+
 export const Scrobbles: React.FC<{
 	profileUsername: string
 	signedIn: boolean
@@ -59,8 +65,10 @@ export const Scrobbles: React.FC<{
 		const dispatch = useDispatch()
 		const last = useSelector((s: State) => s.last)
 
-		const [endIdx, endIdxRef, setEndIdx] = useStateRef(last.scrobblesEndIdx || 0)
+		const modeRef = useRef(mode)
+		useEffect(() => { modeRef.current = mode }, [mode])
 
+		const [endIdx, endIdxRef, setEndIdx] = useStateRef(last.scrobblesEndIdx || 0)
 		const [scrollY, setScrollY] = useState(wnd.pageYOffset)
 
 		const shouldUpdateScrollTo = () => last.scrobblesScrollY !== undefined
@@ -72,8 +80,7 @@ export const Scrobbles: React.FC<{
 		})
 
 		const [searchValue, setSearchValue] = useState("")
-		const [searchIndex, searchIndexRef, setSearchIndex] = useStateRef<Index<Doc> | undefined>(undefined)
-		const [, songsByIdentRef, setSongsByIdent] = useStateRef<Map<string, Song>>(new Map())
+		const [indexesByMode, indexesByModeRef, setIndexesByMode] = useStateRef<Map<Mode, IndexForMode>>(new Map())
 		const [filteredSongs, setFilteredSongs] = useState<Song[] | undefined>(undefined)
 
 		const onControlChange = (newMode: Mode) => {
@@ -230,36 +237,41 @@ export const Scrobbles: React.FC<{
 				return
 			}
 
-			if (searchIndex !== undefined) {
-				searchIndex.destroy()
-			}
+			const indexForMode = indexesByMode.get(mode)
 
-			const index = createIndex()
-			const m = new Map<string, Song>()
+			if (indexForMode === undefined) {
+				const searchIndex = createIndex()
+				const songIdents = new Map<string, Song>()
 
-			for (const s of scrobbles.items) {
-				const d: Doc = {
-					id: toIndexID(s.ident),
-					songIdent: s.ident,
-					title: s.title,
-					artist: s.artistName,
-					album: s.albumTitle,
+				for (const s of scrobbles.items) {
+					const d: Doc = {
+						id: toIndexID(s.ident),
+						songIdent: s.ident,
+						title: s.title,
+						artist: s.artistName,
+						album: s.albumTitle,
+					}
+					searchIndex.add(d)
+					songIdents.set(s.ident, s)
 				}
-				index.add(d)
-				m.set(s.ident, s)
-			}
 
-			setSearchIndex(index)
-			setSongsByIdent(m)
+				const updated = copyMap(indexesByMode)
+				updated.set(mode, {
+					searchIndex,
+					songIdents,
+				})
+				setIndexesByMode(updated)
+			}
 		}, [mode, scrobbles])
 
 		const [debouncedSearch,] = useState(() => debounce((v) => {
-			if (searchIndexRef.current === undefined) {
+			const i = indexesByModeRef.current.get(modeRef.current)
+			if (i === undefined) {
 				return
 			}
 			const query = v.trim().length === 0 ? "" : v
-			searchIndexRef.current.search({ query }, (docs: Doc[]) => {
-				setFilteredSongs(docs.map(doc => songsByIdentRef.current.get(doc.songIdent)!))
+			i.searchIndex.search({ query }, (docs: Doc[]) => {
+				setFilteredSongs(docs.map(doc => i.songIdents.get(doc.songIdent)!))
 			})
 		}, 300))
 
