@@ -140,3 +140,18 @@ export function randInt(min: number, max: number): number {
 	max = Math.floor(max);
 	return Math.floor(Math.random() * (max - min)) + min; // The maximum is exclusive and the minimum is inclusive
 }
+
+// debounce calls the function once after wait milliseconds has passed since the
+// previous invocation of the function.
+export function debounce<F extends (...args: any[]) => void>(fn: F, wait: number) {
+  let timerId: number | undefined
+
+  return (...args: Parameters<F>): void => {
+    window.clearTimeout(timerId)
+
+    timerId = window.setTimeout(() => {
+      timerId = undefined
+      fn(...args)
+    }, wait)
+  }
+}
