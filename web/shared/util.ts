@@ -144,14 +144,14 @@ export function randInt(min: number, max: number): number {
 // debounce calls the function once after wait milliseconds has passed since the
 // previous invocation of the function.
 export function debounce<F extends (...args: any[]) => void>(fn: F, wait: number) {
-  let timerId: number | undefined
+	let timerId: number | undefined
 
-  return (...args: Parameters<F>): void => {
-    window.clearTimeout(timerId)
+	return (...args: Parameters<F>): void => {
+		window.clearTimeout(timerId)
 
-    timerId = window.setTimeout(() => {
-      timerId = undefined
-      fn(...args)
-    }, wait)
-  }
+		timerId = window.setTimeout(() => {
+			timerId = undefined
+			fn(...args)
+		}, wait)
+	}
 }

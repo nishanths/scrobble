@@ -5,16 +5,16 @@ import { SearchBox } from './SearchBox';
 const s = storiesOf("SearchBox", module)
 
 s.add("default", () => {
-  const [value, setValue] = useState("")
+	const [value, setValue] = useState("")
 
-  const props = {
-    value,
-    placeholder: "Filter by album, artist, or song title...",
-    onChange: (v: string) => {
-      console.log(v)
-      setValue(v)
-    },
-  }
+	const props = {
+		value,
+		placeholder: "Filter by album, artist, or song title...",
+		onChange: (v: string) => {
+			console.log(v)
+			setValue(v)
+		},
+	}
 
-  return <SearchBox {...props} />
+	return <SearchBox {...props} />
 })
