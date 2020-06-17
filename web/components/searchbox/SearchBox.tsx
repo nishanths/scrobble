@@ -1,5 +1,6 @@
 import React from "react"
 import "../../scss/searchbox/search-box.scss"
+import { SearchIcon } from "./SearchIcon"
 
 type SearchBoxProps = {
 	onChange: (v: string) => void
@@ -13,6 +14,9 @@ export const SearchBox: React.FC<SearchBoxProps> = ({ value, onChange, placehold
 	}
 
 	return <div className="SearchBox">
-		<input value={value} onChange={onInputChange} placeholder={placeholder} />
+		<div className="icon">
+			{SearchIcon}
+		</div>
+		<input type="text" spellCheck="false" value={value} onChange={onInputChange} placeholder={placeholder} />
 	</div>
 }

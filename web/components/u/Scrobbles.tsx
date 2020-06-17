@@ -10,6 +10,7 @@ import { Songs } from "../Songs"
 import { setLastColor, setLastScrobblesEndIdx, setLastScrobblesScrollY } from "../../redux/actions/last"
 import { fetchAllScrobbles, fetchLovedScrobbles, fetchColorScrobbles } from "../../redux/actions/scrobbles"
 import { Header, ColorPicker, Top } from "./top"
+import { SearchBox } from "../searchbox"
 
 // Divisble by 2, 3, and 4. This is appropriate because these are the number
 // of cards typically displayed per row. Using such a number ensures that
@@ -26,6 +27,8 @@ const nextEndIdx = (currentEndIdx: number, total: number): number => {
 }
 
 type History = RouteComponentProps["history"]
+
+const searchPlaceholder = "Filter by album, artist, or song title…"
 
 export const Scrobbles: React.StatelessComponent<{
 	profileUsername: string
@@ -60,13 +63,14 @@ export const Scrobbles: React.StatelessComponent<{
 		const [scrollY, setScrollY] = useState(wnd.pageYOffset)
 
 		const shouldUpdateScrollTo = () => last.scrobblesScrollY !== undefined
-
 		useEffect(() => {
 			if (shouldUpdateScrollTo()) {
 				wnd.scrollTo({ top: last.scrobblesScrollY })
 				dispatch(setLastScrobblesScrollY(undefined))
 			}
 		})
+
+		const [searchValue, setSearchValue] = useState("")
 
 		const onControlChange = (newMode: Mode) => {
 			nProgress.done()
@@ -199,6 +203,13 @@ export const Scrobbles: React.StatelessComponent<{
 
 		const header = Header(profileUsername, signedIn, true)
 		const colorPicker = ColorPicker(color, onColorChange)
+		const searchBox = <div className="searchBox">
+			<SearchBox
+				value={searchValue}
+				onChange={(v) => setSearchValue(v)}
+				placeholder={searchPlaceholder}
+			/>
+		</div>
 		const top = Top(header, colorPicker, mode, (v) => { onControlChange(modeFromControlValue(v)) })
 
 		// Easy case. For private accounts that aren't the current user, render the
@@ -262,6 +273,7 @@ export const Scrobbles: React.StatelessComponent<{
 			case Mode.Loved: {
 				return <>
 					{top}
+					{searchBox}
 					<div className="songs">
 						<Songs
 							songs={itemsToShow}

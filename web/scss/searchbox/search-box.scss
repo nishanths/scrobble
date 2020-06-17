@@ -1,2 +1,30 @@
+@import "../vars.scss";
+
 .SearchBox {
+	position: relative;
+
+	.icon {
+		position: absolute;
+		width: 19px;
+	    top: 10px;
+	    left: 10px;
+	}
+
+	input[type=text] {
+		font-family: $font-family;
+		background-image: none;
+		background-color: transparent;
+		box-shadow: none;
+		outline: none;
+		padding: 5px 10px 5px 35px;
+		border-radius: 5px;
+		border: 2px solid lighten($meta-color, 40%);
+		height: 25px;
+		width: 250px;
+		font-size: 15px;
+		color: $muted-color;
+		&:focus {
+			border: 2px solid $blue;
+		}
+	}
 }
