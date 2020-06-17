@@ -17,6 +17,7 @@
     "loupe-js": "^1.2.0",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
+    "react-hotkeys-hook": "^2.1.3",
     "react-redux": "^7.1.1",
     "react-responsive-modal": "^5.0.2",
     "react-router": "^5.2.0",

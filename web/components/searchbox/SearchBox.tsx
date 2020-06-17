@@ -1,6 +1,6 @@
-import React from "react"
-import "../../scss/searchbox/search-box.scss"
+import React, { useEffect } from "react"
 import { SearchIcon } from "./SearchIcon"
+import "../../scss/searchbox/search-box.scss"
 
 type SearchBoxProps = {
 	onChange: (v: string) => void
@@ -8,7 +8,9 @@ type SearchBoxProps = {
 	placeholder?: string
 }
 
-export const SearchBox: React.FC<SearchBoxProps> = ({ value, onChange, placeholder }) => {
+// SearchBox provides a component that can be used as a search box.
+// The ref provides access to the uderlying input element.
+export const SearchBox = React.forwardRef<HTMLInputElement, SearchBoxProps>(({ onChange, value, placeholder }, ref) => {
 	const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		onChange(e.target.value)
 	}
@@ -17,6 +19,6 @@ export const SearchBox: React.FC<SearchBoxProps> = ({ value, onChange, placehold
 		<div className="icon">
 			{SearchIcon}
 		</div>
-		<input type="text" spellCheck="false" value={value} onChange={onInputChange} placeholder={placeholder} />
+		<input ref={ref} type="text" spellCheck="false" value={value} onChange={onInputChange} placeholder={placeholder} />
 	</div>
-}
+})

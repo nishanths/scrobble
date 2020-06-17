@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { RouteComponentProps } from "react-router-dom";
+import { useHotkeys } from "react-hotkeys-hook"
 import { Index } from "flexsearch"
 import { State } from "../../redux/types/u"
 import { assertExhaustive, assert, hexEncode, debounce, copyMap } from "../../shared/util"
@@ -62,6 +63,13 @@ export const Scrobbles: React.FC<{
 	history,
 	wnd,
 }) => {
+		const searchInputElem = React.createRef<HTMLInputElement>()
+		useHotkeys("cmd+/", () => {
+			if (searchInputElem.current !== null) {
+				searchInputElem.current.focus()
+			}
+		}, {}, [searchInputElem])
+
 		const dispatch = useDispatch()
 		const last = useSelector((s: State) => s.last)
 
@@ -346,6 +354,7 @@ export const Scrobbles: React.FC<{
 
 		const searchBox = <div className="searchBox">
 			<SearchBox
+				ref={searchInputElem}
 				value={searchValue}
 				onChange={onSearchValueChange}
 				placeholder={searchPlaceholder}
