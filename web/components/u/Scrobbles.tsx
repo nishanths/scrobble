@@ -33,7 +33,7 @@ type History = RouteComponentProps["history"]
 
 const searchPlaceholder = "Filter by album, artist, or song title…"
 
-export const Scrobbles: React.StatelessComponent<{
+export const Scrobbles: React.FC<{
 	profileUsername: string
 	signedIn: boolean
 	artworkBaseURL: string
