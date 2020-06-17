@@ -19,7 +19,7 @@ export const setLastScrobblesEndIdx = (i: number) => {
   }
 }
 
-export const setLastScrobblesScrollY = (y: number) => {
+export const setLastScrobblesScrollY = (y: number | undefined) => {
   return {
     type: "SET_LAST_SCROBBLES_SCROLL_Y" as const,
     scrollY: y,

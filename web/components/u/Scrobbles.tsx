@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { RouteComponentProps } from "react-router-dom";
 import { State } from "../../redux/types/u"
@@ -53,19 +53,27 @@ export const Scrobbles: React.StatelessComponent<{
     const dispatch = useDispatch()
     const last = useSelector((s: State) => s.last)
 
-    const endIdx = last.scrobblesEndIdx || 0
+    console.log("preserved end idx", last.scrobblesEndIdx)
+    const [endIdx, setEndIdx] = useState(last.scrobblesEndIdx || 0)
     const endIdxRef = useRef(endIdx)
     useEffect(() => { endIdxRef.current = endIdx }, [endIdx])
 
-    const shouldUpdateScrollTo = () => last.scrobblesScrollY !== undefined
-      && Math.abs(wnd.pageYOffset - last.scrobblesScrollY) > 200 // throttle frequent updates
+    const [scrollY, setScrollY] = useState(wnd.pageYOffset)
 
-    if (shouldUpdateScrollTo()) {
-      wnd.scrollTo({ top: last.scrobblesScrollY })
-    }
+    const shouldUpdateScrollTo = () => last.scrobblesScrollY !== undefined
+
+    useEffect(() => {
+      if (shouldUpdateScrollTo()) {
+        console.log("update scroll", endIdx, last.scrobblesScrollY)
+        wnd.scrollTo({ top: last.scrobblesScrollY })
+        dispatch(setLastScrobblesScrollY(undefined))
+      }
+    })
 
     const onControlChange = (newMode: Mode) => {
       nProgress.done()
+      dispatch(setLastScrobblesEndIdx(0))
+
       let u: string;
       switch (newMode) {
         case Mode.All:
@@ -83,6 +91,7 @@ export const Scrobbles: React.StatelessComponent<{
 
     const onColorChange = (newColor: Color) => {
       nProgress.done()
+      dispatch(setLastScrobblesEndIdx(0))
       dispatch(setLastColor(newColor))
       assert(mode === Mode.Color, "mode should be Color")
       history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(newColor))
@@ -90,6 +99,9 @@ export const Scrobbles: React.StatelessComponent<{
 
     const onSongClick = (s: Song) => {
       nProgress.done()
+      console.log("on song click", endIdx, scrollY)
+      dispatch(setLastScrobblesEndIdx(endIdx))
+      dispatch(setLastScrobblesScrollY(Math.floor(scrollY)))
 
       let kind: DetailKind
       switch (mode) {
@@ -126,7 +138,10 @@ export const Scrobbles: React.StatelessComponent<{
         return
       }
       const e = s.error === false ? nextEndIdx(0, s.items.length) : 0
-      dispatch(setLastScrobblesEndIdx((e)))
+      console.log("initial end idx", endIdx, e)
+      if (e > endIdx) {
+        setEndIdx(e)
+      }
     }, [scrobbles, mode])
 
     // fetch scrobbles
@@ -165,7 +180,7 @@ export const Scrobbles: React.StatelessComponent<{
     useEffect(() => {
       const f = () => {
         const y = wnd.pageYOffset
-        dispatch(setLastScrobblesScrollY(y))
+        setScrollY(y)
 
         const s = scrobblesRef.current
         if (s === null) {
@@ -176,7 +191,7 @@ export const Scrobbles: React.StatelessComponent<{
         if ((wnd.innerHeight + y) >= (wnd.document.body.offsetHeight - leeway)) {
           const newEnd = nextEndIdx(endIdxRef.current, s.items.length)
           const e = Math.max(newEnd, endIdxRef.current)
-          dispatch(setLastScrobblesEndIdx((e)))
+          setEndIdx(e)
         }
       }
 
