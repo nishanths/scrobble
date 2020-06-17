@@ -286,11 +286,6 @@ export const Scrobbles: React.FC<{
 		const onSearchValueChange = (v: string): void => {
 			setSearchValue(v)
 			setFilteredSongs(undefined)
-			if (hasActiveSearch(v) && scrobbles !== null && scrobbles.done === true) {
-				// extend end index to all songs
-				setEndIdx(scrobbles.items.length)
-			}
-
 			debouncedSearch(v)
 		}
 
