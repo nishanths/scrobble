@@ -19,12 +19,18 @@
 		padding: 5px 10px 5px 35px;
 		border-radius: 5px;
 		border: 2px solid lighten($meta-color, 40%);
+		width: 225px;
 		height: 25px;
-		width: 250px;
 		font-size: 15px;
 		color: $muted-color;
 		&:focus {
 			border: 2px solid $blue;
+		}
+	}
+
+	@media screen and (min-width: 400px) {
+		input[type=text] {
+			width: 250px;
 		}
 	}
 }
