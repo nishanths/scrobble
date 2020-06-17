@@ -5,5 +5,5 @@ import { GoogleSignIn } from './GoogleSignIn';
 const s = storiesOf("GoogleSignIn", module)
 
 s.add("default", () => {
-  return <GoogleSignIn loginURL="/fakeloginurl" />
+    return <GoogleSignIn loginURL="/fakeloginurl" />
 })
