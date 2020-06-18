@@ -1,6 +1,7 @@
 package log
 
 import (
+	"fmt"
 	"log"
 	"path/filepath"
 	"runtime"
@@ -9,6 +10,11 @@ import (
 
 func init() {
 	log.SetFlags(log.LstdFlags)
+}
+
+func Fatalf(format string, args ...interface{}) {
+	printf("FATAL", format, args)
+	panic(fmt.Sprintf(format, args...))
 }
 
 func Criticalf(format string, args ...interface{}) {
