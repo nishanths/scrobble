@@ -129,7 +129,7 @@ func run(ctx context.Context) error {
 	http.HandleFunc("/api/v1/artwork", s.artworkHandler)
 	http.HandleFunc("/api/v1/artwork/missing", s.artworkMissingHandler)
 
-	// Data API handlers
+	// data API handlers
 	// /api/v1/data/play-count/artists      ?sort=desc     ?limit=20
 	// /api/v1/data/play-count/songs        ?sort=desc     ?limit=<n>
 	// /api/v1/data/length/songs            ?sort=desc     ?limit=<n>
