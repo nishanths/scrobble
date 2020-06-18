@@ -1,5 +1,5 @@
 //
-// Copied from node_modules/flesearch/index.d.ts and modified to adjust types
+// Copied from node_modules/flexsearch/index.d.ts, and pruned/modified.
 //
 
 declare module "flexsearch" {
@@ -9,11 +9,7 @@ declare module "flexsearch" {
     readonly index: string;
     readonly length: number;
 
-    init(): unknown;
-    init(options: CreateOptions): unknown;
-    info(): unknown;
     add(o: T): unknown;
-    add(id: number, o: string): unknown;
 
     // Result without pagination -> T[]
     search(query: string, options: number | SearchOptions, callback: (results: T[]) => void): void;
@@ -27,18 +23,8 @@ declare module "flexsearch" {
     search(options: SearchOptions & {query: string, page?: boolean | Cursor}, callback: (results: SearchResults<T>) => void): void;
     search(options: SearchOptions & {query: string, page?: boolean | Cursor}): Promise<SearchResults<T>>;
 
-
-    update(id: number, o: T): unknown;
-    remove(id: number): unknown;
     clear(): unknown;
     destroy(): unknown;
-    addMatcher(matcher: Matcher): unknown;
-
-    where(whereFn: (o: T) => boolean): T[];
-    where(whereObj: {[key: string]: string}): unknown;
-    encode(str: string): string;
-    export(): string;
-    import(exported: string): unknown;
   }
 
   interface SearchOptions {
@@ -79,13 +65,6 @@ declare module "flexsearch" {
     doc?: Document;
   };
 
-//   limit  number  Sets the limit of results.
-// suggest  true, false  Enables suggestions in results.
-// where  object  Use a where-clause for non-indexed fields.
-// field  string, Array<string>  Sets the document fields which should be searched. When no field is set, all fields will be searched. Custom options per field are also supported.
-// bool  "and", "or"  Sets the used logical operator when searching through multiple fields.
-// page  true, false, cursor  Enables paginated results.
-
   type IndexProfile = "memory" | "speed" | "match" | "score" | "balance" | "fast";
   type DefaultTokenizer = "strict" | "forward" | "reverse" | "full";
   type TokenizerFn = (str: string) => string[];
@@ -97,17 +76,6 @@ declare module "flexsearch" {
   type Cursor = string;
 
   export default class FlexSearch {
-    constructor(options?: CreateOptions);
     static create<T>(options?: CreateOptions): Index<T>;
-    static registerMatcher(matcher: Matcher): unknown;
-    static registerEncoder(name: string, encoder: EncoderFn): unknown;
-    static registerLanguage(lang: string, options: { stemmer?: Stemmer; filter?: string[] }): unknown;
-    static encode(name: string, str: string): unknown;
   }
 }
-
-// FlexSearch.create(<options>)
-// FlexSearch.registerMatcher({KEY: VALUE})
-// FlexSearch.registerEncoder(name, encoder)
-// FlexSearch.registerLanguage(lang, {stemmer:{}, filter:[]})
-// FlexSearch.encode(name, string)

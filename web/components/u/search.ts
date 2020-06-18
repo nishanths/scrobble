@@ -35,7 +35,7 @@ const createOptions: CreateOptions = {
 }
 
 export const createIndex = (): Index<Doc> => {
-	return new FlexSearch(createOptions) as Index<Doc> // bleh, flexsearch has poor type definition files
+	return FlexSearch.create(createOptions)
 }
 
 export const toIndexID = hashCode
