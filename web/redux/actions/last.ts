@@ -1,5 +1,4 @@
 import { Color } from "../../components/colorpicker"
-import { Mode } from "../../components/u/shared"
 
 export type LastAction =
 	| ReturnType<typeof setLastColor>
