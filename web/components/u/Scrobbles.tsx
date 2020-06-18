@@ -178,7 +178,7 @@ export const Scrobbles: React.FC<{
 				}
 				case Mode.Loved: {
 					if ((s!.done === false && s!.fetching === false) || s!.error === true) {
-						dispatch(fetchLovedScrobbles(profileUsername, limit))
+						dispatch(fetchLovedScrobbles(profileUsername))
 					}
 					break
 				}

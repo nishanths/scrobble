@@ -87,12 +87,12 @@ export const fetchAllScrobbles = (username: string, limit: number): AllScrobbles
 	}
 }
 
-export const fetchLovedScrobbles = (username: string, limit: number): LovedScrobblesThunkResult<void> => {
+export const fetchLovedScrobbles = (username: string): LovedScrobblesThunkResult<void> => {
 	return async (dispatch) => {
 		dispatch(lovedScrobblesStart(username))
 
 		try {
-			const result = await _fetchScrobbledSongs(username, limit, true)
+			const result = await _fetchScrobbledSongs(username, null, true)
 			dispatch(lovedScrobblesSuccess(username, result.songs, result.total, result.private))
 		} catch (e) {
 			dispatch(lovedScrobblesFail(e))
@@ -107,8 +107,11 @@ type FetchSongsResult = {
 	err: any | null
 }
 
-const _fetchScrobbledSongs = async (username: string, limit: number, loved: boolean): Promise<FetchSongsResult> => {
-	let url = "/api/v1/scrobbled?username=" + username + "&limit=" + limit;
+const _fetchScrobbledSongs = async (username: string, limit: number | null, loved: boolean): Promise<FetchSongsResult> => {
+	let url = "/api/v1/scrobbled?username=" + username
+	if (limit !== null) {
+		url += "&limit=" + limit;
+	}
 	if (loved === true) {
 		url += "&loved=true"
 	}
