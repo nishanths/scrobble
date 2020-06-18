@@ -67,7 +67,7 @@ func computePlayCountArtistStats(songs []Song) ArtistStats {
 	})
 
 	var artistData []ArtistDatum
-	for i := 0; i < len(slice) && len(artistData) < 20; i++ {
+	for i := 0; i < len(slice) && len(artistData) < maxArtistStatsLen; i++ {
 		v := slice[i]
 		artistData = append(artistData, ArtistDatum{
 			ArtistName:     v.artistName,
