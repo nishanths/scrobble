@@ -27,16 +27,16 @@ func statsLastPlayedArtistKey(namespace string) *datastore.Key {
 	}
 }
 
-type ArtistDatum struct {
-	ArtistName     string      `datastore:",noindex"`
-	PrimaryValue   interface{} `datastore:",noindex"`
-	SecondaryValue interface{} `datastore:",noindex"`
-}
-
 // namespace: account
 type ArtistStats struct {
 	Data         []ArtistDatum `datastore:",noindex"`
 	TotalArtists int           `datastore:",noindex"`
+}
+
+type ArtistDatum struct {
+	ArtistName     string      `datastore:",noindex"`
+	PrimaryValue   interface{} `datastore:",noindex"`
+	SecondaryValue interface{} `datastore:",noindex"`
 }
 
 const maxArtistStatsLen = 20
@@ -54,6 +54,7 @@ func computePlayCountArtistStats(songs []Song) ArtistStats {
 		v.artistName = s.ArtistName
 		v.playCount += s.PlayCount
 		v.totalPlayTime += int(s.TotalTime/time.Second) * s.PlayCount
+		m[s.ArtistName] = v
 	}
 
 	slice := make([]value, 0, len(m))
