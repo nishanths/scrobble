@@ -10,7 +10,7 @@ import { NProgress, Song } from "../../shared/types"
 import { Mode, DetailKind, pathForMode, pathForColor, pathForDetailKind, modeFromControlValue } from "./shared"
 import { Color } from "../colorpicker"
 import { Songs } from "../Songs"
-import { setLastColor, setLastScrobblesEndIdx, setLastScrobblesScrollY } from "../../redux/actions/last"
+import { setLastColor, setLastScrobblesEndIdx, setLastScrobblesScrollY, setLastSearch } from "../../redux/actions/last"
 import { fetchAllScrobbles, fetchLovedScrobbles, fetchColorScrobbles } from "../../redux/actions/scrobbles"
 import { Header, ColorPicker, Top } from "./top"
 import { SearchBox } from "../searchbox"
@@ -34,7 +34,7 @@ type History = RouteComponentProps["history"]
 
 const searchPlaceholder = "Filter by album, artist, or song title"
 
-// required search index data for a given mode.
+// required data to enable searching for a given mode.
 type IndexForMode = {
 	songIdents: Map<string, Song> // song ident -> Song
 	searchIndex: Index<Doc>       // actual search index
@@ -64,11 +64,11 @@ export const Scrobbles: React.FC<{
 	wnd,
 }) => {
 		const searchInputElem = React.createRef<HTMLInputElement>()
-		useHotkeys("cmd+/", () => {
+		useHotkeys("cmd+k", () => {
 			if (searchInputElem.current !== null) {
 				searchInputElem.current.focus()
 			}
-		}, {}, [searchInputElem])
+		}, [searchInputElem])
 
 		const dispatch = useDispatch()
 		const last = useSelector((s: State) => s.last)
@@ -87,13 +87,15 @@ export const Scrobbles: React.FC<{
 			}
 		})
 
-		const [searchValue, setSearchValue] = useState("")
-		const [indexesByMode, indexesByModeRef, setIndexesByMode] = useStateRef<Map<Mode, IndexForMode>>(new Map())
+		const [searchValue, setSearchValue] = useState(last.search)
+		const [indexesByMode, indexesByModeRef, setIndexesByMode] = useStateRef<Map<Mode.All | Mode.Loved, IndexForMode>>(new Map())
 		const [filteredSongs, setFilteredSongs] = useState<Song[] | undefined>(undefined)
 
 		const onControlChange = (newMode: Mode) => {
 			nProgress.done()
 			dispatch(setLastScrobblesEndIdx(0))
+			setSearchValue("")
+			dispatch(setLastSearch(""))
 
 			let u: string;
 			switch (newMode) {
@@ -220,11 +222,6 @@ export const Scrobbles: React.FC<{
 			return () => { wnd.removeEventListener("scroll", f) }
 		}, [scrobbles, mode])
 
-		// reset search value when mode changes
-		useEffect(() => {
-			setSearchValue("")
-		}, [mode])
-
 		// search
 		useEffect(() => {
 			if (mode !== Mode.All && mode !== Mode.Loved) {
@@ -273,7 +270,11 @@ export const Scrobbles: React.FC<{
 		}, [mode, scrobbles])
 
 		const [debouncedSearch,] = useState(() => debounce((v) => {
-			const i = indexesByModeRef.current.get(modeRef.current)
+			const m = modeRef.current
+			if (m !== Mode.All && m !== Mode.Loved) {
+				return
+			}
+			const i = indexesByModeRef.current.get(m)
 			if (i === undefined) {
 				return
 			}
@@ -283,10 +284,15 @@ export const Scrobbles: React.FC<{
 			})
 		}, 300))
 
+		useEffect(() => {
+			debouncedSearch(searchValue)
+		}, [searchValue])
+
 		const onSearchValueChange = (v: string): void => {
 			setSearchValue(v)
+			dispatch(setLastSearch(v))
 			setFilteredSongs(undefined)
-			debouncedSearch(v)
+			// debouncedSearch(v)
 		}
 
 		// ... render ...
@@ -382,7 +388,7 @@ export const Scrobbles: React.FC<{
 				}
 
 				const itemsToShow = hasActiveSearch(searchValue) ?
-					filteredSongs! :
+					filteredSongs!.slice(0, endIdx) :
 					scrobbles.items.slice(0, endIdx)
 
 				return <>

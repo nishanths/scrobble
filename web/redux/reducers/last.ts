@@ -5,6 +5,7 @@ const defaultState: LastState = {
 	color: undefined,
 	scrobblesEndIdx: undefined,
 	scrobblesScrollY: undefined,
+	search: "",
 }
 
 export const lastReducer = (state = defaultState, action: LastAction): LastState => {
@@ -15,6 +16,8 @@ export const lastReducer = (state = defaultState, action: LastAction): LastState
 			return { ...state, scrobblesEndIdx: action.endIdx }
 		case "SET_LAST_SCROBBLES_SCROLL_Y":
 			return { ...state, scrobblesScrollY: action.scrollY }
+		case "SET_LAST_SEARCH":
+			return { ...state, search: action.search }
 		default:
 			return state
 	}
