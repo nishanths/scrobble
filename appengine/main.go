@@ -135,7 +135,7 @@ func run(ctx context.Context) error {
 	// /api/v1/data/play-count/artists      ?sort=desc     ?limit=20
 	// /api/v1/data/play-count/songs        ?sort=desc     ?limit=<n>
 	// /api/v1/data/length/songs            ?sort=desc     ?limit=<n>
-	// /api/v1/data/release-date/artists    ?sort=desc|asc ?limit=20
+	// /api/v1/data/last-played/artists     ?sort=desc     ?limit=20
 
 	// internal handlers
 	http.Handle("/internal/fillITunesFields", s.requireTasksSecretHeader(http.HandlerFunc(s.fillITunesFieldsHandler)))
