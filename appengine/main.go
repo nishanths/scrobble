@@ -88,6 +88,8 @@ func run(ctx context.Context) error {
 	}
 
 	// Register handlers.
+
+	// web handlers
 	if isDev() {
 		http.HandleFunc("/", devRootHandler)
 		http.HandleFunc("/u/", devUHandler)
@@ -103,6 +105,7 @@ func run(ctx context.Context) error {
 	http.Handle("/logout", webMiddleware(http.HandlerFunc(s.logoutHandler)))
 	http.Handle("/privacy-policy", webMiddleware(http.HandlerFunc(s.privacyPolicyHandler)))
 
+	// doc handlers
 	http.Handle("/doc/api/v1/", http.StripPrefix("/doc/api/v1/", http.FileServer(http.Dir(filepath.Join("doccontent", "api", "dst")))))
 	http.Handle("/doc/guide/", http.StripPrefix("/doc/guide/", http.FileServer(http.Dir(filepath.Join("doccontent", "guide", "dst")))))
 	if isDev() {
@@ -112,6 +115,7 @@ func run(ctx context.Context) error {
 		})
 	}
 
+	// API handlers
 	if isDev() {
 		http.HandleFunc("/api/v1/scrobbled", devScrobbledHandler)
 		http.HandleFunc("/api/v1/scrobbled/color", devScrobbledColorHandler)
@@ -125,6 +129,13 @@ func run(ctx context.Context) error {
 	http.HandleFunc("/api/v1/artwork", s.artworkHandler)
 	http.HandleFunc("/api/v1/artwork/missing", s.artworkMissingHandler)
 
+	// Data API handlers
+	// /api/v1/data/play-count/artists      ?sort=desc     ?limit=20
+	// /api/v1/data/play-count/songs        ?sort=desc     ?limit=<n>
+	// /api/v1/data/length/songs            ?sort=desc     ?limit=<n>
+	// /api/v1/data/release-date/artists    ?sort=desc     ?limit=20
+
+	// internal handlers
 	http.Handle("/internal/fillITunesFields", s.requireTasksSecretHeader(http.HandlerFunc(s.fillITunesFieldsHandler)))
 	http.Handle("/internal/markParentComplete", s.requireTasksSecretHeader(http.HandlerFunc(s.markParentCompleteHandler)))
 	http.Handle("/internal/deleteEntities", s.requireTasksSecretHeader(http.HandlerFunc(s.deleteEntitiesHandler)))

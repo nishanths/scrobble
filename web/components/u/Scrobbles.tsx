@@ -14,7 +14,7 @@ import { setLastColor, setLastScrobblesEndIdx, setLastScrobblesScrollY, setLastS
 import { fetchAllScrobbles, fetchLovedScrobbles, fetchColorScrobbles } from "../../redux/actions/scrobbles"
 import { Header, ColorPicker, Top } from "./top"
 import { SearchBox } from "../searchbox"
-import { createIndex, Doc, toIndexID, hasActiveSearch } from "./search"
+import { createIndex, Doc, indexID, hasActiveSearch } from "./search"
 
 // Divisble by 2, 3, and 4. This is appropriate because these are the number
 // of cards typically displayed per row. Using such a number ensures that
@@ -255,7 +255,7 @@ export const Scrobbles: React.FC<{
 
 				for (const s of scrobbles.items) {
 					const d: Doc = {
-						id: toIndexID(s.ident),
+						id: indexID(s.ident),
 						songIdent: s.ident,
 						title: s.title,
 						artist: s.artistName,
@@ -265,11 +265,7 @@ export const Scrobbles: React.FC<{
 					songIdents.set(s.ident, s)
 				}
 
-				const updated = copyMap(indexesByMode)
-				updated.set(mode, {
-					searchIndex,
-					songIdents,
-				})
+				const updated = copyMap(indexesByMode).set(mode, { searchIndex, songIdents })
 				setIndexesByMode(updated)
 			}
 		}, [mode, scrobbles])

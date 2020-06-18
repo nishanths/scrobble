@@ -38,7 +38,7 @@ export const createIndex = (): Index<Doc> => {
 	return FlexSearch.create(createOptions)
 }
 
-export const toIndexID = hashCode
+export const indexID = hashCode
 
 export const hasActiveSearch = (s: string): boolean => {
 	return s.trim().toLowerCase().length != 0
