@@ -95,7 +95,7 @@ type Song struct {
 	AlbumTitle  string        `datastore:",noindex" json:"albumTitle"`
 	ArtistName  string        `datastore:",noindex" json:"artistName"`
 	Title       string        `datastore:",noindex" json:"title"`
-	TotalTime   time.Duration `datastore:",noindex" json:"totalTime"`
+	TotalTime   time.Duration `json:"totalTime"`
 	Year        int           `json:"year"`
 	ReleaseDate int64         `datastore:",noindex" json:"releaseDate"` // unix seconds
 
