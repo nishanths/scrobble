@@ -89,7 +89,7 @@ export const Scrobbles: React.FC<{
 
 		const [searchValue, setSearchValue] = useState(last.search)
 		const [indexesByMode, indexesByModeRef, setIndexesByMode] = useStateRef<Map<Mode.All | Mode.Loved, IndexForMode>>(new Map())
-		const [filteredSongs, setFilteredSongs] = useState<Song[] | undefined>(undefined)
+		const [filteredSongs, filteredSongsRef, setFilteredSongs] = useStateRef<Song[] | null>(null)
 
 		const onControlChange = (newMode: Mode) => {
 			nProgress.done()
@@ -204,13 +204,18 @@ export const Scrobbles: React.FC<{
 				setScrollY(y)
 
 				const s = scrobblesRef.current
-				if (s === null) {
+				const f = filteredSongsRef.current
+
+				const items = hasActiveSearch(searchValue) ?
+					(f) :
+					(s && s.items)
+				if (items === null) {
 					return
 				}
 
 				const leeway = 250
 				if ((wnd.innerHeight + y) >= (wnd.document.body.offsetHeight - leeway)) {
-					const newEnd = nextEndIdx(endIdxRef.current, s.items.length)
+					const newEnd = nextEndIdx(endIdxRef.current, items.length)
 					const e = Math.max(newEnd, endIdxRef.current)
 					if (e > endIdxRef.current) {
 						setEndIdx(e)
@@ -220,7 +225,7 @@ export const Scrobbles: React.FC<{
 
 			wnd.addEventListener("scroll", f)
 			return () => { wnd.removeEventListener("scroll", f) }
-		}, [scrobbles, mode])
+		}, [scrobbles, mode, searchValue])
 
 		// search
 		useEffect(() => {
@@ -291,8 +296,7 @@ export const Scrobbles: React.FC<{
 		const onSearchValueChange = (v: string): void => {
 			setSearchValue(v)
 			dispatch(setLastSearch(v))
-			setFilteredSongs(undefined)
-			// debouncedSearch(v)
+			setFilteredSongs(null)
 		}
 
 		// ... render ...
@@ -366,7 +370,7 @@ export const Scrobbles: React.FC<{
 			case Mode.All:
 			case Mode.Loved: {
 				if (hasActiveSearch(searchValue)) {
-					if (filteredSongs === undefined) {
+					if (filteredSongs === null) {
 						// waiting for search results state
 						return <>
 							{top}
