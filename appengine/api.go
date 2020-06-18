@@ -720,6 +720,18 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
+	// Create task to compute stats.
+	// TODO
+	//
+	// at query time, if there the latest song parent is incomplete
+	// then "new stats are being computed"
+	//
+	// stats fetches from latest complete song parent,
+	// stats fetches from singleton datastore entities for artists, if not present then don't render artists
+	// if present, use it.
+	//
+	// at index time, update singleton datastore entities for artists.
+
 	if err := g.Wait(); err != nil {
 		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
