@@ -8,14 +8,25 @@ import (
 	"github.com/nishanths/scrobble/appengine/log"
 )
 
-type ArtistDatum struct {
-	ArtistName string      `json:"artistName"`
-	Value      interface{} `json:"value"` // int64 for last played timestamp, or int for play count
+type PlayCountArtistDatum struct {
+	ArtistName    string `json:"artistName"`
+	PlayCount     int    `json:"playCount"`
+	TotalPlayTime int    `json:"totalPlayTime"` // in seconds
 }
 
-type ArtistDataResponse struct {
-	Data  []ArtistDatum `json:"data"`
-	Total int           `json:"total"` // total artists
+type LastPlayedArtistDatum struct {
+	ArtistName string `json:"artistName"`
+	LastPlayed int    `json:"lastPlayed"`
+}
+
+type PlayCountArtistData struct {
+	Data         []PlayCountArtistDatum `json:"data"`
+	TotalArtists int                    `json:"totalArtists"` // total artists
+}
+
+type LastPlayedArtistData struct {
+	Data         []LastPlayedArtistDatum `json:"data"`
+	TotalArtists int                     `json:"totalArtists"` // total artists
 }
 
 func (s *server) playCountSongsHandler(w http.ResponseWriter, r *http.Request) {
