@@ -28,9 +28,9 @@ func statsLastPlayedArtistKey(namespace string) *datastore.Key {
 }
 
 type ArtistDatum struct {
-	ArtistName     string
-	PrimaryValue   interface{}
-	SecondaryValue interface{}
+	ArtistName     string      `datastore:",noindex"`
+	PrimaryValue   interface{} `datastore:",noindex"`
+	SecondaryValue interface{} `datastore:",noindex"`
 }
 
 // namespace: account
