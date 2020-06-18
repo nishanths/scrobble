@@ -1,7 +1,7 @@
 import FlexSearch, { CreateOptions, Index } from "flexsearch"
-import { hashCode } from "../../shared/util"
+import { hashCode, OmitStrict } from "../../shared/util"
 
-type DocFields = (keyof Omit<Doc, "id" | "songIdent">)[]
+type DocFields = (keyof OmitStrict<Doc, "id" | "songIdent">)[]
 
 export type Doc = {
 	id: number
