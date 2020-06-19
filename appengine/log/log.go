@@ -2,6 +2,7 @@ package log
 
 import (
 	"log"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -9,6 +10,11 @@ import (
 
 func init() {
 	log.SetFlags(log.LstdFlags)
+}
+
+func Fatalf(format string, args ...interface{}) {
+	printf("FATAL", format, args)
+	os.Exit(1)
 }
 
 func Criticalf(format string, args ...interface{}) {
@@ -27,10 +33,14 @@ func Infof(format string, args ...interface{}) {
 	printf("INFO", format, args)
 }
 
+func Debugf(format string, args ...interface{}) {
+	printf("DEBUG", format, args)
+}
+
 func printf(level string, format string, args []interface{}) {
 	_, file, line, ok := runtime.Caller(2)
 	if ok {
-		format = filepath.Base(file) + ":" + strconv.Itoa(line) + ": " + level + ": " + format
+		format = level + ": " + filepath.Base(file) + ":" + strconv.Itoa(line) + ": " + format
 	} else {
 		format = level + ": " + format
 	}

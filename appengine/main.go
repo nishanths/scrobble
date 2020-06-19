@@ -32,7 +32,7 @@ func main() {
 	ctx := context.Background()
 
 	if err := run(ctx); err != nil {
-		log.Errorf(err.Error())
+		log.Fatalf(err.Error())
 	}
 }
 
@@ -88,6 +88,8 @@ func run(ctx context.Context) error {
 	}
 
 	// Register handlers.
+
+	// web handlers
 	if isDev() {
 		http.HandleFunc("/", devRootHandler)
 		http.HandleFunc("/u/", devUHandler)
@@ -103,6 +105,7 @@ func run(ctx context.Context) error {
 	http.Handle("/logout", webMiddleware(http.HandlerFunc(s.logoutHandler)))
 	http.Handle("/privacy-policy", webMiddleware(http.HandlerFunc(s.privacyPolicyHandler)))
 
+	// doc handlers
 	http.Handle("/doc/api/v1/", http.StripPrefix("/doc/api/v1/", http.FileServer(http.Dir(filepath.Join("doccontent", "api", "dst")))))
 	http.Handle("/doc/guide/", http.StripPrefix("/doc/guide/", http.FileServer(http.Dir(filepath.Join("doccontent", "guide", "dst")))))
 	if isDev() {
@@ -112,6 +115,7 @@ func run(ctx context.Context) error {
 		})
 	}
 
+	// API handlers
 	if isDev() {
 		http.HandleFunc("/api/v1/scrobbled", devScrobbledHandler)
 		http.HandleFunc("/api/v1/scrobbled/color", devScrobbledColorHandler)
@@ -125,10 +129,18 @@ func run(ctx context.Context) error {
 	http.HandleFunc("/api/v1/artwork", s.artworkHandler)
 	http.HandleFunc("/api/v1/artwork/missing", s.artworkMissingHandler)
 
+	// data API handlers
+	http.HandleFunc("/api/v1/songs/play-count", s.songPlayCountHandler)
+	http.HandleFunc("/api/v1/songs/length", s.songLengthHandler)
+	http.HandleFunc("/api/v1/artists/play-count", s.artistPlayCountHandler)
+	http.HandleFunc("/api/v1/artists/added", s.artistAddedHandler)
+
+	// internal handlers
 	http.Handle("/internal/fillITunesFields", s.requireTasksSecretHeader(http.HandlerFunc(s.fillITunesFieldsHandler)))
 	http.Handle("/internal/markParentComplete", s.requireTasksSecretHeader(http.HandlerFunc(s.markParentCompleteHandler)))
 	http.Handle("/internal/deleteEntities", s.requireTasksSecretHeader(http.HandlerFunc(s.deleteEntitiesHandler)))
 	http.Handle("/internal/fillArtworkScore", s.requireTasksSecretHeader(http.HandlerFunc(s.fillArtworkScoreHandler)))
+	http.Handle("/internal/computeArtistStats", s.requireTasksSecretHeader(http.HandlerFunc(s.computeArtistStatsHandler)))
 
 	if isDev() {
 		// in production these are handled by app.yaml

@@ -12,7 +12,7 @@ import (
 
 const (
 	KindArtworkScore  = "ArtworkScore"  // namespace: [default]
-	KindArtworkRecord = "ArtworkRecord" // namespace: Account
+	KindArtworkRecord = "ArtworkRecord" // namespace: account
 )
 
 func ArtworkScoreKey(hash string) *datastore.Key {
@@ -43,7 +43,7 @@ type ArtworkScore struct {
 	White int
 }
 
-// Namespace: Account
+// Namespace: account
 // Key: artwork hash
 type ArtworkRecord struct {
 	Score     ArtworkScore

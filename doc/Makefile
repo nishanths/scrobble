@@ -6,8 +6,8 @@ default:
 clean:
 	rm -rf content/{api/dst,guide/dst}
 
-.PHONY: hammer
-hammer: clean go dist
+.PHONY: all
+all: clean go dist
 
 .PHONY: dist
 dist:

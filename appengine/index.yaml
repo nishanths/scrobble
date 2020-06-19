@@ -15,6 +15,25 @@ indexes:
   - name: LastPlayed
     direction: desc
 
+# graphs
+- kind: Song
+  ancestor: yes
+  properties:
+  - name: PlayCount
+    direction: desc
+
+- kind: Song
+  ancestor: yes
+  properties:
+  - name: TotalTime
+    direction: desc
+
+- kind: Song
+  ancestor: yes
+  properties:
+  - name: Added
+    direction: desc
+
 # GET scrobbled
 - kind: SongParent
   properties:
