@@ -6,7 +6,7 @@ import { Loupe, enableLoupe } from 'loupe-js'
 import 'loupe-js/dist/style.css'
 
 // TrackLink is the track link area of a Picture.
-const TrackLink: React.SFC<{ previewURL: string }> = ({ previewURL }) => {
+const TrackLink: React.SFC<{ trackURL: string }> = ({ trackURL }) => {
 	let trackLinkAreaElem: HTMLDivElement | null = null
 
 	useEffect(() => {
@@ -15,7 +15,7 @@ const TrackLink: React.SFC<{ previewURL: string }> = ({ previewURL }) => {
 		if (trackLinkAreaElem !== null) { trackLinkAreaElem.setAttribute("onclick", "") }
 	}, [])
 
-	return <a href={previewURL} title={previewURL} target="_blank" rel="noopener noreferrer">
+	return <a href={trackURL} title={trackURL} target="_blank" rel="noopener noreferrer">
 		<div className="trackLinkArea" ref={r => { trackLinkAreaElem = r }}>
 			<div className="trackLink"></div>
 		</div>
@@ -28,12 +28,12 @@ export const Picture: React.SFC<{
 	artworkBaseURL: string
 	albumCentric: boolean
 }> = ({ song, artworkBaseURL, albumCentric }) => {
-	const previewURL = computeTrackViewURL(song.trackViewURL, albumCentric)
+	const trackURL = computeTrackViewURL(song.trackViewURL, albumCentric)
 	const artworkURL = song.artworkHash ? artworkBaseURL + "/" + song.artworkHash : "";
 	const imgStyles = artworkURL ? { backgroundImage: `url(${artworkURL})` } : { backgroundColor: "#fff" }
 
 	return <div className="pict" style={imgStyles}>
-		{previewURL && <TrackLink previewURL={previewURL} />}
+		{trackURL && <TrackLink trackURL={trackURL} />}
 	</div>
 }
 
@@ -123,7 +123,7 @@ export const LargeMeta: React.SFC<{
 		const title = albumCentric ? s.albumTitle : s.title
 		const other = albumCentric ? `${s.artistName}` : `${s.artistName} – ${s.albumTitle}`
 		const playCount = `Played ${s.playCount.toLocaleString()} ${pluralize("time", s.playCount)}`
-		const previewURL = computeTrackViewURL(s.trackViewURL, albumCentric)
+		const trackURL = computeTrackViewURL(s.trackViewURL, albumCentric)
 
 		let lastPlayed = ""
 		if (s.lastPlayed) {
@@ -144,7 +144,7 @@ export const LargeMeta: React.SFC<{
 		// some songs in an album can be released before the entire album,
 		// so don't use the release date when albumCentric.
 		const includeReleaseDate = !albumCentric && releaseDate
-		const includePreviewURL = !!previewURL
+		const includeTrackURL = !!trackURL
 
 		const meta = <div className="meta">
 			<div className="title">
@@ -154,15 +154,15 @@ export const LargeMeta: React.SFC<{
 			<div className="other">
 				<span className="otherContent">{other}</span>
 			</div>
-			{(includeReleaseDate || includePlayMeta || includePreviewURL) && <div className="lastLine">
+			{(includeReleaseDate || includePlayMeta || includeTrackURL) && <div className="lastLine">
 				{includeReleaseDate && <div className="releaseDate">
 					Released {releaseDate}
 				</div>}
 				{includePlayMeta && <div className="playMeta">
 					{playCount}{lastPlayed && ", " + (s.playCount === 1 ? "" : "last ") + lastPlayed}
 				</div>}
-				{includePreviewURL && <div className="previewURL">
-					<a className="link" href={previewURL} title={previewURL} target="_blank" rel="noopener noreferrer">{"See in Apple Music ↗︎"}</a>
+				{includeTrackURL && <div className="trackURL">
+					<a className="link" href={trackURL} title={trackURL} target="_blank" rel="noopener noreferrer">{"See in Apple Music ↗︎"}</a>
 				</div>}
 			</div>}
 		</div>
