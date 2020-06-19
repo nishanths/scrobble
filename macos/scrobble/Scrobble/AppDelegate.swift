@@ -27,7 +27,6 @@ struct State {
     // last successful scrobble by this instance
     var lastScrobbled: Date?
     // latest "Last Played" time sent by this instance
-    // TODO: this is not surfaced to the user
     var latestPlayed: Date?
     // the accounts response from the server
     var account: API.Account?
@@ -35,7 +34,7 @@ struct State {
     var scrobbling: Bool
     // whether the latest request resulted in an error
     var error: ErrorKind?
-    
+
     // NOTE: when adding a new field, you may also need to handle its reset
     // behavior in clearAPIKey()
     // TODO: this is gross
@@ -54,23 +53,23 @@ func profileLink(_ username: String) -> String {
 class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlertDelegate {
     private static let menuIconName = "scrobble-menu-18x18" // size from https://stackoverflow.com/a/33708433
     private static let shortVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
-    
+
     // Keys for information saved to UserDefaults.
     private static let (keyAPIKey, keyRunning) = ("apiKey", "running")
-    
+
     // Scrobble timer frequnecies.
     // The timer fires frequently, but scrobbling happens less often.
     private static let timerFreq: TimeInterval = 60 * 10;
     private static let scrobbleFreq: TimeInterval = 24 * 60 * 60 * 1;
     private var timer: Timer? = nil
-    
+
     private let statusBarItem = NSStatusBar.system.statusItem(withLength:NSStatusItem.squareLength)
     private let pauseItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
     private let statusItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
     private let secondaryStatusItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
     private let multiItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
     private let profileLinkItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
-    
+
     private var prevState: State? = nil
     private var state = State(running: false,
                               apiKey: nil,
@@ -79,9 +78,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                               account: nil,
                               scrobbling: false,
                               error: nil)
-    
+
     private var lib: ITLibrary! = nil
-    
+
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         if let l = try? ITLibrary.init(apiVersion: "1.0") {
             lib = l
@@ -89,18 +88,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
             os_log("failed to initialize ITLibrary")
             return
         }
-        
+
         // make status bar item and menu
         let button = statusBarItem.button!
         button.image = NSImage(named:AppDelegate.menuIconName)
         button.image!.isTemplate = true
         statusBarItem.menu = makeMenu()
-        
+
         // restore persisted information
         state.running = UserDefaults.standard.bool(forKey: AppDelegate.keyRunning)
         state.apiKey = UserDefaults.standard.string(forKey: AppDelegate.keyAPIKey)
         render()
-        
+
         // initially fetch account info
         guard let key = state.apiKey else { return }
         let task = URLSession.shared.dataTask(with: API.accountRequest(key)) {(data, rsp, err) in
@@ -124,16 +123,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         }
         task.resume()
     }
-    
+
     func applicationWillTerminate(_ aNotification: Notification) {
     }
-    
+
     private func makeMenu() -> NSMenu {
         let m = NSMenu()
-        
+
         let v = NSMenuItem(title: String(format: "Scrobble version %@", AppDelegate.shortVersion), action: nil, keyEquivalent: "")
         v.isEnabled = false
-        
+
         m.addItem(pauseItem)
         m.addItem(NSMenuItem.separator())
         m.addItem(multiItem)
@@ -144,19 +143,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         m.addItem(NSMenuItem.separator())
         m.addItem(v)
         m.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: ""))
-        
+
         return m
     }
-    
+
     // TODO: there are several assignment to State's fields followed by
     // a render() call. Instead make it so that setting State's fields
     // automatically calls render().
     private func render() {
         defer { prevState = state }
-        
+
         profileLinkItem.title = "Browse your scrobbles"
         profileLinkItem.action = #selector(openProfile(_:))
-        
+
         // TODO: clean this up, gosh it's gnarly
         if state.apiKey == nil {
             assert(!state.running)
@@ -189,7 +188,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
             }
             pauseItem.isHidden = false
         }
-        
+
         // Status item
         if let err = state.error {
             switch err {
@@ -208,7 +207,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         } else {
             statusItem.isHidden = true
         }
-        
+
         // Secondary status item
         if state.error != nil || state.scrobbling {
             secondaryStatusItem.isHidden = true
@@ -218,7 +217,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         } else {
             secondaryStatusItem.isHidden = true
         }
-        
+
         // Timers
         let alreadyRunning = prevState?.running ?? false
         if alreadyRunning && !state.running {
@@ -229,17 +228,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
             RunLoop.current.add(timer!, forMode: RunLoop.Mode.common)
         }
     }
-    
+
     private func scrobble() {
         if state.scrobbling {
             // already scrobbling
             return
         }
-    
+
         state.scrobbling = true
         lib.reloadData()
         render()
-        
+
         var (items, latest) = scrobblableItems(from: lib.allMediaItems)
         let loved = lovedItems(in: lib)
         for idx in 0..<items.count {
@@ -249,7 +248,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         }
 
         guard let data = try? JSONEncoder().encode(items) else { return }
-        
+
         let task = URLSession.shared.dataTask(with: API.scrobbleRequest(state.apiKey!, data)) {(data, rsp, err) in
             defer {
                 DispatchQueue.main.async {
@@ -257,10 +256,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                     self.render()
                 }
             }
-            
+
             guard err == nil else { return }
             guard let r = rsp as! HTTPURLResponse? else { return }
-            
+
             if r.statusCode == 404 {
                 DispatchQueue.main.async {
                     self.state.error = .Auth
@@ -268,7 +267,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                 }
                 return
             }
-            
+
             if r.statusCode == 200 {
                 DispatchQueue.main.async {
                     self.state.lastScrobbled = Date(timeIntervalSinceNow: 0)
@@ -287,7 +286,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         }
         task.resume()
     }
-    
+
     private func handleArtwork(_ lib: ITLibrary) {
         guard let key = state.apiKey else { return }
         let task = URLSession.shared.dataTask(with: API.missingArtworkRequest(key)) {(data, rsp, err) in
@@ -300,16 +299,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
             if r.statusCode != 200 {
                 return
             }
-            
+
             guard let incomingHashes = try? JSONDecoder().decode([String: Bool].self, from: data!) else { return }
-            
+
             DispatchQueue.global(qos: .userInitiated).async {
                 var items = Dictionary<String, ITLibMediaItem>()
                 for p in lib.allMediaItems {
                     guard let hash = API.MediaItem(fromITLibMediaItem: p).artworkHash else { continue }
                     items[hash] = p
                 }
-                
+
                 // send artwork that the server is missing
                 for (h, _) in incomingHashes {
                     guard self.state.running else { return }
@@ -324,7 +323,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         }
         task.resume()
     }
-    
+
     private func clearAPIKey() {
         state.running = false
         state.apiKey = nil
@@ -337,20 +336,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         UserDefaults.standard.set(state.apiKey, forKey: AppDelegate.keyAPIKey)
         render()
     }
-    
+
     @objc private func pauseAction(_ sender: Any?) {
         state.running = false
         state.error = nil // clear error on hitting pause
         UserDefaults.standard.set(state.running, forKey: AppDelegate.keyRunning)
         render()
     }
-    
+
     @objc private func startAction(_ sender: Any?) {
         state.running = true
         UserDefaults.standard.set(state.running, forKey: AppDelegate.keyRunning)
         render()
     }
-    
+
     @objc private func timerFired(_ sender: Any?) {
         let leeway: TimeInterval = 60
         if state.lastScrobbled != nil && abs(state.lastScrobbled!.timeIntervalSinceNow) < AppDelegate.scrobbleFreq - leeway {
@@ -359,12 +358,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         }
         scrobble()
     }
-    
+
     @objc private func clearAPIKeyAction(_ sender: Any?) {
         assert(state.apiKey != nil)
         clearAPIKey()
     }
-    
+
     @objc private func scrobblingAsAction(_ sender: Any?) {
         assert(state.apiKey != nil && state.account != nil)
         let a = NSAlert()
@@ -376,7 +375,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         a.delegate = self
         a.addButton(withTitle: "Close")
         a.addButton(withTitle: "Remove API key and Sign out")
-        
+
         let result = a.runModal()
         switch result {
         case NSApplication.ModalResponse.alertFirstButtonReturn:
@@ -387,12 +386,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
             print("unhandled button", result)
         }
     }
-    
+
     private var alert: NSAlert! = nil
     private var textField: NSTextField! = nil
     private var oldOkButtonTarget: AnyObject? = nil
     private var oldOkButtonAction: Selector? = nil
-    
+
     @objc private func enterAPIKeyAction(_ sender: Any?) {
         alert = NSAlert()
         alert.alertStyle = .informational
@@ -400,14 +399,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         alert.showsSuppressionButton = false
         alert.showsHelp = true
         alert.delegate = self
-        
+
         let okButton = alert.addButton(withTitle: "OK")
         oldOkButtonTarget = okButton.target
         oldOkButtonAction = okButton.action
         okButton.target = self
         okButton.action = #selector(okButtonAction(_:))
         alert.addButton(withTitle: "Cancel")
-        
+
         textField = NSTextField(frame: NSMakeRect(0, 0, 250, NSFont.systemFontSize * 1.8))
         textField.usesSingleLineMode = true
         textField.cell?.wraps = false
@@ -418,29 +417,29 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
         alert.accessoryView = textField
         alert.window.initialFirstResponder = alert.accessoryView
         alert.window.makeKey()
-        
+
         alert.runModal()
     }
-    
+
     func alertShowHelp(_ alert: NSAlert) -> Bool {
         if let u = URL(string: Constants.HelpLink) {
             NSWorkspace.shared.open(u)
         }
         return true
     }
-    
+
     @objc private func openProfile(_ sender: Any?) {
         if let u = URL(string: profileLink(state.account!.username)) {
             NSWorkspace.shared.open(u)
         }
     }
-    
+
     @objc private func okButtonAction(_ sender: Any?) {
         let key = textField.stringValue
         if key.isEmpty {
             return
         }
-        
+
         let task = URLSession.shared.dataTask(with: API.accountRequest(key)) {(data, rsp, err) in
             if err == nil {
                 if let rr = rsp as! HTTPURLResponse? {
@@ -472,19 +471,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTextFieldDelegate, NSAlert
                     }
                 }
             }
-            
+
             DispatchQueue.main.async {
                 self.alert.informativeText = String(format: "Something went wrong. Try again?")
             }
         }
         task.resume()
     }
-    
+
     @objc private func clearThenEnterAPIKeyAction(_ sender: Any?) {
         clearAPIKey()
         enterAPIKeyAction(sender)
     }
-    
+
     // uppercase API key input
     func controlTextDidChange(_ obj: Notification) {
         if let text = obj.userInfo!["NSFieldEditor"] as? NSText {
@@ -541,7 +540,7 @@ func lovedItems(in lib: ITLibrary) -> Set<API.MediaItem> {
 func formatDate(_ t: Date) -> String {
     let y0 = Calendar.current.dateComponents(in: TimeZone.current, from: t).year
     let y1 = Calendar.current.dateComponents(in: TimeZone.current, from: Date(timeIntervalSinceNow: 0)).year
-    
+
     let f = DateFormatter()
     f.dateFormat = y0 != y1 ? "MMM d YYYY, h:mm a" : "MMM d, h:mm a"
     f.timeZone = TimeZone.current

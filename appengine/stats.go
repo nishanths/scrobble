@@ -82,20 +82,14 @@ func computeArtistPlayCount(songs []Song) ArtistPlayCountStats {
 	}
 }
 
-func computeAddedArtistStats(songs []Song) ArtistAddedStats {
+func computeArtistAdded(songs []Song) ArtistAddedStats {
 	m := make(map[string]ArtistAddedDatum)
 	for _, s := range songs {
 		if v, ok := m[s.ArtistName]; ok {
 			if s.Added < v.Added {
-				if s.ArtistName == "FAVELA" {
-					log.Debugf("%v %v existing:%v", s.ArtistName, s.Added, v.Added)
-				}
 				m[s.ArtistName] = ArtistAddedDatum{s.ArtistName, s.Added}
 			}
 		} else {
-			if s.ArtistName == "FAVELA" {
-				log.Debugf("%v %v", s.ArtistName, s.Added)
-			}
 			m[s.ArtistName] = ArtistAddedDatum{s.ArtistName, s.Added}
 		}
 	}
@@ -151,10 +145,10 @@ func (s *server) computeArtistStatsHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	pc := computeAddedArtistStats(songs)
+	pc := computeArtistPlayCount(songs)
 	pcKey := statsArtistPlayCountKey(t.Namespace)
 
-	a := computeAddedArtistStats(songs)
+	a := computeArtistAdded(songs)
 	aKey := statsArtistAddedKey(t.Namespace)
 
 	if _, err := s.ds.PutMulti(ctx, []*datastore.Key{pcKey, aKey}, []interface{}{&pc, &a}); err != nil {
