@@ -50,6 +50,7 @@ export const U: React.FC<UProps> = ({
 		/>
 	} else if (mode === Mode.Graphs) {
 		// TODO move to separate component
+		// TODO for SegmentedControl at small widths, use flex-flow: column and different styles with a breakpoint width at ~450px
 		const header = Header(profileUsername, !!logoutURL, true)
 		const segmentedControl = SegmentedControl(mode, (v) => {
 			const m = modeFromControlValue(v)
