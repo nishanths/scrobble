@@ -101,6 +101,7 @@ export const Scrobbles: React.FC<{
 			switch (newMode) {
 				case Mode.All:
 				case Mode.Loved:
+				case Mode.Graphs:
 					u = "/u/" + profileUsername + pathForMode(newMode)
 					break
 				case Mode.Color:
@@ -134,6 +135,9 @@ export const Scrobbles: React.FC<{
 				case Mode.Color:
 					kind = DetailKind.Album
 					break
+				case Mode.Graphs:
+					throw "unimplemented"
+					break
 				default:
 					assertExhaustive(mode)
 			}
@@ -147,6 +151,7 @@ export const Scrobbles: React.FC<{
 				case Mode.All: return s.allScrobbles
 				case Mode.Loved: return s.lovedScrobbles
 				case Mode.Color: return color !== undefined ? s.colorScrobbles.get(color)! : null
+				case Mode.Graphs: throw "unimplemented"
 			}
 			assertExhaustive(mode)
 		})
@@ -190,6 +195,9 @@ export const Scrobbles: React.FC<{
 						dispatch(fetchColorScrobbles(color, profileUsername))
 					}
 					break
+				}
+				case Mode.Graphs: {
+					throw "unimplemented"
 				}
 				default: {
 					assertExhaustive(mode)
@@ -427,6 +435,13 @@ export const Scrobbles: React.FC<{
 							onSongClick={onSongClick}
 						/>
 					</div>
+				</>
+			}
+
+			case Mode.Graphs: {
+				return <>
+					{top}
+					<div className="info">Graphs coming soon!</div>
 				</>
 			}
 

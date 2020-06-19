@@ -6,10 +6,10 @@ export enum DetailKind {
 }
 
 export enum Mode {
-	All, Loved, Color
+	All, Loved, Color, Graphs
 }
 
-export const controlValues = ["All", "Loved", "By color"] as const
+export const controlValues = ["All", "Loved", "By color", "Graphs"] as const
 
 export type ControlValue = typeof controlValues[number]
 
@@ -18,6 +18,7 @@ export const controlValueForMode = (m: Mode): ControlValue => {
 		case Mode.All: return "All"
 		case Mode.Loved: return "Loved"
 		case Mode.Color: return "By color"
+		case Mode.Graphs: return "Graphs"
 		default: assertExhaustive(m)
 	}
 }
@@ -27,6 +28,7 @@ export const modeFromControlValue = (v: ControlValue): Mode => {
 		case "All": return Mode.All
 		case "Loved": return Mode.Loved
 		case "By color": return Mode.Color
+		case "Graphs": return Mode.Graphs
 		default: assertExhaustive(v)
 	}
 }
@@ -36,6 +38,7 @@ export const pathForMode = (m: Mode): string => {
 		case Mode.All: return ""
 		case Mode.Loved: return "/loved"
 		case Mode.Color: return "/color"
+		case Mode.Graphs: return "/graphs"
 	}
 	assertExhaustive(m)
 }
