@@ -12,8 +12,8 @@ type PlayCountArtistsResponse struct {
 	Data []PlayCountArtistDatum `json:"data"`
 }
 
-type LastPlayedArtistsResponse struct {
-	Data []string `json:"data"`
+type AddedArtistsResponse struct {
+	Data []AddedArtistDatum `json:"data"`
 }
 
 func (s *server) playCountSongsHandler(w http.ResponseWriter, r *http.Request) {
@@ -105,4 +105,4 @@ func (s *server) dataSongsHandler(fieldName string) http.Handler {
 
 func (s *server) playCountArtistsHandler(w http.ResponseWriter, r *http.Request) {}
 
-func (s *server) lastPlayedArtistsHandler(w http.ResponseWriter, r *http.Request) {}
+func (s *server) addedArtistsHandler(w http.ResponseWriter, r *http.Request) {}

@@ -28,6 +28,12 @@ indexes:
   - name: TotalTime
     direction: desc
 
+- kind: Song
+  ancestor: yes
+  properties:
+  - name: Added
+    direction: desc
+
 # GET scrobbled
 - kind: SongParent
   properties:

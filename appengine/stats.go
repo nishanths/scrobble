@@ -23,10 +23,10 @@ func statsPlayCountArtistKey(namespace string) *datastore.Key {
 	}
 }
 
-func statsLastPlayedArtistKey(namespace string) *datastore.Key {
+func statsAddedArtistKey(namespace string) *datastore.Key {
 	return &datastore.Key{
 		Kind:      KindStats,
-		Name:      "lastPlayed-artist",
+		Name:      "added-artist",
 		Namespace: namespace,
 	}
 }
@@ -42,8 +42,13 @@ type PlayCountArtistDatum struct {
 	TotalPlayTime int    `datastore:",noindex" json:"totalPlayTime"` // in seconds
 }
 
-type LastPlayedArtistStats struct {
-	Data []string `datastore:",noindex"`
+type AddedArtistStats struct {
+	Data []AddedArtistDatum `datastore:",noindex"`
+}
+
+type AddedArtistDatum struct {
+	ArtistName string `datastore:",noindex" json:"artistName"`
+	Added      int64  `datastore:",noindex" json:"added"`
 }
 
 const maxArtistStatsLen = 20
@@ -89,15 +94,18 @@ func computePlayCountArtistStats(songs []Song) PlayCountArtistStats {
 	}
 }
 
-// songs must be sorted by last played times desc.
-func computeLastPlayedArtistsStats(songs []Song) LastPlayedArtistStats {
+// songs must be sorted by added times desc.
+func computeAddedArtistsStats(songs []Song) AddedArtistStats {
 	m := make(map[string]struct{})
-	var artists []string
+	var data []AddedArtistDatum
 
 	for _, s := range songs {
 		if _, ok := m[s.ArtistName]; !ok {
 			// first time
-			artists = append(artists, s.ArtistName)
+			data = append(data, AddedArtistDatum{
+				ArtistName: s.ArtistName,
+				Added:      s.Added,
+			})
 			m[s.ArtistName] = struct{}{}
 		}
 		if len(m) == maxArtistStatsLen {
@@ -105,8 +113,8 @@ func computeLastPlayedArtistsStats(songs []Song) LastPlayedArtistStats {
 		}
 	}
 
-	return LastPlayedArtistStats{
-		Data: artists,
+	return AddedArtistStats{
+		Data: data,
 	}
 }
 
@@ -133,7 +141,7 @@ func (s *server) computeArtistStatsHandler(w http.ResponseWriter, r *http.Reques
 	parentKey := songParentKey(t.Namespace, t.SongParentIdent)
 	q := datastore.NewQuery(KindSong).
 		Namespace(t.Namespace).
-		Order("-LastPlayed").
+		Order("-Added").
 		Ancestor(parentKey)
 
 	var songs []Song
@@ -146,10 +154,10 @@ func (s *server) computeArtistStatsHandler(w http.ResponseWriter, r *http.Reques
 	pc := computePlayCountArtistStats(songs)
 	pcKey := statsPlayCountArtistKey(t.Namespace)
 
-	lp := computeLastPlayedArtistsStats(songs)
-	lpKey := statsLastPlayedArtistKey(t.Namespace)
+	a := computeAddedArtistsStats(songs)
+	aKey := statsAddedArtistKey(t.Namespace)
 
-	if _, err := s.ds.PutMulti(ctx, []*datastore.Key{pcKey, lpKey}, []interface{}{pc, lp}); err != nil {
+	if _, err := s.ds.PutMulti(ctx, []*datastore.Key{pcKey, aKey}, []interface{}{&pc, &a}); err != nil {
 		log.Errorf("failed to put artist stats: %v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return

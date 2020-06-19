@@ -108,6 +108,8 @@ type Song struct {
 	LastPlayed int64 `json:"lastPlayed"` // unix seconds
 	PlayCount  int   `json:"playCount"`
 
+	Added int64 `json:"added"`
+
 	ArtworkHash string `datastore:",noindex" json:"artworkHash"`
 
 	// The following two fields may be empty in responses to clients, if the
@@ -540,6 +542,7 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 			SortTitle:      st,
 			LastPlayed:     int64(m.LastPlayed),
 			PlayCount:      int(m.PlayCount),
+			Added:          int64(m.Added),
 			ArtworkHash:    m.ArtworkHash,
 			Loved:          m.Loved,
 		}

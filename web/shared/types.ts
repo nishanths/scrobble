@@ -35,6 +35,7 @@ export interface Song {
 	releaseDate: number
 	lastPlayed: number
 	playCount: number
+	added: number
 	artworkHash: ArtworkHash
 	trackViewURL: string
 	loved: boolean
