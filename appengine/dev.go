@@ -28,7 +28,7 @@ func devRootHandler(w http.ResponseWriter, r *http.Request) {
 
 	if loggedIn {
 		var loggedInArgs = RootArgs{
-			Title: "Dev Scrobble · Dashboard",
+			Title: "Dashboard · Dev Scrobble",
 			Bootstrap: BootstrapArgs{
 				Host:             r.Host,
 				Email:            "localdev@gmail.com",
@@ -44,7 +44,7 @@ func devRootHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		var loggedOutArgs = RootArgs{
-			Title: "Dev Scrobble · Apple Music scrobbling",
+			Title: "Apple Music scrobbling — Dev Scrobble",
 			Bootstrap: BootstrapArgs{
 				Host:     r.Host,
 				LoginURL: "/fakeloginurl",

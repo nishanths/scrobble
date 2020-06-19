@@ -76,7 +76,7 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 
 		login := loginURLWithRedirect(dest)
 		args := RootArgs{
-			Title: "Scrobble · Apple Music scrobbling",
+			Title: "Apple Music scrobbling — Scrobble",
 			Bootstrap: BootstrapArgs{
 				Host:     host,
 				LoginURL: login,
@@ -102,7 +102,7 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	args := RootArgs{
-		Title: "Scrobble · Dashboard",
+		Title: "Dashboard · Scrobble",
 		Bootstrap: BootstrapArgs{
 			Host:             host,
 			Email:            u.Email,
@@ -502,11 +502,4 @@ func (s *server) privacyPolicyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	io.WriteString(w, privacyPolicy)
-}
-
-func (s *server) helpGuideHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-		return
-	}
 }

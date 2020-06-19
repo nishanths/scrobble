@@ -15,7 +15,7 @@ dist:
 		-template=cmd/page.template.html \
 		-src=content/api/src \
 		-dst=content/api/dst \
-		-indexTitle="Scrobble · API" \
+		-indexTitle="API · Scrobble" \
 		-titlePrefix="/api/v1/" \
 		-linkPrefix="/doc/api/v1" \
 		-bodyClass="api"
@@ -24,7 +24,7 @@ dist:
 		-template=cmd/page.template.html \
 		-src=content/guide/src \
 		-dst=content/guide/dst \
-		-indexTitle="Scrobble · Guide"
+		-indexTitle="Guide · Scrobble"
 
 .PHONY: go
 go:
