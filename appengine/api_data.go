@@ -8,23 +8,23 @@ import (
 	"github.com/nishanths/scrobble/appengine/log"
 )
 
-type PlayCountArtistsResponse struct {
-	Data []PlayCountArtistDatum `json:"data"`
+type ArtistPlayCountResponse struct {
+	Data []ArtistPlayCountDatum `json:"data"`
 }
 
-type AddedArtistsResponse struct {
-	Data []AddedArtistDatum `json:"data"`
+type ArtistAddedResponse struct {
+	Data []ArtistAddedDatum `json:"data"`
 }
 
-func (s *server) playCountSongsHandler(w http.ResponseWriter, r *http.Request) {
-	s.dataSongsHandler("-PlayCount").ServeHTTP(w, r)
+func (s *server) songPlayCountHandler(w http.ResponseWriter, r *http.Request) {
+	s.songDataHandler("-PlayCount").ServeHTTP(w, r)
 }
 
-func (s *server) lengthSongsHandler(w http.ResponseWriter, r *http.Request) {
-	s.dataSongsHandler("-TotalTime").ServeHTTP(w, r)
+func (s *server) songLengthHandler(w http.ResponseWriter, r *http.Request) {
+	s.songDataHandler("-TotalTime").ServeHTTP(w, r)
 }
 
-func (s *server) dataSongsHandler(fieldName string) http.Handler {
+func (s *server) songDataHandler(fieldName string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		writeSuccessRsp := func(s []SongResponse) {
 			w.Header().Set("Content-Type", "application/json")
@@ -103,6 +103,6 @@ func (s *server) dataSongsHandler(fieldName string) http.Handler {
 	})
 }
 
-func (s *server) playCountArtistsHandler(w http.ResponseWriter, r *http.Request) {}
+func (s *server) artistPlayCountHandler(w http.ResponseWriter, r *http.Request) {}
 
-func (s *server) addedArtistsHandler(w http.ResponseWriter, r *http.Request) {}
+func (s *server) artistAddedHandler(w http.ResponseWriter, r *http.Request) {}

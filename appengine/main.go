@@ -130,15 +130,10 @@ func run(ctx context.Context) error {
 	http.HandleFunc("/api/v1/artwork/missing", s.artworkMissingHandler)
 
 	// data API handlers
-	http.HandleFunc("/api/v1/play-count/songs", s.playCountSongsHandler)
-	http.HandleFunc("/api/v1/length/songs", s.lengthSongsHandler)
-	// http.HandleFunc("/api/v1/play-count/artists", s.playCountArtistsHandler)
-	// http.HandleFunc("/api/v1/added/artists", s.addedArtistsHandler)
-
-	// /api/v1/data/play-count/artists      ?sort=desc     ?limit=20
-	// /api/v1/data/play-count/songs        ?sort=desc     ?limit=<n>
-	// /api/v1/data/length/songs            ?sort=desc     ?limit=<n>
-	// /api/v1/data/added/artists           ?sort=desc     ?limit=20
+	http.HandleFunc("/api/v1/songs/play-count", s.songPlayCountHandler)
+	http.HandleFunc("/api/v1/songs/length", s.songLengthHandler)
+	http.HandleFunc("/api/v1/artists/play-count", s.artistPlayCountHandler)
+	http.HandleFunc("/api/v1/artists/added", s.artistAddedHandler)
 
 	// internal handlers
 	http.Handle("/internal/fillITunesFields", s.requireTasksSecretHeader(http.HandlerFunc(s.fillITunesFieldsHandler)))

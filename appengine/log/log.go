@@ -33,6 +33,10 @@ func Infof(format string, args ...interface{}) {
 	printf("INFO", format, args)
 }
 
+func Debugf(format string, args ...interface{}) {
+	printf("DEBUG", format, args)
+}
+
 func printf(level string, format string, args []interface{}) {
 	_, file, line, ok := runtime.Caller(2)
 	if ok {
