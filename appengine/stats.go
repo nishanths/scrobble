@@ -29,8 +29,7 @@ func statsLastPlayedArtistKey(namespace string) *datastore.Key {
 
 // namespace: account
 type ArtistStats struct {
-	Data         []ArtistDatum `datastore:",noindex"`
-	TotalArtists int           `datastore:",noindex"`
+	Data []ArtistDatum `datastore:",noindex"`
 }
 
 type ArtistDatum struct {
@@ -78,7 +77,27 @@ func computePlayCountArtistStats(songs []Song) ArtistStats {
 	}
 
 	return ArtistStats{
-		Data:         artistData,
-		TotalArtists: len(m),
+		Data: artistData,
+	}
+}
+
+// songs must be sorted by last played times desc.
+func computeLastPlayedArtistsStats(songs []Song) ArtistStats {
+	m := make(map[string]struct{})
+	var data []ArtistDatum
+
+	for _, s := range songs {
+		if _, ok := m[s.ArtistName]; !ok {
+			// first time
+			data = append(data, ArtistDatum{ArtistName: s.ArtistName})
+			m[s.ArtistName] = struct{}{}
+		}
+		if len(m) == maxArtistStatsLen {
+			break
+		}
+	}
+
+	return ArtistStats{
+		Data: data,
 	}
 }

@@ -14,19 +14,12 @@ type PlayCountArtistDatum struct {
 	TotalPlayTime int    `json:"totalPlayTime"` // in seconds
 }
 
-type LastPlayedArtistDatum struct {
-	ArtistName string `json:"artistName"`
-	LastPlayed int    `json:"lastPlayed"`
-}
-
 type PlayCountArtistData struct {
-	Data         []PlayCountArtistDatum `json:"data"`
-	TotalArtists int                    `json:"totalArtists"` // total artists
+	Data []PlayCountArtistDatum `json:"data"`
 }
 
 type LastPlayedArtistData struct {
-	Data         []LastPlayedArtistDatum `json:"data"`
-	TotalArtists int                     `json:"totalArtists"` // total artists
+	Data []string `json:"data"`
 }
 
 func (s *server) playCountSongsHandler(w http.ResponseWriter, r *http.Request) {
