@@ -109,7 +109,10 @@ func (svr *server) fillITunesFields(ctx context.Context, namespace string, songP
 		// Fetch data from iTunes API
 		tctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 		defer cancel()
-		searchTerm := strings.Join([]string{s.Title, s.ArtistName}, " ") // including the album name produces poorer results
+		searchTerm := strings.Join([]string{
+			iTunesSearchTermReplacer.Replace(s.Title),
+			iTunesSearchTermReplacer.Replace(s.ArtistName),
+		}, " ") // including the album name produces poorer results
 		tracks, retry, err := iTunesSearchSong(tctx, svr.httpClient, searchTerm)
 		if err != nil {
 			log.Errorf("failed to search iTunes for %q: %s (retry=%v)", searchTerm, err, retry)
@@ -240,3 +243,5 @@ func iTunesSearchSong(ctx context.Context, httpClient *http.Client, searchTerm s
 	}
 	return ret, false, nil
 }
+
+var iTunesSearchTermReplacer = strings.NewReplacer("(", "", ")", "")

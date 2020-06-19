@@ -145,7 +145,7 @@ func (s *server) computeArtistStatsHandler(w http.ResponseWriter, r *http.Reques
 	lp := computeLastPlayedArtistsStats(songs)
 	lpKey := statsLastPlayedArtistKey(t.Namespace)
 
-	if _, err := s.ds.PutMulti(ctx, []*datastore.Key{pcKey, lpKey}, []interface{}{pc, lp}); err != nil {
+	if _, err := s.ds.PutMulti(ctx, []*datastore.Key{pcKey, lpKey}, []ArtistStats{pc, lp}); err != nil {
 		log.Errorf("failed to put artist stats: %v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
