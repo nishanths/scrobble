@@ -1,7 +1,7 @@
 import React from "react"
 import { RouteComponentProps } from "react-router-dom";
 import { UArgs, NProgress } from "../../shared/types"
-import { Mode, DetailKind, modeFromControlValue, fullPath } from "./shared"
+import { Mode, DetailKind } from "./shared"
 import { Scrobbles } from "./Scrobbles"
 import { Graphs } from "./Graphs"
 import { Detail } from "./Detail"

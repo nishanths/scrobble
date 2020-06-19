@@ -29,6 +29,6 @@ export const Graphs: React.FC<GraphsProps> = ({
 
 	return <>
 		{top}
-		<div className="info">Graphs coming soon!</div>
+		<div className="info">Graphs are coming soon!</div>
 	</>
 }

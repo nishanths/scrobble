@@ -66,8 +66,8 @@ export const fullPath = (
 	mode: Mode,
 	color: Color | undefined,
 	detail: {
-		kind: DetailKind,
-		songIdent: string,
+		kind: DetailKind
+		songIdent: string
 	} | undefined,
 ): string => {
 	let u: string;
