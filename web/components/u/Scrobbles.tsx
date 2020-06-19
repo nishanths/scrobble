@@ -40,7 +40,7 @@ type IndexForMode = {
 	searchIndex: Index<Doc>       // actual search index
 }
 
-type ScrobbleMode = Exclude<Mode, Mode.Graphs>
+type ScrobblesMode = Exclude<Mode, Mode.Graphs>
 
 export const Scrobbles: React.FC<{
 	profileUsername: string
@@ -48,7 +48,7 @@ export const Scrobbles: React.FC<{
 	artworkBaseURL: string
 	private: boolean
 	self: boolean
-	mode: ScrobbleMode
+	mode: ScrobblesMode
 	color: Color | undefined
 	nProgress: NProgress
 	history: History
