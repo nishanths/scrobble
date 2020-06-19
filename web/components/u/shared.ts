@@ -1,4 +1,4 @@
-import { assertExhaustive } from "../../shared/util"
+import { assertExhaustive, hexEncode } from "../../shared/util"
 import { Color } from "../colorpicker"
 
 export enum DetailKind {
@@ -59,4 +59,32 @@ export const pathForDetailKind = (k: DetailKind): string => {
 		default:
 			assertExhaustive(k)
 	}
+}
+
+export const fullPath = (
+	profileUsername: string,
+	mode: Mode,
+	color: Color | undefined,
+	detail: {
+		kind: DetailKind,
+		songIdent: string,
+	} | undefined,
+): string => {
+	let u: string;
+	switch (mode) {
+		case Mode.All:
+		case Mode.Loved:
+		case Mode.Graphs:
+			u = "/u/" + profileUsername + pathForMode(mode)
+			break
+		case Mode.Color:
+			u = "/u/" + profileUsername + pathForMode(mode) + pathForColor(color)
+			break
+		default:
+			assertExhaustive(mode)
+	}
+	if (detail !== undefined) {
+		u += pathForDetailKind(detail.kind) + "/" + hexEncode(detail.songIdent)
+	}
+	return u
 }

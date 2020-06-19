@@ -1,9 +1,10 @@
 import React from "react"
 import { RouteComponentProps } from "react-router-dom";
 import { UArgs, NProgress } from "../../shared/types"
-import { Mode, DetailKind } from "./shared"
+import { Mode, DetailKind, modeFromControlValue, fullPath } from "./shared"
 import { Scrobbles } from "./Scrobbles"
 import { Detail } from "./Detail"
+import { Header, SegmentedControl, Top } from "./top"
 import { hexDecode } from "../../shared/util"
 import { Color } from "../colorpicker"
 import "../../scss/u/u.scss"
@@ -34,20 +35,7 @@ export const U: React.FC<UProps> = ({
 	history,
 	nProgress,
 }) => {
-	if (detail === undefined) {
-		return <Scrobbles
-			profileUsername={profileUsername}
-			signedIn={!!logoutURL}
-			artworkBaseURL={artworkBaseURL}
-			private={priv}
-			self={self}
-			mode={mode}
-			color={color}
-			nProgress={nProgress}
-			history={history}
-			wnd={wnd}
-		/>
-	} else {
+	if (detail !== undefined) {
 		return <Detail
 			profileUsername={profileUsername}
 			artworkBaseURL={artworkBaseURL}
@@ -59,6 +47,32 @@ export const U: React.FC<UProps> = ({
 			mode={mode}
 			color={color}
 			history={history}
+		/>
+	} else if (mode === Mode.Graphs) {
+		// TODO move to separate component
+		const header = Header(profileUsername, !!logoutURL, true)
+		const segmentedControl = SegmentedControl(mode, (v) => {
+			const m = modeFromControlValue(v)
+			history.push(fullPath(profileUsername, m, undefined, undefined)) // TODO: use last.color
+		})
+		const top = Top(header, segmentedControl, null, Mode.Graphs)
+
+		return <>
+			{top}
+			<div className="info">Graphs coming soon!</div>
+		</>
+	} else {
+		return <Scrobbles
+			profileUsername={profileUsername}
+			signedIn={!!logoutURL}
+			artworkBaseURL={artworkBaseURL}
+			private={priv}
+			self={self}
+			mode={mode}
+			color={color}
+			nProgress={nProgress}
+			history={history}
+			wnd={wnd}
 		/>
 	}
 }
