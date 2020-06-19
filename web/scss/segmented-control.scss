@@ -1,26 +1,30 @@
 @import "vars.scss";
 @import "mixins.scss";
 
-$segmented-control-elem-w: 93px;
-
 .SegmentedControl {
-  $border-radius: 15px;
-  $height: 26px;
+  $segmented-control-elem-w-small: 200px;
+  $segmented-control-elem-w-large: 93px;
+
+  $border-radius-small: 5px;
+  $border-radius-large: 4px;
+
+  $height-small: 32px;
+  $height-large: 26px;
 
   display: inline-flex;
-  border-radius: $border-radius;
-  height: 23px;
   align-items: center;
   width: auto;
+  flex-flow: column;
 
   .c {
     @include no-select();
 
-    width: $segmented-control-elem-w;
+    width: $segmented-control-elem-w-small;
     text-align: center;
     text-transform: uppercase;
-    font-size: 11px;
-    height: $height;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    height: $height-small;
     display: flex;
     justify-content: center;
     align-content: center;
@@ -29,7 +33,7 @@ $segmented-control-elem-w: 93px;
     font-weight: 600;
     cursor: pointer;
     border: 1px solid #ccc;
-    border-right: 0;
+    border-bottom: 0;
 
     &.selected {
       background: $love-color;
@@ -40,11 +44,32 @@ $segmented-control-elem-w: 93px;
   }
 
   .c:first-child {
-    border-radius: $border-radius 0px 0 $border-radius;
+    border-radius: $border-radius-small $border-radius-small 0 0;
   }
 
   .c:last-child {
-    border-radius: 0 $border-radius $border-radius 0;
-    border-right: 1px solid #ccc;
+    border-radius: 0 0 $border-radius-small $border-radius-small;
+    border-bottom: 1px solid #ccc;
+  }
+
+  @media screen and (min-width: 400px) {
+    flex-flow: nowrap;
+
+    .c {
+      font-size: 11px;
+      width: $segmented-control-elem-w-large;
+      border: 1px solid #ccc;
+      border-right: 0;
+      height: $height-large;
+    }
+
+    .c:first-child {
+      border-radius: $border-radius-large 0 0 $border-radius-large;
+    }
+
+    .c:last-child {
+      border-radius: 0 $border-radius-large $border-radius-large 0;
+      border-right: 1px solid #ccc;
+    }
   }
 }
