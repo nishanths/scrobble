@@ -132,6 +132,9 @@ func run(ctx context.Context) error {
 	// data API handlers
 	http.HandleFunc("/api/v1/play-count/songs", s.playCountSongsHandler)
 	http.HandleFunc("/api/v1/length/songs", s.lengthSongsHandler)
+	// http.HandleFunc("/api/v1/play-count/artists", s.playCountArtistsHandler)
+	// http.HandleFunc("/api/v1/last-played/artists", s.lastPlayedArtistsHandler)
+
 	// /api/v1/data/play-count/artists      ?sort=desc     ?limit=20
 	// /api/v1/data/play-count/songs        ?sort=desc     ?limit=<n>
 	// /api/v1/data/length/songs            ?sort=desc     ?limit=<n>

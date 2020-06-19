@@ -32,19 +32,23 @@ func statsLastPlayedArtistKey(namespace string) *datastore.Key {
 }
 
 // namespace: account
-type ArtistStats struct {
-	Data []ArtistDatum `datastore:",noindex"`
+type PlayCountArtistStats struct {
+	Data []PlayCountArtistDatum `datastore:",noindex"`
 }
 
-type ArtistDatum struct {
-	ArtistName     string      `datastore:",noindex"`
-	PrimaryValue   interface{} `datastore:",noindex"`
-	SecondaryValue interface{} `datastore:",noindex"`
+type PlayCountArtistDatum struct {
+	ArtistName    string `datastore:",noindex" json:"artistName"`
+	PlayCount     int    `datastore:",noindex" json:"playCount"`
+	TotalPlayTime int    `datastore:",noindex" json:"totalPlayTime"` // in seconds
+}
+
+type LastPlayedArtistStats struct {
+	Data []string `datastore:",noindex"`
 }
 
 const maxArtistStatsLen = 20
 
-func computePlayCountArtistStats(songs []Song) ArtistStats {
+func computePlayCountArtistStats(songs []Song) PlayCountArtistStats {
 	type value struct {
 		artistName    string
 		playCount     int
@@ -70,30 +74,30 @@ func computePlayCountArtistStats(songs []Song) ArtistStats {
 		return slice[i].playCount > slice[j].playCount
 	})
 
-	var artistData []ArtistDatum
+	var artistData []PlayCountArtistDatum
 	for i := 0; i < len(slice) && len(artistData) < maxArtistStatsLen; i++ {
 		v := slice[i]
-		artistData = append(artistData, ArtistDatum{
-			ArtistName:     v.artistName,
-			PrimaryValue:   v.playCount,
-			SecondaryValue: v.totalPlayTime,
+		artistData = append(artistData, PlayCountArtistDatum{
+			ArtistName:    v.artistName,
+			PlayCount:     v.playCount,
+			TotalPlayTime: v.totalPlayTime,
 		})
 	}
 
-	return ArtistStats{
+	return PlayCountArtistStats{
 		Data: artistData,
 	}
 }
 
 // songs must be sorted by last played times desc.
-func computeLastPlayedArtistsStats(songs []Song) ArtistStats {
+func computeLastPlayedArtistsStats(songs []Song) LastPlayedArtistStats {
 	m := make(map[string]struct{})
-	var data []ArtistDatum
+	var artists []string
 
 	for _, s := range songs {
 		if _, ok := m[s.ArtistName]; !ok {
 			// first time
-			data = append(data, ArtistDatum{ArtistName: s.ArtistName})
+			artists = append(artists, s.ArtistName)
 			m[s.ArtistName] = struct{}{}
 		}
 		if len(m) == maxArtistStatsLen {
@@ -101,8 +105,8 @@ func computeLastPlayedArtistsStats(songs []Song) ArtistStats {
 		}
 	}
 
-	return ArtistStats{
-		Data: data,
+	return LastPlayedArtistStats{
+		Data: artists,
 	}
 }
 
@@ -145,7 +149,7 @@ func (s *server) computeArtistStatsHandler(w http.ResponseWriter, r *http.Reques
 	lp := computeLastPlayedArtistsStats(songs)
 	lpKey := statsLastPlayedArtistKey(t.Namespace)
 
-	if _, err := s.ds.PutMulti(ctx, []*datastore.Key{pcKey, lpKey}, []ArtistStats{pc, lp}); err != nil {
+	if _, err := s.ds.PutMulti(ctx, []*datastore.Key{pcKey, lpKey}, []interface{}{pc, lp}); err != nil {
 		log.Errorf("failed to put artist stats: %v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return

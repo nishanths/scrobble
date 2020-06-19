@@ -8,17 +8,11 @@ import (
 	"github.com/nishanths/scrobble/appengine/log"
 )
 
-type PlayCountArtistDatum struct {
-	ArtistName    string `json:"artistName"`
-	PlayCount     int    `json:"playCount"`
-	TotalPlayTime int    `json:"totalPlayTime"` // in seconds
-}
-
-type PlayCountArtistData struct {
+type PlayCountArtistsResponse struct {
 	Data []PlayCountArtistDatum `json:"data"`
 }
 
-type LastPlayedArtistData struct {
+type LastPlayedArtistsResponse struct {
 	Data []string `json:"data"`
 }
 
@@ -108,3 +102,7 @@ func (s *server) dataSongsHandler(fieldName string) http.Handler {
 		writeSuccessRsp(songs)
 	})
 }
+
+func (s *server) playCountArtistsHandler(w http.ResponseWriter, r *http.Request) {}
+
+func (s *server) lastPlayedArtistsHandler(w http.ResponseWriter, r *http.Request) {}
