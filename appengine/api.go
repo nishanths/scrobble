@@ -704,6 +704,21 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
+	// Create task to compute stats.
+	g.Go(func() error {
+		createReq, err := jsonPostTask("/internal/computeArtistStats", computeArtistStatsTask{
+			Namespace:       namespace,
+			SongParentIdent: newParentIdent,
+		}, svr.secret.TasksSecret)
+		if err != nil {
+			return errors.Wrapf(err, "failed to build task")
+		}
+		if _, err := svr.tasks.CreateTask(ctx, createReq); err != nil {
+			return errors.Wrapf(err, "failed to add computeArtistStats task for %s,%s", namespaceID(accID), newParentIdent)
+		}
+		return nil
+	})
+
 	// Create tasks to fill in iTunes-related fields.
 	for _, s := range songs {
 		songIdent := s.Ident()
@@ -722,21 +737,6 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 			return nil
 		})
 	}
-
-	// Create task to compute stats.
-	g.Go(func() error {
-		createReq, err := jsonPostTask("/internal/computeArtistStats", computeArtistStatsTask{
-			Namespace:       namespace,
-			SongParentIdent: newParentIdent,
-		}, svr.secret.TasksSecret)
-		if err != nil {
-			return errors.Wrapf(err, "failed to build task")
-		}
-		if _, err := svr.tasks.CreateTask(ctx, createReq); err != nil {
-			return errors.Wrapf(err, "failed to add computeArtistStats task for %s,%s", namespaceID(accID), newParentIdent)
-		}
-		return nil
-	})
 
 	if err := g.Wait(); err != nil {
 		log.Errorf("%v", err.Error())
