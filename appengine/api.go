@@ -695,7 +695,7 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 				return errors.Wrapf(err, "failed to build task")
 			}
 			if _, err := svr.tasks.CreateTask(ctx, createReq); err != nil {
-				return errors.Wrapf(err, "failed to add fillArtworkScore tasks for %s,%s", namespaceID(accID), k)
+				return errors.Wrapf(err, "failed to add fillArtworkScore task for %s,%s", namespaceID(accID), k)
 			}
 			return nil
 		})
@@ -714,23 +714,26 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 				return errors.Wrapf(err, "failed to build task")
 			}
 			if _, err := svr.tasks.CreateTask(ctx, createReq); err != nil {
-				return errors.Wrapf(err, "failed to add fillITunesFields tasks for %s,%s,%s", namespaceID(accID), newParentIdent, songIdent)
+				return errors.Wrapf(err, "failed to add fillITunesFields task for %s,%s,%s", namespaceID(accID), newParentIdent, songIdent)
 			}
 			return nil
 		})
 	}
 
 	// Create task to compute stats.
-	// TODO
-	//
-	// at query time, if there the latest song parent is incomplete
-	// then "new stats are being computed"
-	//
-	// stats fetches from latest complete song parent,
-	// stats fetches from singleton datastore entities for artists, if not present then don't render artists
-	// if present, use it.
-	//
-	// at index time, update singleton datastore entities for artists.
+	g.Go(func() error {
+		createReq, err := jsonPostTask("/internal/computeArtistStats", computeArtistStatsTask{
+			Namespace:       namespace,
+			SongParentIdent: newParentIdent,
+		}, svr.secret.TasksSecret)
+		if err != nil {
+			return errors.Wrapf(err, "failed to build task")
+		}
+		if _, err := svr.tasks.CreateTask(ctx, createReq); err != nil {
+			return errors.Wrapf(err, "failed to add computeArtistStats task for %s,%s", namespaceID(accID), newParentIdent)
+		}
+		return nil
+	})
 
 	if err := g.Wait(); err != nil {
 		log.Errorf("%v", err.Error())

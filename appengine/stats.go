@@ -1,10 +1,14 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
+	"net/http"
 	"sort"
 	"time"
 
 	"cloud.google.com/go/datastore"
+	"github.com/nishanths/scrobble/appengine/log"
 )
 
 const (
@@ -100,4 +104,52 @@ func computeLastPlayedArtistsStats(songs []Song) ArtistStats {
 	return ArtistStats{
 		Data: data,
 	}
+}
+
+type computeArtistStatsTask struct {
+	Namespace       string
+	SongParentIdent string
+}
+
+func (s *server) computeArtistStatsHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+
+	if r.Method != "POST" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	var t computeArtistStatsTask
+	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
+		log.Errorf("failed to json-decode task: %v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	parentKey := songParentKey(t.Namespace, t.SongParentIdent)
+	q := datastore.NewQuery(KindSong).
+		Namespace(t.Namespace).
+		Order("-LastPlayed").
+		Ancestor(parentKey)
+
+	var songs []Song
+	if _, err := s.ds.GetAll(ctx, q, &songs); err != nil {
+		log.Errorf("failed to get songs: %v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	pc := computePlayCountArtistStats(songs)
+	pcKey := statsPlayCountArtistKey(t.Namespace)
+
+	lp := computeLastPlayedArtistsStats(songs)
+	lpKey := statsLastPlayedArtistKey(t.Namespace)
+
+	if _, err := s.ds.PutMulti(ctx, []*datastore.Key{pcKey, lpKey}, []interface{}{pc, lp}); err != nil {
+		log.Errorf("failed to put artist stats: %v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }

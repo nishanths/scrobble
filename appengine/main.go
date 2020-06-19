@@ -142,6 +142,7 @@ func run(ctx context.Context) error {
 	http.Handle("/internal/markParentComplete", s.requireTasksSecretHeader(http.HandlerFunc(s.markParentCompleteHandler)))
 	http.Handle("/internal/deleteEntities", s.requireTasksSecretHeader(http.HandlerFunc(s.deleteEntitiesHandler)))
 	http.Handle("/internal/fillArtworkScore", s.requireTasksSecretHeader(http.HandlerFunc(s.fillArtworkScoreHandler)))
+	http.Handle("/internal/computeArtistStats", s.requireTasksSecretHeader(http.HandlerFunc(s.computeArtistStatsHandler)))
 
 	if isDev() {
 		// in production these are handled by app.yaml
