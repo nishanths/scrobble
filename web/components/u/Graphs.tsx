@@ -21,11 +21,11 @@ export const Graphs: React.FC<GraphsProps> = ({
 	const last = useSelector((s: State) => s.last)
 
 	const header = Header(profileUsername, signedIn, true)
-	const segmentedControl = SegmentedControl(Mode.Graphs, v => {
+	const segmentedControl = SegmentedControl(Mode.Insights, v => {
 		const p = fullPath(profileUsername, modeFromControlValue(v), last.color, undefined)
 		history.push(p)
 	})
-	const top = Top(header, segmentedControl, null, Mode.Graphs)
+	const top = Top(header, segmentedControl, null, Mode.Insights)
 
 	return <>
 		{top}

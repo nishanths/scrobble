@@ -6,10 +6,10 @@ export enum DetailKind {
 }
 
 export enum Mode {
-	All, Loved, Color, Graphs
+	All, Loved, Color, Insights
 }
 
-export const controlValues = ["All", "Loved", "By color", "Graphs"] as const
+export const controlValues = ["All", "Loved", "By color", "Insights"] as const
 
 export type ControlValue = typeof controlValues[number]
 
@@ -18,7 +18,7 @@ export const controlValueForMode = (m: Mode): ControlValue => {
 		case Mode.All: return "All"
 		case Mode.Loved: return "Loved"
 		case Mode.Color: return "By color"
-		case Mode.Graphs: return "Graphs"
+		case Mode.Insights: return "Insights"
 		default: assertExhaustive(m)
 	}
 }
@@ -28,7 +28,7 @@ export const modeFromControlValue = (v: ControlValue): Mode => {
 		case "All": return Mode.All
 		case "Loved": return Mode.Loved
 		case "By color": return Mode.Color
-		case "Graphs": return Mode.Graphs
+		case "Insights": return Mode.Insights
 		default: assertExhaustive(v)
 	}
 }
@@ -38,7 +38,7 @@ export const pathForMode = (m: Mode): string => {
 		case Mode.All: return ""
 		case Mode.Loved: return "/loved"
 		case Mode.Color: return "/color"
-		case Mode.Graphs: return "/graphs"
+		case Mode.Insights: return "/insights"
 	}
 	assertExhaustive(m)
 }
@@ -74,7 +74,7 @@ export const fullPath = (
 	switch (mode) {
 		case Mode.All:
 		case Mode.Loved:
-		case Mode.Graphs:
+		case Mode.Insights:
 			u = "/u/" + profileUsername + pathForMode(mode)
 			break
 		case Mode.Color:

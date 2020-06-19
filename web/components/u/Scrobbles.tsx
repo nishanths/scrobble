@@ -40,7 +40,7 @@ type IndexForMode = {
 	searchIndex: Index<Doc>       // actual search index
 }
 
-type ScrobblesMode = Exclude<Mode, Mode.Graphs>
+type ScrobblesMode = Exclude<Mode, Mode.Insights>
 
 export const Scrobbles: React.FC<{
 	profileUsername: string

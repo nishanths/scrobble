@@ -48,7 +48,7 @@ export const U: React.FC<UProps> = ({
 			color={color}
 			history={history}
 		/>
-	} else if (mode === Mode.Graphs) {
+	} else if (mode === Mode.Insights) {
 		return <Graphs
 			profileUsername={profileUsername}
 			signedIn={!!logoutURL}

@@ -103,6 +103,54 @@ func (s *server) songDataHandler(fieldName string) http.Handler {
 	})
 }
 
-func (s *server) artistPlayCountHandler(w http.ResponseWriter, r *http.Request) {}
+func (s *server) artistPlayCountHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	ctx := r.Context()
+
+	username := r.FormValue("username")
+	if username == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	limit, hasLimit := parseLimit(r.FormValue("limit"))
+	limit = normalizeLimit(limit, hasLimit, 20)
+
+	acc, accID, ok := fetchAccountForUsername(ctx, username, s.ds, w)
+	if !ok {
+		return
+	}
+
+	if acc.Private && !s.canViewScrobbled(ctx, accID, r) {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	namespace := namespaceID(accID)
+
+	key := statsArtistPlayCountKey(namespace)
+	var a ArtistPlayCountStats
+
+	err := s.ds.Get(ctx, key, &a)
+	if err == datastore.ErrNoSuchEntity {
+		log.Infof("no play count stats for %s", key)
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+	if err != nil {
+		log.Errorf("failed to get: %v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(ArtistPlayCountResponse{a.Data}); err != nil {
+		log.Errorf("failed to write response: %v", err.Error())
+	}
+}
 
 func (s *server) artistAddedHandler(w http.ResponseWriter, r *http.Request) {}
