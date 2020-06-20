@@ -49,9 +49,8 @@ type ArtistAddedStats struct {
 type ArtistAddedDatum struct {
 	ArtistName string `datastore:",noindex" json:"artistName"`
 	Added      int64  `datastore:",noindex" json:"added"`
+	Song       Song   `datastore:",noindex" json:"song"` // song that was added
 }
-
-const maxArtistStatsLen = 20
 
 func computeArtistPlayCount(songs []Song) ArtistPlayCountStats {
 	m := make(map[string]ArtistPlayCountDatum)
@@ -73,10 +72,6 @@ func computeArtistPlayCount(songs []Song) ArtistPlayCountStats {
 		return slice[i].PlayCount > slice[j].PlayCount
 	})
 
-	if len(slice) > maxArtistStatsLen {
-		slice = slice[:maxArtistStatsLen]
-	}
-
 	return ArtistPlayCountStats{
 		Data: slice,
 	}
@@ -87,10 +82,18 @@ func computeArtistAdded(songs []Song) ArtistAddedStats {
 	for _, s := range songs {
 		if v, ok := m[s.ArtistName]; ok {
 			if s.Added < v.Added {
-				m[s.ArtistName] = ArtistAddedDatum{s.ArtistName, s.Added}
+				// earliest added date
+				datum := m[s.ArtistName]
+				datum.Added = s.Added
+				m[s.ArtistName] = datum
+			} else {
+				// latest added song
+				datum := m[s.ArtistName]
+				datum.Song = s
+				m[s.ArtistName] = datum
 			}
 		} else {
-			m[s.ArtistName] = ArtistAddedDatum{s.ArtistName, s.Added}
+			m[s.ArtistName] = ArtistAddedDatum{s.ArtistName, s.Added, s}
 		}
 	}
 
@@ -103,10 +106,6 @@ func computeArtistAdded(songs []Song) ArtistAddedStats {
 	sort.Slice(slice, func(i, j int) bool {
 		return slice[i].Added > slice[j].Added
 	})
-
-	if len(slice) > maxArtistStatsLen {
-		slice = slice[:maxArtistStatsLen]
-	}
 
 	return ArtistAddedStats{
 		Data: slice,
