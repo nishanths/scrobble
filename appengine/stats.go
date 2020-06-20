@@ -12,28 +12,24 @@ import (
 )
 
 const (
+	statsStorageDirectory = "stats" // Cloud Storage directory name for stats
+)
+
+const (
 	KindStats = "Stats" // namespace: account
 )
 
-func statsArtistPlayCountKey(namespace string) *datastore.Key {
-	return &datastore.Key{
-		Kind:      KindStats,
-		Name:      "artist-playCount",
-		Namespace: namespace,
-	}
+func statsArtistPlayCountStoragePath(namespace string) string {
+	return statsStorageDirectory + "/" + namespace + "/" + "artist-playCount"
 }
 
-func statsArtistAddedKey(namespace string) *datastore.Key {
-	return &datastore.Key{
-		Kind:      KindStats,
-		Name:      "artist-added",
-		Namespace: namespace,
-	}
+func statsArtistAddedStoragePath(namespace string) string {
+	return statsStorageDirectory + "/" + namespace + "/" + "artist-added"
 }
 
 // namespace: account
 type ArtistPlayCountStats struct {
-	Data []ArtistPlayCountDatum `datastore:",noindex"`
+	Data []ArtistPlayCountDatum `datastore:",noindex" json:"data"`
 }
 
 type ArtistPlayCountDatum struct {
@@ -43,13 +39,13 @@ type ArtistPlayCountDatum struct {
 }
 
 type ArtistAddedStats struct {
-	Data []ArtistAddedDatum `datastore:",noindex"`
+	Data []ArtistAddedDatum `datastore:",noindex" json:"data"`
 }
 
 type ArtistAddedDatum struct {
 	ArtistName string `datastore:",noindex" json:"artistName"`
-	Added      int64  `datastore:",noindex" json:"added"`
-	Song       Song   `datastore:",noindex" json:"song"` // song that was added
+	Added      int64  `datastore:",noindex" json:"added"` // earliest song added date for artist library-wide
+	Song       Song   `datastore:",noindex" json:"song"`  // latest added song for artist library-wide
 }
 
 func computeArtistPlayCount(songs []Song) ArtistPlayCountStats {
@@ -144,16 +140,38 @@ func (s *server) computeArtistStatsHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	pc := computeArtistPlayCount(songs)
-	pcKey := statsArtistPlayCountKey(t.Namespace)
+	{
+		pc := computeArtistPlayCount(songs)
+		pcPath := statsArtistPlayCountStoragePath(t.Namespace)
 
-	a := computeArtistAdded(songs)
-	aKey := statsArtistAddedKey(t.Namespace)
+		wr := s.storage.Bucket(DefaultBucketName).Object(pcPath).NewWriter(ctx)
+		if err := json.NewEncoder(wr).Encode(pc); err != nil {
+			log.Errorf("failed to json-write artist stats: %v", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if err := wr.Close(); err != nil {
+			log.Errorf("failed to close storage writer: %v", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	}
 
-	if _, err := s.ds.PutMulti(ctx, []*datastore.Key{pcKey, aKey}, []interface{}{&pc, &a}); err != nil {
-		log.Errorf("failed to put artist stats: %v", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+	{
+		a := computeArtistAdded(songs)
+		aPath := statsArtistAddedStoragePath(t.Namespace)
+
+		wr := s.storage.Bucket(DefaultBucketName).Object(aPath).NewWriter(ctx)
+		if err := json.NewEncoder(wr).Encode(a); err != nil {
+			log.Errorf("failed to json-encode artist stats: %v", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if err := wr.Close(); err != nil {
+			log.Errorf("failed to close storage writer: %v", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 	}
 
 	w.WriteHeader(http.StatusOK)

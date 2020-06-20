@@ -2,19 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 
 	"cloud.google.com/go/datastore"
+	"cloud.google.com/go/storage"
 	"github.com/nishanths/scrobble/appengine/log"
 )
-
-type ArtistPlayCountResponse struct {
-	Data []ArtistPlayCountDatum `json:"data"`
-}
-
-type ArtistAddedResponse struct {
-	Data []ArtistAddedDatum `json:"data"`
-}
 
 func (s *server) songPlayCountHandler(w http.ResponseWriter, r *http.Request) {
 	s.songDataHandler("-PlayCount").ServeHTTP(w, r)
@@ -104,101 +98,59 @@ func (s *server) songDataHandler(fieldName string) http.Handler {
 }
 
 func (s *server) artistPlayCountHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
-	ctx := r.Context()
-
-	username := r.FormValue("username")
-	if username == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	limit, hasLimit := parseLimit(r.FormValue("limit"))
-	limit = normalizeLimit(limit, hasLimit, 20)
-
-	acc, accID, ok := fetchAccountForUsername(ctx, username, s.ds, w)
-	if !ok {
-		return
-	}
-
-	if acc.Private && !s.canViewScrobbled(ctx, accID, r) {
-		w.WriteHeader(http.StatusForbidden)
-		return
-	}
-
-	namespace := namespaceID(accID)
-
-	key := statsArtistPlayCountKey(namespace)
-	var a ArtistPlayCountStats
-
-	err := s.ds.Get(ctx, key, &a)
-	if err == datastore.ErrNoSuchEntity {
-		log.Infof("no play count stats for %s", key)
-		w.WriteHeader(http.StatusNoContent)
-		return
-	}
-	if err != nil {
-		log.Errorf("failed to get: %v", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(ArtistPlayCountResponse{a.Data}); err != nil {
-		log.Errorf("failed to write response: %v", err.Error())
-	}
+	s.artistDataHandler(statsArtistPlayCountStoragePath).ServeHTTP(w, r)
 }
 
 func (s *server) artistAddedHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
+	s.artistDataHandler(statsArtistAddedStoragePath).ServeHTTP(w, r)
+}
 
-	ctx := r.Context()
+func (s *server) artistDataHandler(storagePathFunc func(namespace string) string) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
 
-	username := r.FormValue("username")
-	if username == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
+		ctx := r.Context()
 
-	limit, hasLimit := parseLimit(r.FormValue("limit"))
-	limit = normalizeLimit(limit, hasLimit, 20)
+		username := r.FormValue("username")
+		if username == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
 
-	acc, accID, ok := fetchAccountForUsername(ctx, username, s.ds, w)
-	if !ok {
-		return
-	}
+		acc, accID, ok := fetchAccountForUsername(ctx, username, s.ds, w)
+		if !ok {
+			return
+		}
 
-	if acc.Private && !s.canViewScrobbled(ctx, accID, r) {
-		w.WriteHeader(http.StatusForbidden)
-		return
-	}
+		if acc.Private && !s.canViewScrobbled(ctx, accID, r) {
+			w.WriteHeader(http.StatusForbidden)
+			return
+		}
 
-	namespace := namespaceID(accID)
+		namespace := namespaceID(accID)
 
-	key := statsArtistAddedKey(namespace)
-	var a ArtistAddedStats
+		rd, err := s.storage.Bucket(DefaultBucketName).Object(storagePathFunc(namespace)).NewReader(ctx)
+		if err == storage.ErrObjectNotExist {
+			log.Infof("no artist stats for %s", storagePathFunc(namespace))
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		if err != nil {
+			log.Errorf("failed to get: %v", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 
-	err := s.ds.Get(ctx, key, &a)
-	if err == datastore.ErrNoSuchEntity {
-		log.Infof("no added stats for %s", key)
-		w.WriteHeader(http.StatusNoContent)
-		return
-	}
-	if err != nil {
-		log.Errorf("failed to get: %v", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(ArtistAddedResponse{a.Data}); err != nil {
-		log.Errorf("failed to write response: %v", err.Error())
-	}
+		w.Header().Set("Content-Type", "application/json")
+		if _, err := io.Copy(w, rd); err != nil {
+			log.Errorf("failed to write response: %v", err.Error())
+			return
+		}
+		if err := rd.Close(); err != nil {
+			log.Errorf("failed to close storage reader: %v", err.Error())
+		}
+	})
 }
