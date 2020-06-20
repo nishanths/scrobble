@@ -15,10 +15,6 @@ const (
 	statsStorageDirectory = "stats" // Cloud Storage directory name for stats
 )
 
-const (
-	KindStats = "Stats" // namespace: account
-)
-
 func statsArtistPlayCountStoragePath(namespace string) string {
 	return statsStorageDirectory + "/" + namespace + "/" + "artist-playCount"
 }
