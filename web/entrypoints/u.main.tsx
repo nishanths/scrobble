@@ -37,6 +37,8 @@ ReactDOM.render(
 
 				{colors.map(c => <Route key={c} exact path={`/u/:username/color/${c}`} render={p => <U {...uargs} wnd={window} mode={Mode.Color} color={c} nProgress={NProgress} {...p} />} />)}
 				{colors.map(c => <Route key={c + "a"} exact path={`/u/:username/color/${c}/album/:hexSongIdent`} render={p => <U {...uargs} wnd={window} mode={Mode.Color} color={c} detail={{ kind: DetailKind.Album, hexIdent: p.match.params["hexSongIdent"] }} nProgress={NProgress} {...p} />} />)}
+
+				<Route exact path="/u/:username/insights" render={p => <U {...uargs} wnd={window} mode={Mode.Insights} nProgress={NProgress} {...p} />} />
 			</Switch>
 		</Router>
 	</Provider>,

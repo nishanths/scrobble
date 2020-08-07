@@ -3,6 +3,7 @@ import { RouteComponentProps } from "react-router-dom";
 import { UArgs, NProgress } from "../../shared/types"
 import { Mode, DetailKind } from "./shared"
 import { Scrobbles } from "./Scrobbles"
+import { Graphs } from "./Graphs"
 import { Detail } from "./Detail"
 import { hexDecode } from "../../shared/util"
 import { Color } from "../colorpicker"
@@ -34,20 +35,7 @@ export const U: React.FC<UProps> = ({
 	history,
 	nProgress,
 }) => {
-	if (detail === undefined) {
-		return <Scrobbles
-			profileUsername={profileUsername}
-			signedIn={!!logoutURL}
-			artworkBaseURL={artworkBaseURL}
-			private={priv}
-			self={self}
-			mode={mode}
-			color={color}
-			nProgress={nProgress}
-			history={history}
-			wnd={wnd}
-		/>
-	} else {
+	if (detail !== undefined) {
 		return <Detail
 			profileUsername={profileUsername}
 			artworkBaseURL={artworkBaseURL}
@@ -59,6 +47,25 @@ export const U: React.FC<UProps> = ({
 			mode={mode}
 			color={color}
 			history={history}
+		/>
+	} else if (mode === Mode.Insights) {
+		return <Graphs
+			profileUsername={profileUsername}
+			signedIn={!!logoutURL}
+			history={history}
+		/>
+	} else {
+		return <Scrobbles
+			profileUsername={profileUsername}
+			signedIn={!!logoutURL}
+			artworkBaseURL={artworkBaseURL}
+			private={priv}
+			self={self}
+			mode={mode}
+			color={color}
+			nProgress={nProgress}
+			history={history}
+			wnd={wnd}
 		/>
 	}
 }

@@ -4,15 +4,15 @@ import { RouteComponentProps } from "react-router-dom";
 import { useHotkeys } from "react-hotkeys-hook"
 import { Index } from "flexsearch"
 import { State } from "../../redux/types/u"
-import { assertExhaustive, assert, hexEncode, debounce, copyMap } from "../../shared/util"
+import { assertExhaustive, assert, debounce, copyMap } from "../../shared/util"
 import { useStateRef } from "../../shared/hooks"
 import { NProgress, Song } from "../../shared/types"
-import { Mode, DetailKind, pathForMode, pathForColor, pathForDetailKind, modeFromControlValue } from "./shared"
+import { Mode, DetailKind, modeFromControlValue, fullPath } from "./shared"
 import { Color } from "../colorpicker"
 import { Songs } from "../Songs"
 import { setLastColor, setLastScrobblesEndIdx, setLastScrobblesScrollY, setLastSearch } from "../../redux/actions/last"
 import { fetchAllScrobbles, fetchLovedScrobbles, fetchColorScrobbles } from "../../redux/actions/scrobbles"
-import { Header, ColorPicker, Top } from "./top"
+import { Header, SegmentedControl, ColorPicker, Top } from "./top"
 import { SearchBox } from "../searchbox"
 import { createIndex, Doc, indexID, hasActiveSearch } from "./search"
 
@@ -40,13 +40,15 @@ type IndexForMode = {
 	searchIndex: Index<Doc>       // actual search index
 }
 
+type ScrobblesMode = Exclude<Mode, Mode.Insights>
+
 export const Scrobbles: React.FC<{
 	profileUsername: string
 	signedIn: boolean
 	artworkBaseURL: string
 	private: boolean
 	self: boolean
-	mode: Mode
+	mode: ScrobblesMode
 	color: Color | undefined
 	nProgress: NProgress
 	history: History
@@ -97,19 +99,7 @@ export const Scrobbles: React.FC<{
 			setSearchValue("")
 			dispatch(setLastSearch(""))
 
-			let u: string;
-			switch (newMode) {
-				case Mode.All:
-				case Mode.Loved:
-					u = "/u/" + profileUsername + pathForMode(newMode)
-					break
-				case Mode.Color:
-					u = "/u/" + profileUsername + pathForMode(newMode) + pathForColor(last.color)
-					break
-				default:
-					assertExhaustive(newMode)
-			}
-			history.push(u)
+			history.push(fullPath(profileUsername, newMode, last.color, undefined))
 		}
 
 		const onColorChange = (newColor: Color) => {
@@ -117,7 +107,7 @@ export const Scrobbles: React.FC<{
 			dispatch(setLastScrobblesEndIdx(0))
 			dispatch(setLastColor(newColor))
 			assert(mode === Mode.Color, "mode should be Color")
-			history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(newColor))
+			history.push(fullPath(profileUsername, mode, newColor, undefined))
 		}
 
 		const onSongClick = (s: Song) => {
@@ -138,7 +128,7 @@ export const Scrobbles: React.FC<{
 					assertExhaustive(mode)
 			}
 
-			history.push("/u/" + profileUsername + pathForMode(mode) + pathForColor(color) + pathForDetailKind(kind) + "/" + hexEncode(s.ident))
+			history.push(fullPath(profileUsername, mode, color, { kind, songIdent: s.ident }))
 		}
 
 		// scrobbles redux state
@@ -299,7 +289,8 @@ export const Scrobbles: React.FC<{
 
 		const header = Header(profileUsername, signedIn, true)
 		const colorPicker = ColorPicker(color, onColorChange)
-		const top = Top(header, colorPicker, mode, (v) => { onControlChange(modeFromControlValue(v)) })
+		const segmentedControl = SegmentedControl(mode, (v) => { onControlChange(modeFromControlValue(v)) })
+		const top = Top(header, segmentedControl, colorPicker, mode)
 
 		// Easy case. For private accounts that aren't the current user, render the
 		// private info-message.

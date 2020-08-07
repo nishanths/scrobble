@@ -265,7 +265,7 @@ func parseLimit(lim string) (int, bool) {
 	return i, true
 }
 
-func clampLimit(lim int, hasLimit bool, max int) int {
+func normalizeLimit(lim int, hasLimit bool, max int) int {
 	if !hasLimit || lim > max {
 		return max
 	}

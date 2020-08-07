@@ -2,19 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 
 	"cloud.google.com/go/datastore"
+	"cloud.google.com/go/storage"
 	"github.com/nishanths/scrobble/appengine/log"
 )
-
-type ArtistPlayCountResponse struct {
-	Data []ArtistPlayCountDatum `json:"data"`
-}
-
-type ArtistAddedResponse struct {
-	Data []ArtistAddedDatum `json:"data"`
-}
 
 func (s *server) songPlayCountHandler(w http.ResponseWriter, r *http.Request) {
 	s.songDataHandler("-PlayCount").ServeHTTP(w, r)
@@ -103,6 +97,60 @@ func (s *server) songDataHandler(fieldName string) http.Handler {
 	})
 }
 
-func (s *server) artistPlayCountHandler(w http.ResponseWriter, r *http.Request) {}
+func (s *server) artistPlayCountHandler(w http.ResponseWriter, r *http.Request) {
+	s.artistDataHandler(statsArtistPlayCountStoragePath).ServeHTTP(w, r)
+}
 
-func (s *server) artistAddedHandler(w http.ResponseWriter, r *http.Request) {}
+func (s *server) artistAddedHandler(w http.ResponseWriter, r *http.Request) {
+	s.artistDataHandler(statsArtistAddedStoragePath).ServeHTTP(w, r)
+}
+
+func (s *server) artistDataHandler(storagePathFunc func(namespace string) string) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
+		ctx := r.Context()
+
+		username := r.FormValue("username")
+		if username == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		acc, accID, ok := fetchAccountForUsername(ctx, username, s.ds, w)
+		if !ok {
+			return
+		}
+
+		if acc.Private && !s.canViewScrobbled(ctx, accID, r) {
+			w.WriteHeader(http.StatusForbidden)
+			return
+		}
+
+		namespace := namespaceID(accID)
+
+		rd, err := s.storage.Bucket(DefaultBucketName).Object(storagePathFunc(namespace)).NewReader(ctx)
+		if err == storage.ErrObjectNotExist {
+			log.Infof("no artist stats for %s", storagePathFunc(namespace))
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		if err != nil {
+			log.Errorf("failed to get: %v", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		if _, err := io.Copy(w, rd); err != nil {
+			log.Errorf("failed to write response: %v", err.Error())
+			return
+		}
+		if err := rd.Close(); err != nil {
+			log.Errorf("failed to close storage reader: %v", err.Error())
+		}
+	})
+}

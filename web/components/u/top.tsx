@@ -1,7 +1,7 @@
 import React from "react"
 import { Header as HeaderComponent } from "./Header"
 import { ColorPicker as ColorPickerComponent, Color } from "../colorpicker"
-import { SegmentedControl } from "../SegmentedControl"
+import { SegmentedControl as SegmentedControlComponent } from "../SegmentedControl"
 import { controlValues, controlValueForMode, Mode, ControlValue } from "./shared"
 
 export const Header = (profileUsername: string, signedIn: boolean, showNav: boolean) =>
@@ -12,20 +12,23 @@ export const ColorPicker = (color?: Color, onColorChange?: (c: Color) => void) =
 		<ColorPickerComponent initialSelection={color} prompt="Pick a color to see scrobbled artwork of that color." afterSelect={onColorChange} />
 	</div>
 
+export const SegmentedControl = (mode: Mode, onControlChange: (v: ControlValue) => void) =>
+	<div className="control">
+		<SegmentedControlComponent
+			afterChange={onControlChange}
+			values={controlValues}
+			initialValue={controlValueForMode(mode)}
+		/>
+	</div>
+
 export const Top = (
 	header: JSX.Element,
-	colorPicker: JSX.Element,
+	segmentedControl: JSX.Element,
+	colorPicker: JSX.Element | null, // necessary only when mode === Mode.Color
 	mode: Mode,
-	onControlChange: (v: ControlValue) => void
 ) =>
 	<>
 		{header}
-		<div className="control">
-			<SegmentedControl
-				afterChange={onControlChange}
-				values={controlValues}
-				initialValue={controlValueForMode(mode)}
-			/>
-		</div>
+		{segmentedControl}
 		{mode === Mode.Color && colorPicker}
 	</>

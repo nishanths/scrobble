@@ -301,7 +301,7 @@ func (s *server) initializeAccountHandler(w http.ResponseWriter, r *http.Request
 		}
 		account.Username = username
 		account.APIKey = gen
-		account.Private = true
+		account.Private = false
 		if _, err := tx.Put(aKey, &account); err != nil {
 			return errors.Wrapf(err, "failed to put account for %s", u.Email)
 		}
