@@ -16,6 +16,7 @@ import (
 	_ "image/jpeg"
 	"image/png"
 	_ "image/png"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -778,6 +779,11 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 func (s *server) artworkHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
+	if r.Method == "GET" {
+		s.GetArtworkHandler(w, r)
+		return
+	}
+
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
@@ -994,6 +1000,34 @@ func (s *server) markParentComplete(ctx context.Context, namespace, songParentId
 	}
 
 	return nil
+}
+
+func (s *server) GetArtworkHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	if r.Method != "GET" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	artworkHash := r.FormValue("hash")
+	if artworkHash == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	reader, err := s.storage.Bucket(DefaultBucketName).Object(artworkStorageDirectory + "/" + artworkHash).NewReader(ctx)
+	if err == storage.ErrObjectNotExist {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	defer reader.Close()
+	io.Copy(w, reader)
 }
 
 func min(a, b int) int {
