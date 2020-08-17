@@ -21,7 +21,7 @@ type UProps = UArgs & {
 } & RouteComponentProps;
 
 // U is the root component for the username page, e.g.,
-// https://scrobble.littleroot.org/u/whatever.
+// https://<AppDomain>/u/whatever.
 export const U: React.FC<UProps> = ({
 	artworkBaseURL,
 	profileUsername,

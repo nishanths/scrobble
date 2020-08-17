@@ -22,7 +22,7 @@ const (
 	CookieNameState    = "_scrobble_auth_state" // value: state param (string)
 	CookieNameUserInfo = "_scrobble_user_info"  // value: JSON marshaled CookieData (string)
 
-	CookieDomain = "scrobble.littleroot.org"
+	CookieDomain = AppDomain
 
 	// Maximum age for cookies.
 	CookieAgeState    = 10 * time.Minute
@@ -154,7 +154,7 @@ func oauthConfig(clientID, clientSecret string) *oauth2.Config {
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		Scopes:       []string{"profile", "email", "openid"},
-		RedirectURL:  "https://scrobble.littleroot.org/googleAuth",
+		RedirectURL:  "https://" + AppDomain + "/googleAuth",
 		Endpoint:     google.Endpoint,
 	}
 }

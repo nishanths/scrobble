@@ -1,7 +1,7 @@
 import React from "react"
 import { GoogleSignIn } from "../GoogleSignIn"
 import { randInt } from "../../shared/util"
-import { macOSAppLink, guideLink, apiDocLink } from "../../shared/const"
+import { macOSAppLink, guideLink, apiDocLink, appDomain } from "../../shared/const"
 
 interface HomeProps {
 	loginURL: string
@@ -36,10 +36,10 @@ export const Home: React.FC<HomeProps> = ({ loginURL }) => {
 		</div>
 		<div className="footer">
 			<div>
+				<a href={`https://${appDomain}/u/nishanth`}><div className="item">Example profile</div></a>
 				<a href={guideLink}><div className="item">How do I use Scrobble?</div></a>
-				<a href={"https://scrobble.littleroot.org/u/nishanth"}><div className="item">Example profile</div></a>
 				<a href={apiDocLink}><div className="item">API doc</div></a>
-				<a href={macOSAppLink}><div className="item">macOS app</div></a>
+				<a href={macOSAppLink}><div className="item">Download macOS app</div></a>
 			</div>
 		</div>
 	</div>

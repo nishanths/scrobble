@@ -37,6 +37,7 @@ func devRootHandler(w http.ResponseWriter, r *http.Request) {
 				TotalSongs:       1337,
 				LastScrobbleTime: time.Now().Unix(),
 			},
+			AppDomain: AppDomain,
 		}
 
 		if err := dashboardTmpl.Execute(w, loggedInArgs); err != nil {
@@ -49,6 +50,7 @@ func devRootHandler(w http.ResponseWriter, r *http.Request) {
 				Host:     r.Host,
 				LoginURL: "/fakeloginurl",
 			},
+			AppDomain: AppDomain,
 		}
 
 		if err := homeTmpl.Execute(w, loggedOutArgs); err != nil {

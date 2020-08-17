@@ -1,19 +1,19 @@
 # scrobble
 
-[`scrobble.littleroot.org`](https://scrobble.littleroot.org) is an Apple Music scrobbling
+[`scrobbl.es`](https://scrobbl.es) is an Apple Music scrobbling
 service, with a client app available for macOS.
 
-See an [example profile](https://scrobble.littleroot.org/u/nishanth).
+See an [example profile](https://scrobbl.es/u/nishanth).
 
 ![Scrobbled by color: white](assets/scrobbled_color_white.png)
 
 ## Getting Started
 
-See the [Guide](https://scrobble.littleroot.org/doc/guide) on the website.
+See the [Guide](https://scrobbl.es/doc/guide) on the website.
 
 ## HTTP API
 
-Check out the [API documentation](https://scrobble.littleroot.org/doc/api/v1).
+Check out the [API documentation](https://scrobbl.es/doc/api/v1).
 
 ## Download macOS app
 

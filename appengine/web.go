@@ -34,6 +34,7 @@ type BootstrapArgs struct {
 type RootArgs struct {
 	Title     string
 	Bootstrap BootstrapArgs
+	AppDomain string
 }
 
 func validRootPath(p string) bool {
@@ -81,6 +82,7 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 				Host:     host,
 				LoginURL: login,
 			},
+			AppDomain: AppDomain,
 		}
 		if err := homeTmpl.Execute(w, args); err != nil {
 			log.Errorf("failed to execute template: %v", err.Error())
@@ -111,6 +113,7 @@ func (s *server) rootHandler(w http.ResponseWriter, r *http.Request) {
 			TotalSongs:       nSongs,
 			LastScrobbleTime: lastScrobbled,
 		},
+		AppDomain: AppDomain,
 	}
 	if err := dashboardTmpl.Execute(w, args); err != nil {
 		log.Errorf("failed to execute template: %v", err.Error())
@@ -462,7 +465,7 @@ func ptrStruct() *struct{} {
 
 const privacyPolicy = `Your privacy is important to us. It is littleroot's policy to respect your
 privacy regarding any information we may collect from you across our
-website, https://scrobble.littleroot.org, and other sites we own and operate.
+website, https://` + AppDomain + `, and other sites we own and operate.
 
 We only ask for personal information when we truly need it to provide a
 service to you. We collect it by fair and lawful means, with your knowledge

@@ -40,13 +40,15 @@ struct State {
     // TODO: this is gross
 }
 
+
 struct Constants {
+    static let AppDomain = "scrobbl.es"
     static let BaseUrl = "selective-scrobble.appspot.com"
-    static let HelpLink = "https://scrobble.littleroot.org"
+    static let HelpLink = "https://" + Constants.AppDomain
 }
 
 func profileLink(_ username: String) -> String {
-    return String(format: "https://scrobble.littleroot.org/u/%@", username)
+    return String(format: "https://%@/u/%@", Constants.AppDomain, username)
 }
 
 @NSApplicationMain

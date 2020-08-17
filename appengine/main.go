@@ -20,6 +20,10 @@ const (
 	DefaultQueueName  = "projects/selective-scrobble/locations/us-east1/queues/default"
 )
 
+const (
+	AppDomain = "scrobble.es"
+)
+
 type server struct {
 	ds         *datastore.Client
 	storage    *storage.Client
@@ -84,7 +88,7 @@ func run(ctx context.Context) error {
 	}
 
 	webMiddleware := func(h http.Handler) http.Handler {
-		return withHTTPS(withAlleleRedirect(h))
+		return withHTTPS(withOldHostsRedirect(h))
 	}
 
 	// Register handlers.
@@ -180,11 +184,11 @@ func maybeRedirectHTTPS(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-func withAlleleRedirect(h http.Handler) http.Handler {
+func withOldHostsRedirect(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Host == "scrobble.allele.cc" {
+		if r.Host == "scrobble.allele.cc" || r.Host == "scrobble.littleroot.org" {
 			u := *r.URL
-			u.Host = "scrobble.littleroot.org"
+			u.Host = AppDomain
 			http.Redirect(w, r, u.String(), http.StatusFound)
 			return
 		}
