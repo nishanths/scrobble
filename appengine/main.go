@@ -21,7 +21,7 @@ const (
 )
 
 const (
-	AppDomain = "scrobble.es"
+	AppDomain = "scrobbl.es"
 )
 
 type server struct {
