@@ -815,7 +815,10 @@ func (s *server) artworkHandler(w http.ResponseWriter, r *http.Request) {
 
 	// upload to GCS
 	wr := s.storage.Bucket(DefaultBucketName).Object(artworkStorageDirectory + "/" + hash).NewWriter(ctx)
-	wr.Metadata = map[string]string{"format": format}
+	wr.Metadata = map[string]string{
+		"format":     format,
+		"uploadedBy": accID,
+	}
 	if _, err := wr.Write(artworkBytes); err != nil {
 		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
