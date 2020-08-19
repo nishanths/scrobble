@@ -11,6 +11,12 @@ cloud.google.com/go/internal/version
 cloud.google.com/go/storage
 # github.com/RobCherry/vibrant v0.0.0-20160904011657-0680b8cf1c89
 github.com/RobCherry/vibrant
+# github.com/go-http-utils/etag v0.0.0-20161124023236-513ea8f21eb1
+github.com/go-http-utils/etag
+# github.com/go-http-utils/fresh v0.0.0-20161124030543-7231e26a4b27
+github.com/go-http-utils/fresh
+# github.com/go-http-utils/headers v0.0.0-20181008091004-fed159eddc2a
+github.com/go-http-utils/headers
 # github.com/golang/protobuf v1.2.0
 github.com/golang/protobuf/proto
 github.com/golang/protobuf/protoc-gen-go/descriptor
@@ -21,11 +27,6 @@ github.com/golang/protobuf/ptypes/empty
 github.com/golang/protobuf/ptypes/struct
 github.com/golang/protobuf/ptypes/timestamp
 github.com/golang/protobuf/ptypes/wrappers
-# github.com/gomarkdown/markdown v0.0.0-20200504064842-79b2cdd7e9e6
-github.com/gomarkdown/markdown
-github.com/gomarkdown/markdown/ast
-github.com/gomarkdown/markdown/html
-github.com/gomarkdown/markdown/parser
 # github.com/google/uuid v1.1.0
 github.com/google/uuid
 # github.com/googleapis/gax-go/v2 v2.0.4

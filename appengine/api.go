@@ -26,6 +26,7 @@ import (
 	"cloud.google.com/go/datastore"
 	"cloud.google.com/go/storage"
 	"github.com/RobCherry/vibrant"
+	"github.com/go-http-utils/etag"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/google/uuid"
 	"github.com/nishanths/scrobble/appengine/artwork"
@@ -109,7 +110,7 @@ type Song struct {
 	LastPlayed int64 `json:"lastPlayed"` // unix seconds
 	PlayCount  int   `json:"playCount"`
 
-	Added int64 `json:"added"`
+	Added int64 `json:"added"` // unix seconds
 
 	ArtworkHash string `datastore:",noindex" json:"artworkHash"`
 
@@ -283,7 +284,7 @@ type ScrobbledResponse struct {
 
 func (svr *server) scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate, private")
+	w.Header().Set("cache-control", "no-store")
 
 	writeSuccessRsp := func(s ScrobbledResponse) {
 		w.Header().Set("Content-Type", "application/json")
@@ -780,7 +781,7 @@ func (s *server) artworkHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	if r.Method == "GET" {
-		s.GetArtworkHandler(w, r)
+		etag.Handler(http.HandlerFunc(s.GetArtworkHandler), false).ServeHTTP(w, r)
 		return
 	}
 
@@ -1028,8 +1029,9 @@ func (s *server) GetArtworkHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
 	defer reader.Close()
+
+	w.Header().Set("cache-control", fmt.Sprintf("public, max-age=%d, immutable", 60*24*time.Hour/time.Second))
 	io.Copy(w, reader)
 }
 
