@@ -463,7 +463,7 @@ func ptrStruct() *struct{} {
 	return &struct{}{}
 }
 
-const privacyPolicy = `Your privacy is important to us. It is littleroot's policy to respect your
+const privacyPolicy = `Your privacy is important to us. It is Littleroot's policy to respect your
 privacy regarding any information we may collect from you across our
 website, https://` + AppDomain + `, and other sites we own and operate.
 

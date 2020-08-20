@@ -20,3 +20,5 @@ macos/archive
 appengine/.scratch
 
 *.xcuserstate
+
+deployed-hash.txt
