@@ -32,6 +32,6 @@ Get it from the [Releases](https://github.com/nishanths/scrobble/releases/latest
 
 ## Attribution
 
-The macOS app icon is Gramophone by Mahmure Alp from the Noun Project.
+The macOS app icon is Gramophone by Mahmure Alp from thenounproject.com.
 
-The macOS menu bar icon is Flower by nitut786 from the Noun Project.
+The macOS menu bar icon is Flower by nitut786 from thenounproject.com.
