@@ -39,9 +39,10 @@ type ArtistAddedStats struct {
 }
 
 type ArtistAddedDatum struct {
-	ArtistName string `datastore:",noindex" json:"artistName"`
-	Added      int64  `datastore:",noindex" json:"added"` // earliest song added date for artist library-wide
-	Song       Song   `datastore:",noindex" json:"song"`  // latest added song for artist library-wide
+	ArtistName   string `datastore:",noindex" json:"artistName"`
+	Added        int64  `datastore:",noindex" json:"added"`        // earliest song added date for artist library-wide
+	LatestSong   Song   `datastore:",noindex" json:"latestSong"`   // latest added song for artist library-wide
+	EarliestSong Song   `datastore:",noindex" json:"earliestSong"` // earliest added song for artist library-wide
 }
 
 func computeArtistPlayCount(songs []Song) ArtistPlayCountStats {
@@ -74,18 +75,19 @@ func computeArtistAdded(songs []Song) ArtistAddedStats {
 	for _, s := range songs {
 		if v, ok := m[s.ArtistName]; ok {
 			if s.Added < v.Added {
-				// earliest added date
+				// record the earliest added date, earliest added song (progressively)
 				datum := m[s.ArtistName]
 				datum.Added = s.Added
+				datum.EarliestSong = s
 				m[s.ArtistName] = datum
 			} else {
-				// latest added song
+				// record the latest added song (progressively)
 				datum := m[s.ArtistName]
-				datum.Song = s
+				datum.LatestSong = s
 				m[s.ArtistName] = datum
 			}
 		} else {
-			m[s.ArtistName] = ArtistAddedDatum{s.ArtistName, s.Added, s}
+			m[s.ArtistName] = ArtistAddedDatum{s.ArtistName, s.Added, s, s}
 		}
 	}
 
