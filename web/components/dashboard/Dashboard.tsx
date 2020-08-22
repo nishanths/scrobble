@@ -81,6 +81,7 @@ export class Dashboard extends React.Component<DashboardProps, { account: Accoun
 			</div>
 
 			<div className="nav">
+				<div className="item"><Link to="/">Home</Link></div>
 				{this.state.account.username && <>
 					<div className="item"><Link to="/dashboard/privacy">Profile privacy</Link> <span className="privacyHint">({this.state.account.private ? "private" : "public"})</span></div>
 					<div className="item"><Link to="/dashboard/api-key">API key</Link></div>
@@ -96,7 +97,6 @@ export class Dashboard extends React.Component<DashboardProps, { account: Accoun
 			<div className="footer">
 				<div className="item"><a href={guideLink}>Guide</a></div>
 				<div className="item"><a href={macOSAppLink}>macOS app</a></div>
-				<div className="item"><Link to="/">Home</Link></div>
 			</div>
 		</div>
 	}
