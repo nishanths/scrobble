@@ -284,7 +284,6 @@ type ScrobbledResponse struct {
 
 func (svr *server) scrobbledHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	w.Header().Set("cache-control", "no-store")
 
 	writeSuccessRsp := func(s ScrobbledResponse) {
 		w.Header().Set("Content-Type", "application/json")

@@ -11,6 +11,7 @@ import (
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	"cloud.google.com/go/datastore"
 	"cloud.google.com/go/storage"
+	"github.com/go-http-utils/etag"
 	"github.com/nishanths/scrobble/appengine/log"
 	"github.com/pkg/errors"
 )
@@ -124,8 +125,8 @@ func run(ctx context.Context) error {
 		http.HandleFunc("/api/v1/scrobbled", devScrobbledHandler)
 		http.HandleFunc("/api/v1/scrobbled/color", devScrobbledColorHandler)
 	} else {
-		http.HandleFunc("/api/v1/scrobbled", s.scrobbledHandler)
-		http.HandleFunc("/api/v1/scrobbled/color", s.scrobbledColorHandler)
+		http.Handle("/api/v1/scrobbled", etag.Handler(http.HandlerFunc(s.scrobbledHandler), false))
+		http.Handle("/api/v1/scrobbled/color", etag.Handler(http.HandlerFunc(s.scrobbledHandler), false))
 	}
 	http.HandleFunc("/api/v1/scrobble", s.scrobbleHandler)
 	http.HandleFunc("/api/v1/account", s.accountHandler)
