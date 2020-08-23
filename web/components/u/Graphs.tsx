@@ -4,6 +4,7 @@ import { State } from "../../redux/types/u"
 import { Mode, modeFromControlValue, fullPath } from "./shared"
 import { RouteComponentProps } from "react-router-dom";
 import { Header, SegmentedControl, Top } from "./top"
+import "../../scss/u/graphs.scss"
 
 type History = RouteComponentProps["history"]
 
@@ -27,8 +28,15 @@ export const Graphs: React.FC<GraphsProps> = ({
 	})
 	const top = Top(header, segmentedControl, null, Mode.Insights)
 
-	return <>
+	return <div className="Graphs">
 		{top}
-		<div className="info">Insights are coming soon.</div>
-	</>
+		<div className="select-container">
+			<select>
+				<option>Longest songs</option>
+				<option>Most played songs</option>
+				<option>Artist Discovery dates</option>
+				<option>Most played artists</option>
+			</select>
+		</div>
+	</div>
 }
