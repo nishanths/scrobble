@@ -98,7 +98,7 @@ body {
 // TODO: should validate programatically that at each breakpoint, the
 // specified number of cards (i.e. $n-cards) can really be shown.
 
-@media screen and (min-width: 360px) {
+@media screen and (min-width: 365px) {
   $cards: 2;
   $dim: 139px;
   $bb: 90px;

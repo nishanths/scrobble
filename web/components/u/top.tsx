@@ -18,6 +18,7 @@ export const SegmentedControl = (mode: Mode, onControlChange: (v: ControlValue) 
 			afterChange={onControlChange}
 			values={controlValues}
 			initialValue={controlValueForMode(mode)}
+			newBadges={new Set(["Insights" as const])}
 		/>
 	</div>
 
