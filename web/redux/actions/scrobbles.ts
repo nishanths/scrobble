@@ -181,8 +181,8 @@ const _fetchColorScrobbles = async (color: string, username: string): Promise<Fe
 	const r = await fetch(url)
 	switch (r.status) {
 		case 200: {
-			const rsp: ScrobbledResponse = await r.json()
-			return { songs: rsp.songs, private: false, err: null }
+			const songs: Song[] = await r.json()
+			return { songs, private: false, err: null }
 		}
 		case 403:
 			return { songs: [], private: true, err: null }
