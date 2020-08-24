@@ -538,6 +538,7 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 			ArtistName:     m.ArtistName,
 			Title:          m.Title,
 			TotalTime:      time.Duration(m.TotalTime) * (time.Millisecond / time.Nanosecond),
+			TrackNumber:    m.TrackNumber,
 			Year:           int(m.Year),
 			ReleaseDate:    int64(m.ReleaseDate),
 			SortAlbumTitle: sal,
