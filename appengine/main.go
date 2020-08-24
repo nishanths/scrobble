@@ -126,7 +126,7 @@ func run(ctx context.Context) error {
 		http.HandleFunc("/api/v1/scrobbled/color", devScrobbledColorHandler)
 	} else {
 		http.Handle("/api/v1/scrobbled", etag.Handler(http.HandlerFunc(s.scrobbledHandler), false))
-		http.Handle("/api/v1/scrobbled/color", etag.Handler(http.HandlerFunc(s.scrobbledHandler), false))
+		http.Handle("/api/v1/scrobbled/color", etag.Handler(http.HandlerFunc(s.scrobbledColorHandler), false))
 	}
 	http.HandleFunc("/api/v1/scrobble", s.scrobbleHandler)
 	http.HandleFunc("/api/v1/account", s.accountHandler)
