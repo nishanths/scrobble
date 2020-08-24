@@ -24,7 +24,7 @@ indexes:
 .PHONY: deploy
 deploy:
 	gcloud --quiet --project $(PROJECT_ID) app deploy -v 1 $(APP_YAML)
-	echo $(shell git rev-list HEAD | head -n 1) > deployed-hash.txt
+	echo $(shell git rev-list HEAD | head -n 1) >> deployed-hash.txt
 
 .PHONY: bindata
 bindata:
