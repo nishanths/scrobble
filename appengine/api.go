@@ -98,6 +98,7 @@ type Song struct {
 	ArtistName  string        `datastore:",noindex" json:"artistName"`
 	Title       string        `datastore:",noindex" json:"title"`
 	TotalTime   time.Duration `json:"totalTime"`
+	TrackNumber int           `datastore:",noindex" json:"trackNumber"`
 	Year        int           `json:"year"`
 	ReleaseDate int64         `datastore:",noindex" json:"releaseDate"` // unix seconds
 
@@ -492,6 +493,7 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 		SortTitle      string  `json:"sortTitle"`
 		Title          string  `json:"title"`
 		TotalTime      uint    `json:"totalTime"` // milliseconds
+		TrackNumber    int     `json:"trackNumber"`
 		Year           uint    `json:"year"`
 		PersistentID   string  `json:"persistentID"`
 		ArtworkHash    string  `json:"artworkHash"`

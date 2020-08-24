@@ -31,6 +31,7 @@ export interface Song {
 	artistName: string
 	title: string
 	totalTime: number
+	trackNumber: number
 	year: number
 	releaseDate: number
 	lastPlayed: number

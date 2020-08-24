@@ -22,14 +22,14 @@
 			containerPortal = 856A056E2133373D00CEFCC5 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 856A05752133373D00CEFCC5;
-			remoteInfo = "Scrobble";
+			remoteInfo = Scrobble;
 		};
 		856A05942133374200CEFCC5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 856A056E2133373D00CEFCC5 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 856A05752133373D00CEFCC5;
-			remoteInfo = "Scrobble";
+			remoteInfo = Scrobble;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -145,7 +145,7 @@
 			dependencies = (
 			);
 			name = Scrobble;
-			productName = "Scrobble";
+			productName = Scrobble;
 			productReference = 856A05762133373D00CEFCC5 /* Scrobble.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -163,7 +163,7 @@
 				856A058A2133374200CEFCC5 /* PBXTargetDependency */,
 			);
 			name = ScrobbleTests;
-			productName = "ScrobbleTests";
+			productName = ScrobbleTests;
 			productReference = 856A05882133374100CEFCC5 /* ScrobbleTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
@@ -181,7 +181,7 @@
 				856A05952133374200CEFCC5 /* PBXTargetDependency */,
 			);
 			name = ScrobbleUITests;
-			productName = "ScrobbleUITests";
+			productName = ScrobbleUITests;
 			productReference = 856A05932133374200CEFCC5 /* ScrobbleUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
@@ -445,7 +445,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				MARKETING_VERSION = 1.6;
+				MARKETING_VERSION = 1.7;
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.nishanths.Scrobble;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -470,7 +470,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				MARKETING_VERSION = 1.6;
+				MARKETING_VERSION = 1.7;
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.nishanths.Scrobble;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

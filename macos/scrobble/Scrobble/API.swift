@@ -79,6 +79,7 @@ class API {
         var sortTitle: String?
         var title: String
         var totalTime: UInt
+        var trackNumber: Int
         var year: UInt
         var persistentID: String
         var artworkHash: String?
@@ -100,6 +101,7 @@ class API {
             self.sortTitle = i.sortTitle
             self.title = i.title
             self.totalTime = UInt(i.totalTime)
+            self.trackNumber = i.trackNumber
             self.year = UInt(i.year)
             self.persistentID = i.persistentID.stringValue
 

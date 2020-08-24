@@ -18,6 +18,7 @@ type Song = {
   artistName:   string
   title:        string
   totalTime:    number // length of song in nanoseconds
+  trackNumber:  number
   year:         number
   releaseDate:  number // timestamp in unix seconds
   lastPlayed:   number // timestamp in unix seconds
