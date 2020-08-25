@@ -21,6 +21,7 @@ export function insightsStart(it: InsightType, username: string) {
 export function insightsSuccess(it: InsightType, username: string, data: unknown, priv: boolean) {
 	return {
 		type: "INSIGHTS_SUCCESS" as const,
+		insightType: it,
 		data,
 		private: priv,
 		username,
@@ -30,6 +31,7 @@ export function insightsSuccess(it: InsightType, username: string, data: unknown
 export function insightsFail(it: InsightType, username: string, err: any) {
 	return {
 		type: "INSIGHTS_FAIL" as const,
+		insightType: it,
 		username,
 		err,
 	}

@@ -6,5 +6,4 @@ export type InsightState =
 	| { status: "initial" }
 	| { status: "fetching" }
 	| { status: "error" }
-	| { status: "done", data: unknown }
-	| { status: "done", private: true }
+	| { status: "done", data: unknown, private: boolean }
