@@ -54,8 +54,11 @@ export const U: React.FC<UProps> = ({
 		return <Insights
 			profileUsername={profileUsername}
 			signedIn={!!logoutURL}
+			private={priv}
+			self={self}
 			history={history}
 			insightType={insightType!}
+			nProgress={nProgress}
 		/>
 	} else {
 		return <Scrobbles

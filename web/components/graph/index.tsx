@@ -1,8 +1,10 @@
 import React from "react"
 import "../../scss/graph/graph.scss"
+import { InsightType } from "../u"
 
 type GraphProps = {
 	data: unknown
+	type: InsightType
 }
 
 export class Graph extends React.Component<GraphProps> {
@@ -14,6 +16,8 @@ export class Graph extends React.Component<GraphProps> {
 	}
 
 	render() {
+		console.log(this.props.data)
+
 		return <div className="Graph">
 		</div>
 	}

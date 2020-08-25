@@ -40,7 +40,7 @@ type IndexForMode = {
 	searchIndex: Index<Doc>       // actual search index
 }
 
-type ScrobblesMode = Exclude<Mode, Mode.Insights>
+type ScrobblesMode = Mode.All | Mode.Loved | Mode.Color
 
 export const Scrobbles: React.FC<{
 	profileUsername: string

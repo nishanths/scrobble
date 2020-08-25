@@ -33,4 +33,11 @@
 		margin: 0 auto;
 		max-width: 220px;
 	}
+
+	main {
+		.graph {
+			display: flex;
+			justify-content: center;
+		}
+	}
 }
