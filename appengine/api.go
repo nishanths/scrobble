@@ -557,6 +557,11 @@ func (svr *server) scrobbleHandler(w http.ResponseWriter, r *http.Request) {
 			log.Warningf("duplicate incoming song ident %v; skipping", s.Ident())
 			continue
 		}
+		if s.Title == "" {
+			// happens in practice; see non-iCloud(?) song Superorganism
+			log.Warningf("empty song title %+v: skipping", s)
+			continue
+		}
 		songIdentsSet[s.Ident()] = struct{}{}
 
 		songs = append(songs, s)
