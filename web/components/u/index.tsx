@@ -1,2 +1,2 @@
 export { U } from "./U"
-export { DetailKind, Mode } from "./shared"
+export { DetailKind, Mode, InsightType, defaultInsightType, insightTypes } from "./shared"

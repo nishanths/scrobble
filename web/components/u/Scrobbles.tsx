@@ -99,7 +99,7 @@ export const Scrobbles: React.FC<{
 			setSearchValue("")
 			dispatch(setLastSearch(""))
 
-			history.push(fullPath(profileUsername, newMode, last.color, undefined))
+			history.push(fullPath(profileUsername, newMode, last.color, undefined, undefined))
 		}
 
 		const onColorChange = (newColor: Color) => {
@@ -107,7 +107,7 @@ export const Scrobbles: React.FC<{
 			dispatch(setLastScrobblesEndIdx(0))
 			dispatch(setLastColor(newColor))
 			assert(mode === Mode.Color, "mode should be Color")
-			history.push(fullPath(profileUsername, mode, newColor, undefined))
+			history.push(fullPath(profileUsername, mode, newColor, undefined, undefined))
 		}
 
 		const onSongClick = (s: Song) => {
@@ -128,7 +128,7 @@ export const Scrobbles: React.FC<{
 					assertExhaustive(mode)
 			}
 
-			history.push(fullPath(profileUsername, mode, color, { kind, songIdent: s.ident }))
+			history.push(fullPath(profileUsername, mode, color, undefined, { kind, songIdent: s.ident }))
 		}
 
 		// scrobbles redux state

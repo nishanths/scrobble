@@ -65,6 +65,7 @@ export const fullPath = (
 	profileUsername: string,
 	mode: Mode,
 	color: Color | undefined,
+	insightType: InsightType | undefined,
 	detail: {
 		kind: DetailKind
 		songIdent: string
@@ -74,8 +75,10 @@ export const fullPath = (
 	switch (mode) {
 		case Mode.All:
 		case Mode.Loved:
-		case Mode.Insights:
 			u = "/u/" + profileUsername + pathForMode(mode)
+			break
+		case Mode.Insights:
+			u = "/u/" + profileUsername + pathForMode(mode) + pathForInsightType(insightType)
 			break
 		case Mode.Color:
 			u = "/u/" + profileUsername + pathForMode(mode) + pathForColor(color)
@@ -88,3 +91,18 @@ export const fullPath = (
 	}
 	return u
 }
+
+export const pathForInsightType = (it: InsightType | undefined): string => {
+	return it === undefined ? "" : "/" + it
+}
+
+export const insightTypes = [
+	"most-played-songs",
+	"most-listened-artists",
+	"longest-songs",
+	"artist-discovery",
+] as const
+
+export type InsightType = typeof insightTypes[number]
+
+export const defaultInsightType: InsightType = "most-played-songs"
