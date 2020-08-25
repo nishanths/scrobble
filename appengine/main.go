@@ -135,10 +135,17 @@ func run(ctx context.Context) error {
 	http.HandleFunc("/api/v1/artwork/missing", s.artworkMissingHandler)
 
 	// data API handlers
-	http.HandleFunc("/api/v1/data/songs/play-count", s.songPlayCountHandler)
-	http.HandleFunc("/api/v1/data/songs/length", s.songLengthHandler)
-	http.HandleFunc("/api/v1/data/artists/play-count", s.artistPlayCountHandler)
-	http.HandleFunc("/api/v1/data/artists/added", s.artistAddedHandler)
+	if isDev() {
+		http.HandleFunc("/api/v1/data/songs/play-count", devSongPlayCountHandler)
+		http.HandleFunc("/api/v1/data/songs/length", devSongLengthHandler)
+		http.HandleFunc("/api/v1/data/artists/play-count", devArtistPlayCountHandler)
+		http.HandleFunc("/api/v1/data/artists/added", devArtistAddedHandler)
+	} else {
+		http.HandleFunc("/api/v1/data/songs/play-count", s.songPlayCountHandler)
+		http.HandleFunc("/api/v1/data/songs/length", s.songLengthHandler)
+		http.HandleFunc("/api/v1/data/artists/play-count", s.artistPlayCountHandler)
+		http.HandleFunc("/api/v1/data/artists/added", s.artistAddedHandler)
+	}
 
 	// internal handlers
 	http.Handle("/internal/fillITunesFields", s.requireTasksSecretHeader(http.HandlerFunc(s.fillITunesFieldsHandler)))
@@ -154,6 +161,7 @@ func run(ctx context.Context) error {
 	}
 
 	// Serve.
+	log.Infof("listening on port %s", port)
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		return errors.Wrapf(err, "ListenAndServe")
 	}
