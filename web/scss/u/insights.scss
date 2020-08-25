@@ -36,9 +36,13 @@
 
 	main {
 		padding: 0 5px;
+		display: flex;
+		justify-content: center;
+
 		.graph {
 			display: flex;
 			justify-content: center;
+			max-width: 500px;
 		}
 	}
 }

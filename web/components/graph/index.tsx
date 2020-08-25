@@ -59,6 +59,8 @@ export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
 		// XXX: selection may need to be more specific if there are ever
 		// multiple graph elements
 
+		// https://observablehq.com/@d3/zoomable-bar-chart
+
 		const data = [
 			{name: "E", value: 0.12702},
 			{name: "T", value: 0.09056},
@@ -72,8 +74,8 @@ export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
 
 
 		const margin = {top: 20, right: 0, bottom: 30, left: 40}
-		const width = 500
-		const height = 500
+		const width = 400
+		const height = 400
 
 		const x = d3.scaleBand()
 			.domain(data.map(d => d.name))
@@ -112,8 +114,10 @@ export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
 		}
 
 		const svg = d3.select(".Graph").append("svg")
-			.attr("viewBox", "0, 0, 400, 400")
+			.attr("viewBox", "0 0 " + width + " " + height)
 			.attr("preserveAspectRatio", "xMidYMid meet")
+			// .attr("width", width)
+			// .attr("height", height)
 			.call(zoom)
 
 		svg.append("g")
