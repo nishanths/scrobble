@@ -6,7 +6,7 @@ import { copyMap } from "../../shared/util"
 const defaultInsightsState = (() => {
 	const m: InsightsState = new Map()
 	insightTypes.forEach(it => {
-		defaultInsightsState.set(it, { status: "initial" })
+		m.set(it, { status: "initial" })
 	})
 	return m
 })()

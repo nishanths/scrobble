@@ -131,7 +131,7 @@ func devSongLengthHandler(w http.ResponseWriter, r *http.Request) {
 	time.Sleep(1 * time.Second)
 
 	data := func() string {
-		b, err := ioutil.ReadFile(filepath.Join(".devdata", "data/song_length.json"))
+		b, err := ioutil.ReadFile(filepath.Join(".devdata", "data/songs_length.json"))
 		if err != nil {
 			panic(err)
 		}
