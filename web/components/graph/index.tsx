@@ -22,10 +22,10 @@ export class Graph extends React.Component<GraphProps> {
 
 		switch (this.props.type) {
 			case "most-played-songs":
-				content = <MostPlayedSongs data={this.props.data as SongsDataResponse} />
+				content = <MostPlayedSongs data={(this.props.data || []) as SongsDataResponse} />
 				break
 			case "most-listened-artists":
-				const data = this.props.data as ArtistPlayCountDataResponse
+				const data = (this.props.data || []) as ArtistPlayCountDataResponse
 				data.sort((a, b) => {
 					if (a.totalPlayTime === b.totalPlayTime) {
 						return a.artistName.localeCompare(b.artistName)
@@ -40,7 +40,7 @@ export class Graph extends React.Component<GraphProps> {
 			case "artist-discovery":
 				break
 			case "longest-songs":
-				content = <LongestSongs data={this.props.data as SongsDataResponse} />
+				content = <LongestSongs data={(this.props.data || []) as SongsDataResponse} />
 				break
 			default:
 				assertExhaustive(this.props.type)

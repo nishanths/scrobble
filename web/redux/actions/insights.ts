@@ -80,6 +80,9 @@ const _fetchInsights = async (it: InsightType, username: string): Promise<FetchI
 			const data = await r.json()
 			return { data, private: false, err: null }
 		}
+		case 204: {
+			return { data: null, private: false, err: null }
+		}
 		case 403:
 			return { data: null, private: true, err: null }
 		// TODO: if we had the ability to display toast notifications, we could show
