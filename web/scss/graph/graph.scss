@@ -3,13 +3,14 @@
 .Graph {
 	font-family: $font-family;
 
-	.tooltip {
+	.tooltip,
+	.initial-tooltip {
 		position: absolute;
 		padding: 2px 4px;
 		font-family: $font-family;
 		font-size: 12px;
-		color: #fff;
-		background: $muted-color;
+		color: $muted-color;
+		background: #fff;
 		border: 0px;
 		border-radius: 4px;
 		pointer-events: none;
@@ -25,7 +26,7 @@
 
 	.label {
 		fill: $meta-color;
-		font-size: 14px;
+		font-size: 15px;
 	}
 
 	.x-axis, .y-axis {
@@ -37,7 +38,7 @@
 			fill: $meta-color;
 		}
 		.tick text {
-			font-size: 11px;
+			font-size: 12px;
 		}
 	}
 
@@ -102,28 +103,32 @@
 			}
 		}
 
-		.MostPlayedSongs {
-			th.album, td.album,
-			th.artist, td.artist {
-				display: none;
-			}
-		}
-
 		@media (min-width: 600px) {
 			font-size: 15px;
+		}
+	}
+}
 
-			.MostPlayedSongs {
-				th.album, td.album {
-					display: table-cell;
-				}
+.MostPlayedSongs {
+	.table {
+		th.album, td.album,
+		th.artist, td.artist {
+			display: none;
+		}
+	}
+
+	@media (min-width: 600px) {
+		.table {
+			th.album, td.album {
+				display: table-cell;
 			}
 		}
+	}
 
-		@media (min-width: 400px) {
-			.MostPlayedSongs {
-				th.artist, td.artist {
-					display: table-cell;
-				}
+	@media (min-width: 400px) {
+		.table {
+			th.artist, td.artist {
+				display: table-cell;
 			}
 		}
 	}

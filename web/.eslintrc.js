@@ -25,6 +25,7 @@ module.exports = {
     "@typescript-eslint/no-explicit-any": "off",
     "react/no-unescaped-entities": "off", // e.g. `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`
     "react/prop-types": "off", // e.g. 'username' is missing in props validation
+    "@typescript-eslint/no-this-alias": "off",
 
     // modifications
     "@typescript-eslint/member-delimiter-style": [

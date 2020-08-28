@@ -2,7 +2,7 @@ import React from "react"
 import "../../scss/graph/graph.scss"
 import { InsightType } from "../u"
 import { assertExhaustive } from "../../shared/util"
-import { SongsDataResponse } from "../../shared/types"
+import { SongsDataResponse, Song } from "../../shared/types"
 import { colors } from "../../shared/const"
 import * as d3 from "d3"
 
@@ -46,6 +46,9 @@ type MostPlayedSongsProps = {
 const maxGraphItems = 125
 
 export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
+	private svg: any
+	private tooltip: any
+
 	componentDidMount() {
 		this.draw()
 	}
@@ -57,7 +60,12 @@ export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
 	}
 
 	componentWillUnmount() {
-		// svg.remove()
+		this.svg?.remove()
+		this.tooltip?.remove()
+	}
+
+	private tooltipHTML(d: Song): string {
+		return `${d.artistName} – ${d.title}<br/>${d.playCount} times`
 	}
 
 	private draw() {
@@ -94,32 +102,43 @@ export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
 			.attr("transform", `translate(0,${height - margin.bottom})`)
 			.call(d3.axisBottom(x).tickSizeOuter(0).tickFormat(() => "").tickSize(0))
 
+		const svg = d3.select(".graph-content").append("svg")
+			.attr("viewBox", "0 0 " + width + " " + height)
+			.attr("preserveAspectRatio", "xMidYMid meet")
+			.call(zoom)
+		this.svg = svg
+
+		const tooltip = d3.select(".graph-content").append("div")
+			.attr("class", "tooltip")
+			.style("opacity", 0)
+		this.tooltip = tooltip
+
 		function zoom(svg: any) {
 			const extent: [[number, number], [number, number]] = [[margin.left, margin.top], [width - margin.right, height - margin.top]];
 
-			svg.call(d3.zoom()
+			const zoomSpec = d3.zoom()
 				.scaleExtent([1, 4])
 				.translateExtent(extent)
 				.extent(extent)
-				.on("zoom", zoomed));
+				.on("zoom", zoomed)
+
+			svg.call(zoomSpec)
 
 			function zoomed() {
 				const ns: [number, number] = [margin.left, width - margin.right]
 				const mapped = ns.map(d => d3.event.transform.applyX(d)) as [number, number]
 				x.range(mapped);
-				svg.selectAll(".bars rect").attr("x", (d: any) => x(d.ident)).attr("width", x.bandwidth());
+				svg.selectAll(".bars rect").attr("x", (d: Song) => x(d.ident)).attr("width", x.bandwidth());
 				svg.selectAll(".x-axis").call(xAxis);
+
+				// https://stackoverflow.com/questions/46005546/d3-v4-get-current-zoom-scale/46005996
+				if (d3.event.transform.k === 1) {
+					// TODO: unused
+				}
 			}
 		}
 
-		const svg = d3.select(".graph-content").append("svg")
-			.attr("viewBox", "0 0 " + width + " " + height)
-			.attr("preserveAspectRatio", "xMidYMid meet")
-			.call(zoom)
-
-		const tooltip = d3.select(".graph-content").append("div")
-			.attr("class", "tooltip")
-			.style("opacity", 0);
+		const self = this
 
 		svg.append("g")
 			.attr("class", "bars")
@@ -139,9 +158,9 @@ export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
 				tooltip.transition()
 					.duration(200)
 					.style("opacity", .9);
-				tooltip.html(d.title + "<br/>" + d.playCount)
+				tooltip.html(() => self.tooltipHTML(d))
 					.style("left", (d3.event.pageX) + 20 + "px")
-					.style("top", (d3.event.pageY - 80) + "px");
+					.style("top", (d3.event.pageY - 80) + "px")
 			})
 			.on("mouseout", function() {
 				d3.select(this).transition()
