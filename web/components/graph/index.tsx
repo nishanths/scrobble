@@ -52,6 +52,7 @@ export class Graph extends React.Component<GraphProps> {
 	}
 }
 
+const graphInstructionText = `You can hover over, zoom (scroll / pinch), and pan this graph.`
 
 const graphMargin = { top: 20, right: 0, bottom: 30, left: 100 }
 const graphHeight = 700
@@ -224,7 +225,7 @@ export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
 
 		return <div className="MostPlayedSongs">
 			<div className="graph-content"></div>
-			<div className="instruction">You can hover over, zoom (scroll), and pan this graph.</div>
+			<div className="instruction">{graphInstructionText}</div>
 			<div className="table">
 				<table>
 					<thead>
@@ -434,7 +435,7 @@ export class MostListenedArtists extends React.Component<MostListenedArtistsProp
 
 		return <div className="MostListenedArtists">
 			<div className="graph-content"></div>
-			<div className="instruction">You can hover over, zoom (scroll), and pan this graph.</div>
+			<div className="instruction">{graphInstructionText}</div>
 			<div className="table">
 				<table>
 					<thead>
@@ -636,7 +637,7 @@ export class LongestSongs extends React.Component<LongestSongsProps> {
 
 		return <div className="LongestSongs">
 			<div className="graph-content"></div>
-			<div className="instruction">You can hover over, zoom (scroll), and pan this graph.</div>
+			<div className="instruction">{graphInstructionText}</div>
 			<div className="table">
 				<table>
 					<thead>
