@@ -29,10 +29,10 @@ type InsightOption = {
 }
 
 const insightsOptionData: readonly InsightOption[] = [
-	{ type: "artist-discovery", display: "Artist discovery timeline (upcoming)", disabled: true },
 	{ type: "most-played-songs", display: "Most played songs", disabled: false },
 	{ type: "most-listened-artists", display: "Most listened to artists", disabled: false },
 	{ type: "longest-songs", display: "Longest songs", disabled: false },
+	{ type: "artist-discovery", display: "Artist discovery timeline (upcoming)", disabled: true },
 ]
 
 export const Insights: React.FC<InsightsProps> = ({
@@ -95,7 +95,7 @@ export const Insights: React.FC<InsightsProps> = ({
 		{top}
 		<div className="select-container">
 			<select value={insightType} onChange={e => { history.push(fullPath(profileUsername, Mode.Insights, last.color, e.target.value as InsightType, undefined)) }}>
-				{insightsOptionData.map(d => <option key={d.type} disabled={!!d.disabled} value={d.type}>{d.display}</option>)}
+				{insightsOptionData.filter(d => !d.disabled).map(d => <option key={d.type} value={d.type}>{d.display}</option>)}
 			</select>
 		</div>
 		<main>

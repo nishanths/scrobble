@@ -3,8 +3,7 @@
 .Graph {
 	font-family: $font-family;
 
-	.tooltip,
-	.initial-tooltip {
+	.tooltip {
 		position: absolute;
 		padding: 2px 4px;
 		font-family: $font-family;
@@ -43,6 +42,7 @@
 	}
 
 	.y-axis {
+		g:first-child,
 		g:last-child {
 			display: none;
 		}
@@ -111,6 +111,9 @@
 
 .MostPlayedSongs {
 	.table {
+		th {
+			border-color: $http-pink;
+		}
 		th.album, td.album,
 		th.artist, td.artist {
 			display: none;
@@ -126,6 +129,44 @@
 	}
 
 	@media (min-width: 400px) {
+		.table {
+			th.artist, td.artist {
+				display: table-cell;
+			}
+		}
+	}
+}
+
+.MostListenedArtists {
+	.table {
+		th {
+			border-color: $purple;
+		}
+		th.play-count, td.play-count {
+			display: none;
+		}
+	}
+
+	@media (min-width: 600px) {
+		.table {
+			th.play-count, td.play-count {
+				display: table-cell;
+			}
+		}
+	}
+}
+
+.LongestSongs {
+	.table {
+		th {
+			border-color: $yellow;
+		}
+		th.artist, td.artist {
+			display: none;
+		}
+	}
+
+	@media (min-width: 600px) {
 		.table {
 			th.artist, td.artist {
 				display: table-cell;

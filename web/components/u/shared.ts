@@ -105,4 +105,4 @@ export const insightTypes = [
 
 export type InsightType = typeof insightTypes[number]
 
-export const defaultInsightType: InsightType = "most-played-songs"
+export const defaultInsightType: InsightType = "most-listened-artists"
