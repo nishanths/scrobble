@@ -232,6 +232,4 @@ export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
 	}
 }
 
-// tooltip
-
 // copy to other two graphs
