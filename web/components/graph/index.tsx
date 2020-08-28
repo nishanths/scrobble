@@ -182,7 +182,7 @@ export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
 			return <div className="info">Not enough data yet. Scrobble away!</div>
 		}
 
-		return <>
+		return <div className="MostPlayedSongs">
 			<div className="graph-content"></div>
 			<div className="instruction">You can hover over, zoom, and pan this graph.</div>
 			<div className="table">
@@ -209,7 +209,7 @@ export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
 					</tbody>
 				</table>
 			</div>
-		</>
+		</div>
 	}
 }
 
