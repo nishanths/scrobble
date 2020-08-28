@@ -184,7 +184,7 @@ export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
 
 		return <div className="MostPlayedSongs">
 			<div className="graph-content"></div>
-			<div className="instruction">You can hover over, zoom, and pan this graph.</div>
+			<div className="instruction">You can hover over, zoom (scroll), and pan this graph.</div>
 			<div className="table">
 				<table>
 					<thead>
