@@ -143,7 +143,7 @@ func (s *server) computeArtistStatsHandler(w http.ResponseWriter, r *http.Reques
 		pcPath := statsArtistPlayCountStoragePath(t.Namespace)
 
 		wr := s.storage.Bucket(DefaultBucketName).Object(pcPath).NewWriter(ctx)
-		if err := json.NewEncoder(wr).Encode(pc); err != nil {
+		if err := json.NewEncoder(wr).Encode(pc.Data); err != nil {
 			log.Errorf("failed to json-write artist stats: %v", err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -160,7 +160,7 @@ func (s *server) computeArtistStatsHandler(w http.ResponseWriter, r *http.Reques
 		aPath := statsArtistAddedStoragePath(t.Namespace)
 
 		wr := s.storage.Bucket(DefaultBucketName).Object(aPath).NewWriter(ctx)
-		if err := json.NewEncoder(wr).Encode(a); err != nil {
+		if err := json.NewEncoder(wr).Encode(a.Data); err != nil {
 			log.Errorf("failed to json-encode artist stats: %v", err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			return

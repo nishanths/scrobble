@@ -1,3 +1,114 @@
-.Graph {
+@import "../vars";
 
+.Graph {
+	font-family: $font-family;
+
+	.tooltip {
+		position: absolute;
+		padding: 2px 4px;
+		font-family: $font-family;
+		font-size: 12px;
+		color: #fff;
+		background: $muted-color;
+		border: 0px;
+		border-radius: 4px;
+		pointer-events: none;
+	}
+
+
+	.bars {
+		rect {
+			rx: 1px;
+			ry: 1px;
+		}
+	}
+
+	.x-axis, .y-axis {
+		path {
+			stroke: $meta-color;
+		}
+		.tick * {
+			stroke: $meta-color;
+			fill: $meta-color;
+		}
+		.tick text {
+			font-size: 12px;
+		}
+	}
+
+	.instruction {
+		margin-bottom: 20px;
+		font-size: 14px;
+		color: $meta-color;
+		text-align: center;
+	}
+
+	.table {
+		font-size: 14px;
+		margin-top: 80px;
+		margin-bottom: 50px;
+		color: $muted-color;
+		display: flex;
+		justify-content: center;
+
+		table th {
+			font-weight: normal;
+			text-align: left;
+		}
+
+		table {
+			// https://stackoverflow.com/questions/17969877/force-html-tables-to-not-exceed-their-containers-size
+			// table-layout: fixed;
+			width: 100%;
+			max-width: 900px;
+
+			margin-bottom: 1rem;
+			border: 0 solid #ddd;
+			border-collapse: collapse;
+		}
+
+		td,
+		th {
+			padding: .75rem .5rem;
+			border-color: #ddd;
+			border-style: solid;
+			border-width: 0;
+			border-bottom-width: 1px;
+		}
+
+		th {
+			text-align: left;
+		}
+
+		thead th {
+			font-weight: bold;
+			border-bottom-width: 3px;
+		}
+
+		tbody {
+			tr:last-child {
+				td {
+					border-bottom-width: 0;
+				}
+			}
+		}
+
+		th.album, td.album,
+		th.artist, td.artist {
+			display: none;
+		}
+
+		@media (min-width: 600px) {
+			font-size: 15px;
+			th.album, td.album {
+				display: table-cell;
+			}
+		}
+
+		@media (min-width: 400px) {
+			th.artist, td.artist {
+				display: table-cell;
+			}
+		}
+	}
 }

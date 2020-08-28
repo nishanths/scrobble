@@ -1,5 +1,4 @@
-{
-  "data": [
+[
     {
       "artistName": "Foals",
       "playCount": 4241,
@@ -2710,5 +2709,4 @@
       "playCount": 1,
       "totalPlayTime": 555
     }
-  ]
-}
+]

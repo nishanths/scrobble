@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react"
+import React, { useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { State } from "../../redux/types/u"
 import { Mode, modeFromControlValue, fullPath, InsightType } from "./shared"

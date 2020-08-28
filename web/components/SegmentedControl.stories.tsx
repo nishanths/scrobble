@@ -19,5 +19,5 @@ s.add("default", () => {
 		newBadges,
 	}
 
-	return <SegmentedControl {...props}  />
+	return <SegmentedControl {...props} />
 })

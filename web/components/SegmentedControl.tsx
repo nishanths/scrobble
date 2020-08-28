@@ -21,7 +21,6 @@ export const SegmentedControl = <V extends readonly string[]>(props: (SegmentedC
 		setSelected(initialValue)
 	}, [initialValue])
 
-	const className = (selected: boolean, newBadge: boolean) => selected ? `c selected` : `c`
 	const onControlClick = (v: string) => {
 		const old = selected
 		if (v != old) {
