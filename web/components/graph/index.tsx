@@ -160,6 +160,21 @@ export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
 		svg.append("g")
 			.attr("class", "y-axis")
 			.call(yAxis);
+
+		svg.append("text")
+			.attr("class", "x label")
+			.attr("text-anchor", "end")
+			.attr("x", width)
+			.attr("y", height - 6)
+			.text("Songs");
+
+		svg.append("text")
+			.attr("class", "y label")
+			.attr("text-anchor", "end")
+			.attr("x", 120)
+			.attr("y", 30)
+			.attr("dy", ".75em")
+			.text("↑ Times played");
 	}
 
 	render() {
@@ -169,7 +184,7 @@ export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
 
 		return <>
 			<div className="graph-content"></div>
-			<div className="instruction">You can hover over, zoom in, and pan this graph.</div>
+			<div className="instruction">You can hover over, zoom, and pan this graph.</div>
 			<div className="table">
 				<table>
 					<thead>
@@ -184,7 +199,7 @@ export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
 					<tbody>
 						{this.props.data.slice(0, maxGraphItems).map((d, i) => {
 							return <tr key={d.ident}>
-								<td>{i+1}</td>
+								<td>{i + 1}</td>
 								<td>{d.title}</td>
 								<td className="artist">{d.artistName}</td>
 								<td className="album">{d.albumTitle}</td>

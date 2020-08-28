@@ -23,6 +23,11 @@
 		}
 	}
 
+	.label {
+		fill: $meta-color;
+		font-size: 14px;
+	}
+
 	.x-axis, .y-axis {
 		path {
 			stroke: $meta-color;
@@ -32,7 +37,13 @@
 			fill: $meta-color;
 		}
 		.tick text {
-			font-size: 12px;
+			font-size: 10px;
+		}
+	}
+
+	.y-axis {
+		g:last-child {
+			display: none;
 		}
 	}
 
