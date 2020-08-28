@@ -213,12 +213,6 @@ export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
 	}
 }
 
-// axes appearance and label color
-// hover color
-// code cleanup
-
 // tooltip
-// tabular data
-// scroll instruction
 
 // copy to other two graphs
