@@ -1,7 +1,7 @@
 import React from "react"
 import "../../scss/graph/graph.scss"
 import { InsightType } from "../u"
-import { assertExhaustive } from "../../shared/util"
+import { assertExhaustive, pluralize } from "../../shared/util"
 import { SongsDataResponse, Song } from "../../shared/types"
 import { colors } from "../../shared/const"
 import * as d3 from "d3"
@@ -43,6 +43,9 @@ type MostPlayedSongsProps = {
 	data: SongsDataResponse
 }
 
+const graphMargin = { top: 20, right: 0, bottom: 30, left: 40 }
+const graphHeight = 600
+const graphWidth = 1000
 const maxGraphItems = 125
 
 export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
@@ -65,13 +68,10 @@ export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
 	}
 
 	private tooltipHTML(d: Song): string {
-		return `${d.artistName} – ${d.title}<br/>${d.playCount} times`
+		return `${d.artistName} – ${d.title}<br/>${d.playCount.toLocaleString()} ${pluralize("time", d.playCount)}`
 	}
 
 	private draw() {
-		// XXX: d3.select() calls for svg may need to be more specific if there are ever
-		// multiple graph elements
-
 		// https://observablehq.com/@d3/zoomable-bar-chart
 
 		if (this.props.data.length === 0) {
@@ -80,9 +80,9 @@ export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
 
 		const data = this.props.data.slice(0, maxGraphItems)
 
-		const margin = { top: 20, right: 0, bottom: 30, left: 40 }
-		const width = 1100
-		const height = 800
+		const margin = graphMargin
+		const width = graphWidth
+		const height = graphHeight
 
 		const x = d3.scaleBand()
 			.domain(data.map(d => d.ident))
@@ -222,7 +222,7 @@ export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
 								<td>{d.title}</td>
 								<td className="artist">{d.artistName}</td>
 								<td className="album">{d.albumTitle}</td>
-								<td>{d.playCount}</td>
+								<td>{d.playCount.toLocaleString()}</td>
 							</tr>
 						})}
 					</tbody>

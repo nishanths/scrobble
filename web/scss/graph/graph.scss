@@ -33,11 +33,11 @@
 		path {
 			stroke: $meta-color;
 		}
-		.tick * {
+		.tick line {
 			stroke: $meta-color;
-			fill: $meta-color;
 		}
 		.tick text {
+			fill: $meta-color;
 			font-size: 12px;
 		}
 	}
