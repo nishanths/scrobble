@@ -1,9 +1,9 @@
 import React from "react"
 import { RouteComponentProps } from "react-router-dom";
 import { UArgs, NProgress } from "../../shared/types"
-import { Mode, DetailKind } from "./shared"
+import { Mode, DetailKind, InsightType } from "./shared"
 import { Scrobbles } from "./Scrobbles"
-import { Graphs } from "./Graphs"
+import { Insights } from "./Insights"
 import { Detail } from "./Detail"
 import { hexDecode } from "../../shared/util"
 import { Color } from "../colorpicker"
@@ -17,6 +17,7 @@ type UProps = UArgs & {
 		kind: DetailKind
 		hexIdent: string // hex-encoded song ident
 	}
+	insightType?: InsightType
 	nProgress: NProgress
 } & RouteComponentProps;
 
@@ -32,6 +33,7 @@ export const U: React.FC<UProps> = ({
 	mode,
 	color,
 	detail,
+	insightType,
 	history,
 	nProgress,
 }) => {
@@ -49,10 +51,14 @@ export const U: React.FC<UProps> = ({
 			history={history}
 		/>
 	} else if (mode === Mode.Insights) {
-		return <Graphs
+		return <Insights
 			profileUsername={profileUsername}
 			signedIn={!!logoutURL}
+			private={priv}
+			self={self}
 			history={history}
+			insightType={insightType!}
+			nProgress={nProgress}
 		/>
 	} else {
 		return <Scrobbles

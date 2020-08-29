@@ -27,8 +27,7 @@
     height: $height-small;
     display: flex;
     justify-content: center;
-    align-content: center;
-    flex-direction: column;
+    align-items: center;
     color: $meta-color;
     font-weight: 600;
     cursor: pointer;
@@ -41,6 +40,19 @@
       border: 1px solid rgb(239, 46, 84);
       box-shadow: 0px 3px 10px #ec2e53 inset;
     }
+
+    .new-badge {
+      text-transform: uppercase;
+      font-size: 10px;
+      margin-left: 7px;
+      padding: 1px 4px;
+      background-color: #0074d9;
+      border-radius: 4px;
+      color: #f5f5f5;
+      border: 1px solid #0074d9;
+      position: relative;
+      top: -1px;
+    }
   }
 
   .c:first-child {
@@ -52,7 +64,7 @@
     border-bottom: 1px solid #ccc;
   }
 
-  @media screen and (min-width: 400px) {
+  @media screen and (min-width: 450px) {
     flex-flow: nowrap;
 
     .c {
@@ -61,6 +73,9 @@
       border: 1px solid #ccc;
       border-right: 0;
       height: $height-large;
+      &.has-badge {
+        width: $segmented-control-elem-w-large + 30px;
+      }
     }
 
     .c:first-child {

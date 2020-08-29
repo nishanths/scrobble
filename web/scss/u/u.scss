@@ -26,11 +26,9 @@ body {
 .header {
   max-width: header-width(1, $dim);
 
-  // Aligning elements center and right: https://stackoverflow.com/a/38948646
-  display: grid;
-  grid-template-columns: 1fr repeat(1, auto) 1fr;
-  grid-column-gap: 5px;
-  justify-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
   font-size: 24px;
   color: $muted-color;
@@ -40,19 +38,16 @@ body {
     max-width: 275px;
     @include ellipsis();
     display: block;
-    grid-column-start: 2;
     .emph {
       font-weight: 600;
     }
   }
 
   .nav {
-    display: none;
-    margin-left: auto;
     font-size: 15px;
     font-weight: 600;
-    position: relative;
-    top: 8px;
+    margin-top: 10px;
+
     a {
       text-decoration: none;
       color: inherit;
@@ -98,7 +93,7 @@ body {
 // TODO: should validate programatically that at each breakpoint, the
 // specified number of cards (i.e. $n-cards) can really be shown.
 
-@media screen and (min-width: 360px) {
+@media screen and (min-width: 365px) {
   $cards: 2;
   $dim: 139px;
   $bb: 90px;
@@ -272,6 +267,22 @@ body {
     max-width: app-width($cards, $dim)
   }
   .header {
+    // Aligning elements center and right: https://stackoverflow.com/a/38948646
+    display: grid;
+    grid-template-columns: 1fr repeat(1, auto) 1fr;
+    grid-column-gap: 5px;
+    justify-items: center;
+
+    .username {
+      grid-column-start: 2;
+    }
+    .nav {
+      margin-left: auto;
+      margin-top: 0;
+      position: relative;
+      top: 2px;
+    }
+
     max-width: header-width($cards, $dim)
   }
   .SongCard {

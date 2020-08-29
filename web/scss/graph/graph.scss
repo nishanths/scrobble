@@ -1,0 +1,185 @@
+@import "../vars";
+
+.Graph {
+	font-family: $font-family;
+
+	.tooltip {
+		position: absolute;
+		padding: 2px 4px;
+		font-family: $font-family;
+		font-size: 12px;
+		color: $muted-color;
+		background: #fff;
+		border: 0px;
+		border-radius: 4px;
+		pointer-events: none;
+	}
+
+
+	.bars {
+		rect {
+			rx: 1px;
+			ry: 1px;
+		}
+	}
+
+	.label {
+		fill: $meta-color;
+		font-size: 15px;
+	}
+
+	.x-axis, .y-axis {
+		path {
+			stroke: $meta-color;
+		}
+		.tick line {
+			stroke: $meta-color;
+		}
+		.tick text {
+			fill: $meta-color;
+			font-size: 12px;
+		}
+	}
+
+	.y-axis {
+		g:first-child,
+		g:last-child {
+			display: none;
+		}
+	}
+
+	.instruction {
+		margin-bottom: 20px;
+		font-size: 14px;
+		color: $meta-color;
+		text-align: center;
+	}
+
+	.table {
+		font-size: 14px;
+		margin-top: 60px;
+		margin-bottom: 50px;
+		color: $muted-color;
+		display: flex;
+		justify-content: center;
+
+		table th {
+			font-weight: normal;
+			text-align: left;
+		}
+
+		table {
+			width: 100%;
+			max-width: 900px;
+
+			margin-bottom: 1rem;
+			border: 0 solid #ddd;
+			border-collapse: collapse;
+		}
+
+		td,
+		th {
+			padding: .75rem .5rem;
+			border-color: #ddd;
+			border-style: solid;
+			border-width: 0;
+			border-bottom-width: 1px;
+		}
+
+		th {
+			text-align: left;
+		}
+
+		td {
+			color: $meta-color;
+		}
+
+		a {
+			color: $meta-color;
+			text-decoration: none;
+		}
+
+		thead th {
+			font-weight: bold;
+			border-bottom-width: 3px;
+		}
+
+		tbody {
+			tr:last-child {
+				td {
+					border-bottom-width: 0;
+				}
+			}
+		}
+
+		@media (min-width: 600px) {
+			font-size: 15px;
+		}
+	}
+}
+
+.MostPlayedSongs {
+	.table {
+		th {
+			border-color: $http-pink;
+		}
+		th.album, td.album,
+		th.artist, td.artist {
+			display: none;
+		}
+	}
+
+	@media (min-width: 600px) {
+		.table {
+			th.album, td.album {
+				display: table-cell;
+			}
+		}
+	}
+
+	@media (min-width: 400px) {
+		.table {
+			th.artist, td.artist {
+				display: table-cell;
+			}
+		}
+	}
+}
+
+.MostListenedArtists {
+	.table {
+		th {
+			border-color: $purple;
+		}
+		th.play-count, td.play-count {
+			display: none;
+		}
+	}
+
+	@media (min-width: 600px) {
+		.table {
+			th.play-count, td.play-count {
+				display: table-cell;
+			}
+		}
+	}
+}
+
+.LongestSongs {
+	.table {
+		th {
+			border-color: $yellow;
+		}
+		th.artist, td.artist {
+			display: none;
+		}
+	}
+
+	@media (min-width: 600px) {
+		.table {
+			th.artist, td.artist {
+				display: table-cell;
+			}
+		}
+	}
+}

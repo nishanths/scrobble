@@ -5,8 +5,10 @@ import { SegmentedControl } from './SegmentedControl';
 const s = storiesOf("SegmentedControl", module)
 
 s.add("default", () => {
-	const values = ["All", "Loved", "By color"] as const
+	const values = ["All", "Loved", "By color", "Insights"] as const
 	type V = typeof values[number]
+
+	const newBadges: Set<V> = new Set(["Insights"])
 
 	const props = {
 		values,
@@ -14,6 +16,7 @@ s.add("default", () => {
 		afterChange: (v: V) => {
 			console.log(v)
 		},
+		newBadges,
 	}
 
 	return <SegmentedControl {...props} />

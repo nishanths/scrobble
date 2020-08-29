@@ -1,10 +1,11 @@
 import React from "react";
 import thunk from 'redux-thunk'
 import * as ReactDOM from "react-dom";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom"
+import path from "path"
+import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom"
 import { createStore, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
-import { U, Mode, DetailKind } from "../components/u"
+import { U, Mode, DetailKind, defaultInsightType, insightTypes } from "../components/u"
 import { colors } from "../components/colorpicker"
 import { UArgs, NProgress } from "../shared/types";
 import reducer from "../redux/reducers/u"
@@ -38,7 +39,17 @@ ReactDOM.render(
 				{colors.map(c => <Route key={c} exact path={`/u/:username/color/${c}`} render={p => <U {...uargs} wnd={window} mode={Mode.Color} color={c} nProgress={NProgress} {...p} />} />)}
 				{colors.map(c => <Route key={c + "a"} exact path={`/u/:username/color/${c}/album/:hexSongIdent`} render={p => <U {...uargs} wnd={window} mode={Mode.Color} color={c} detail={{ kind: DetailKind.Album, hexIdent: p.match.params["hexSongIdent"] }} nProgress={NProgress} {...p} />} />)}
 
-				<Route exact path="/u/:username/insights" render={p => <U {...uargs} wnd={window} mode={Mode.Insights} nProgress={NProgress} {...p} />} />
+				<Route
+					exact
+					path="/u/:username/insights"
+					render={p => <Redirect to={path.join(p.location.pathname + "/" + defaultInsightType)} />}
+				/>
+				{insightTypes.map(it => <Route
+					key={it}
+					exact
+					path={["/u/:username/insights/" + it]}
+					render={p => <U {...uargs} wnd={window} mode={Mode.Insights} insightType={it} nProgress={NProgress} {...p} />}
+				/>)}
 			</Switch>
 		</Router>
 	</Provider>,

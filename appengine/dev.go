@@ -112,3 +112,59 @@ func devScrobbledColorHandler(w http.ResponseWriter, r *http.Request) {
 
 	io.WriteString(w, data)
 }
+
+func devSongPlayCountHandler(w http.ResponseWriter, r *http.Request) {
+	time.Sleep(1 * time.Second)
+
+	data := func() string {
+		b, err := ioutil.ReadFile(filepath.Join(".devdata", "data/songs_play_count.json"))
+		if err != nil {
+			panic(err)
+		}
+		return string(b)
+	}()
+
+	io.WriteString(w, data)
+}
+
+func devSongLengthHandler(w http.ResponseWriter, r *http.Request) {
+	time.Sleep(1 * time.Second)
+
+	data := func() string {
+		b, err := ioutil.ReadFile(filepath.Join(".devdata", "data/songs_length.json"))
+		if err != nil {
+			panic(err)
+		}
+		return string(b)
+	}()
+
+	io.WriteString(w, data)
+}
+
+func devArtistPlayCountHandler(w http.ResponseWriter, r *http.Request) {
+	time.Sleep(1 * time.Second)
+
+	data := func() string {
+		b, err := ioutil.ReadFile(filepath.Join(".devdata", "data/artists_play_count.json"))
+		if err != nil {
+			panic(err)
+		}
+		return string(b)
+	}()
+
+	io.WriteString(w, data)
+}
+
+func devArtistAddedHandler(w http.ResponseWriter, r *http.Request) {
+	time.Sleep(1 * time.Second)
+
+	data := func() string {
+		b, err := ioutil.ReadFile(filepath.Join(".devdata", "data/artists_added.json"))
+		if err != nil {
+			panic(err)
+		}
+		return string(b)
+	}()
+
+	io.WriteString(w, data)
+}

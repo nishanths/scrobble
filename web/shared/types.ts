@@ -64,3 +64,22 @@ export type Notie = {
 		position?: 'top' | 'bottom' // optional, default = 'top'
 	}): void
 }
+
+export type SongsDataResponse = Song[]
+
+export type ArtistAddedDatum = {
+	artistName: string
+	added: number
+	latestSongs: Song[]
+	earliestSong: Song[]
+}
+
+export type ArtistAddedDataResponse = ArtistAddedDatum[]
+
+export type ArtistPlayCountDatum = {
+	artistName: string
+	playCount: number
+	totalPlayTime: number
+}
+
+export type ArtistPlayCountDataResponse = ArtistPlayCountDatum[]
