@@ -90,6 +90,15 @@
 			text-align: left;
 		}
 
+		td {
+			color: $meta-color;
+		}
+
+		a {
+			color: $meta-color;
+			text-decoration: none;
+		}
+
 		thead th {
 			font-weight: bold;
 			border-bottom-width: 3px;

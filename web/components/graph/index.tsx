@@ -2,7 +2,7 @@ import React from "react"
 import "../../scss/graph/graph.scss"
 import { InsightType } from "../u"
 import { assertExhaustive, pluralize } from "../../shared/util"
-import { secondsToHms  } from "../../shared/time"
+import { secondsToHms } from "../../shared/time"
 import { SongsDataResponse, Song, ArtistPlayCountDataResponse, ArtistPlayCountDatum } from "../../shared/types"
 import { colors } from "../../shared/const"
 import * as d3 from "d3"
@@ -24,7 +24,7 @@ export class Graph extends React.Component<GraphProps> {
 			case "most-played-songs":
 				content = <MostPlayedSongs data={(this.props.data || []) as SongsDataResponse} />
 				break
-			case "most-listened-artists":
+			case "most-listened-artists": {
 				const data = (this.props.data || []) as ArtistPlayCountDataResponse
 				data.sort((a, b) => {
 					if (a.totalPlayTime === b.totalPlayTime) {
@@ -37,6 +37,7 @@ export class Graph extends React.Component<GraphProps> {
 				})
 				content = <MostListenedArtists data={data} />
 				break
+			}
 			case "artist-discovery":
 				break
 			case "longest-songs":
@@ -186,13 +187,13 @@ export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
 					.duration(500)
 					.style("opacity", 0);
 			})
-			.attr("y", (d) => y(0))
-			.attr("height", (d) => 0)
+			.attr("y", () => y(0))
+			.attr("height", () => 0)
 			.transition()
-				.duration(500)
-				.attr("y", (d) => y(d.playCount))
-				.attr("height", (d) => y(0) - y(d.playCount))
-				.delay(function(d,i){return(i*20)})
+			.duration(500)
+			.attr("y", (d) => y(d.playCount))
+			.attr("height", (d) => y(0) - y(d.playCount))
+			.delay(function(d, i) { return (i * 20) })
 
 		svg.append("g")
 			.attr("class", "x-axis")
@@ -240,11 +241,11 @@ export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
 					<tbody>
 						{this.props.data.slice(0, this.maxDataItems).map((d, i) => {
 							return <tr key={d.ident}>
-								<td>{i + 1}</td>
-								<td>{d.title}</td>
-								<td className="artist">{d.artistName}</td>
-								<td className="album">{d.albumTitle}</td>
-								<td>{d.playCount.toLocaleString()}</td>
+								<td>{maybeLink(i+1, d.trackViewURL)}</td>
+								<td>{maybeLink(d.title, d.trackViewURL)}</td>
+								<td className="artist">{maybeLink(d.artistName, d.trackViewURL)}</td>
+								<td className="album">{maybeLink(d.albumTitle, d.trackViewURL)}</td>
+								<td>{maybeLink(d.playCount.toLocaleString(), d.trackViewURL)}</td>
 							</tr>
 						})}
 					</tbody>
@@ -254,12 +255,18 @@ export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
 	}
 }
 
+function maybeLink(n: React.ReactNode, url: string) {
+	return url ?
+		<a href={url} target="_blank" rel="noreferrer">{n}</a> :
+		n
+}
+
 function hmsDisplay(h: number, m: number, s: number, long: boolean): [string, string, string] {
 	const reth = h === 0 ?
 		"" :
-		(""+h) + (long ? pluralize(" hour", m) : "h")
-	const retm = (long ? ""+m : (""+m).padStart(2, "0")) + (long ? pluralize(" minute", m) : "m")
-	const rets = (long ? ""+s : (""+s).padStart(2, "0")) + (long ? pluralize(" second", s) : "s")
+		("" + h) + (long ? pluralize(" hour", m) : "h")
+	const retm = (long ? "" + m : ("" + m).padStart(2, "0")) + (long ? pluralize(" minute", m) : "m")
+	const rets = (long ? "" + s : ("" + s).padStart(2, "0")) + (long ? pluralize(" second", s) : "s")
 	return [reth, retm, rets]
 }
 
@@ -320,7 +327,7 @@ export class MostListenedArtists extends React.Component<MostListenedArtistsProp
 			.attr("transform", `translate(${margin.left},0)`)
 			.call(d3.axisLeft(y).tickFormat((n) => {
 				const [h, m, s] = secondsToHms(n as number)
-				const [hd, md, ] = hmsDisplay(h, m, s, false)
+				const [hd, md,] = hmsDisplay(h, m, s, false)
 				return hd + " " + md
 			}))
 			.call((g: any) => g.select(".domain").remove())
@@ -396,13 +403,13 @@ export class MostListenedArtists extends React.Component<MostListenedArtistsProp
 					.duration(500)
 					.style("opacity", 0);
 			})
-			.attr("y", (d) => y(0))
-			.attr("height", (d) => 0)
+			.attr("y", () => y(0))
+			.attr("height", () => 0)
 			.transition()
-				.duration(500)
-				.attr("y", (d) => y(d.totalPlayTime))
-				.attr("height", (d) => y(0) - y(d.totalPlayTime))
-				.delay(function(d,i){return(i*20)})
+			.duration(500)
+			.attr("y", (d) => y(d.totalPlayTime))
+			.attr("height", (d) => y(0) - y(d.totalPlayTime))
+			.delay(function(d, i) { return (i * 20) })
 
 		svg.append("g")
 			.attr("class", "x-axis")
@@ -450,13 +457,13 @@ export class MostListenedArtists extends React.Component<MostListenedArtistsProp
 						{this.props.data.slice(0, this.maxDataItems).map((d, i) => {
 							const [h, m, s] = secondsToHms(d.totalPlayTime)
 							const [hd, md, sd] = hmsDisplay(h, m, s, false)
-
-							return <tr key={d.artistName}>
+							const row = <tr key={d.artistName}>
 								<td>{i + 1}</td>
 								<td className="artist">{d.artistName}</td>
 								<td>{hd + " " + md + " " + sd}</td>
 								<td className="play-count">{d.playCount.toLocaleString()}</td>
 							</tr>
+							return row
 						})}
 					</tbody>
 				</table>
@@ -491,7 +498,7 @@ export class LongestSongs extends React.Component<LongestSongsProps> {
 	}
 
 	private tooltipHTML(d: Song): string {
-		const [h, m, s] = secondsToHms(d.totalTime / 10**9)
+		const [h, m, s] = secondsToHms(d.totalTime / 10 ** 9)
 		const [hd, md, sd] = hmsDisplay(h, m, s, true)
 		return `${d.artistName} – ${d.title}<br/>${(hd + " " + md + " " + sd).trim()}`
 	}
@@ -521,7 +528,7 @@ export class LongestSongs extends React.Component<LongestSongsProps> {
 		const yAxis = (g: any) => g
 			.attr("transform", `translate(${margin.left},0)`)
 			.call(d3.axisLeft(y).tickFormat((n) => {
-				const [h, m, s] = secondsToHms(n as number / 10**9)
+				const [h, m, s] = secondsToHms(n as number / 10 ** 9)
 				const [hd, md, sd] = hmsDisplay(h, m, s, false)
 				return (hd + " " + md + " " + sd).trim()
 			}))
@@ -598,13 +605,13 @@ export class LongestSongs extends React.Component<LongestSongsProps> {
 					.duration(500)
 					.style("opacity", 0);
 			})
-			.attr("y", (d) => y(0))
-			.attr("height", (d) => 0)
+			.attr("y", () => y(0))
+			.attr("height", () => 0)
 			.transition()
-				.duration(500)
-				.attr("y", (d) => y(d.totalTime))
-				.attr("height", (d) => y(0) - y(d.totalTime))
-				.delay(function(d,i){return(i*20)})
+			.duration(500)
+			.attr("y", (d) => y(d.totalTime))
+			.attr("height", (d) => y(0) - y(d.totalTime))
+			.delay(function(d, i) { return (i * 20) })
 
 		svg.append("g")
 			.attr("class", "x-axis")
@@ -650,14 +657,13 @@ export class LongestSongs extends React.Component<LongestSongsProps> {
 					</thead>
 					<tbody>
 						{this.props.data.slice(0, this.maxDataItems).map((d, i) => {
-							const [h, m, s] = secondsToHms(d.totalTime / 10**9)
+							const [h, m, s] = secondsToHms(d.totalTime / 10 ** 9)
 							const [hd, md, sd] = hmsDisplay(h, m, s, false)
-
 							return <tr key={d.ident}>
-								<td>{i + 1}</td>
-								<td>{d.title}</td>
-								<td className="artist">{d.artistName}</td>
-								<td>{(hd + " " + md + " " + sd).trim()}</td>
+								<td>{maybeLink(i + 1, d.trackViewURL)}</td>
+								<td>{maybeLink(d.title, d.trackViewURL)}</td>
+								<td className="artist">{maybeLink(d.artistName, d.trackViewURL)}</td>
+								<td>{maybeLink((hd + " " + md + " " + sd).trim(), d.trackViewURL)}</td>
 							</tr>
 						})}
 					</tbody>
@@ -666,8 +672,3 @@ export class LongestSongs extends React.Component<LongestSongsProps> {
 		</div>
 	}
 }
-
-// copy to other two graphs
-
-
-

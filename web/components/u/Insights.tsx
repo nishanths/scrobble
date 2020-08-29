@@ -29,8 +29,8 @@ type InsightOption = {
 }
 
 const insightsOptionData: readonly InsightOption[] = [
-	{ type: "most-played-songs", display: "Most played songs", disabled: false },
-	{ type: "most-listened-artists", display: "Most listened to artists", disabled: false },
+	{ type: "most-played-songs", display: "Top played songs", disabled: false },
+	{ type: "most-listened-artists", display: "Most listened artists", disabled: false },
 	{ type: "longest-songs", display: "Longest songs", disabled: false },
 	{ type: "artist-discovery", display: "Artist discovery timeline (upcoming)", disabled: true },
 ]
