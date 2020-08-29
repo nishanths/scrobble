@@ -123,7 +123,7 @@ export class MostPlayedSongs extends React.Component<MostPlayedSongsProps> {
 			.attr("viewBox", "0 0 " + width + " " + height)
 			.attr("width", "100%")
 			.attr("preserveAspectRatio", "xMidYMid meet")
-			.call(zoom)
+			// .call(zoom)
 		this.svg = svg
 
 		const tooltip = d3.select(".graph-content").append("div")
@@ -339,7 +339,7 @@ export class MostListenedArtists extends React.Component<MostListenedArtistsProp
 		const svg = d3.select(".graph-content").append("svg")
 			.attr("viewBox", "0 0 " + width + " " + height)
 			.attr("preserveAspectRatio", "xMidYMid meet")
-			.call(zoom)
+			// .call(zoom)
 		this.svg = svg
 
 		const tooltip = d3.select(".graph-content").append("div")
@@ -541,7 +541,7 @@ export class LongestSongs extends React.Component<LongestSongsProps> {
 		const svg = d3.select(".graph-content").append("svg")
 			.attr("viewBox", "0 0 " + width + " " + height)
 			.attr("preserveAspectRatio", "xMidYMid meet")
-			.call(zoom)
+			// .call(zoom)
 		this.svg = svg
 
 		const tooltip = d3.select(".graph-content").append("div")

@@ -53,6 +53,8 @@
 		font-size: 14px;
 		color: $meta-color;
 		text-align: center;
+
+		display: none; // since zoom/pan on graphs is currently disabled
 	}
 
 	.table {
