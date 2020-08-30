@@ -25,6 +25,7 @@ Get it from the [Releases](https://github.com/nishanths/scrobble/releases/latest
 * See scrobbled songs that you "love" on Apple Music
 * Browse scrobbled albums by artwork color
 * A detail page for seeing album artwork and song metadata
+* Graphs and insights on top played songs, longest songs, most listened artists
 
 ## Build Status
 
