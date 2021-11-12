@@ -110,7 +110,7 @@ func run(ctx context.Context) error {
 			}
 		} else {
 			// copy the file directly to dst
-			if err := copyFile(path, filepath.Join(*fDst, i.Name())); err != nil {
+			if err := copyFile(filepath.Join(*fDst, i.Name()), path); err != nil {
 				return fmt.Errorf("copy file: %s", err)
 			}
 		}
@@ -119,7 +119,7 @@ func run(ctx context.Context) error {
 	})
 }
 
-func copyFile(src, dst string) error {
+func copyFile(dst, src string) error {
 	in, err := os.Open(src)
 	if err != nil {
 		return err
