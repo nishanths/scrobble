@@ -14,7 +14,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"gopkg.in/russross/blackfriday.v2"
+	"github.com/russross/blackfriday/v2"
 )
 
 var (
@@ -136,7 +136,7 @@ func copyFile(src, dst string) error {
 	if err != nil {
 		return err
 	}
-	return out.Close()
+	return nil
 }
 
 func convertNameToTitle(f string) string {
