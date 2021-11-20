@@ -38,6 +38,7 @@ sb:
 
 .PHONY: deps
 deps:
+	# NOTE: Needs node version 14; node version 16 is known to fail.
 	npm i
 	# remove bad types file
 	rm node_modules/flexsearch/index.d.ts
