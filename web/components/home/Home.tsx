@@ -40,6 +40,8 @@ export const Home: React.FC<HomeProps> = ({ loginURL }) => {
 				<a href={guideLink}><div className="item">How do I use Scrobble?</div></a>
 				<a href={apiDocLink}><div className="item">API doc</div></a>
 				<a href={macOSAppLink}><div className="item">Download macOS app</div></a>
+				<a href={"/terms"}><div className="item">Terms of use</div></a>
+				<a href={"/privacy-policy"}><div className="item">Privacy</div></a>
 			</div>
 		</div>
 	</div>

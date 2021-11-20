@@ -86,7 +86,7 @@ func appengineTemplateDashboardHtml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "appengine/template/dashboard.html", size: 739, mode: os.FileMode(0644), modTime: time.Unix(1592424782, 0)}
+	info := bindataFileInfo{name: "appengine/template/dashboard.html", size: 739, mode: os.FileMode(0644), modTime: time.Unix(1636699053, 0)}
 	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0x3d, 0x4d, 0x1a, 0x30, 0xd3, 0x32, 0x3c, 0xb8, 0x8, 0x14, 0xa0, 0xba, 0xfb, 0xaa, 0x55, 0xf, 0x65, 0xd2, 0xfb, 0xc4, 0x30, 0x1, 0xb9, 0xe, 0x8a, 0xf5, 0xbc, 0xba, 0x24, 0xa5, 0x3a, 0xd7}}
 	return a, nil
 }
@@ -106,7 +106,7 @@ func appengineTemplateHomeHtml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "appengine/template/home.html", size: 777, mode: os.FileMode(0644), modTime: time.Unix(1598199053, 0)}
+	info := bindataFileInfo{name: "appengine/template/home.html", size: 777, mode: os.FileMode(0644), modTime: time.Unix(1636699053, 0)}
 	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0xe4, 0x68, 0xe5, 0x12, 0xe, 0x13, 0xca, 0xd5, 0x70, 0xb7, 0x11, 0x7d, 0x4c, 0xe8, 0x92, 0x9d, 0xcd, 0x68, 0xaa, 0xbb, 0x2f, 0xd0, 0xfe, 0xd8, 0x1a, 0xba, 0xf4, 0xb7, 0xd7, 0xc9, 0xe0, 0xf6}}
 	return a, nil
 }
@@ -126,7 +126,7 @@ func appengineTemplateUHtml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "appengine/template/u.html", size: 674, mode: os.FileMode(0644), modTime: time.Unix(1598651269, 0)}
+	info := bindataFileInfo{name: "appengine/template/u.html", size: 674, mode: os.FileMode(0644), modTime: time.Unix(1636699053, 0)}
 	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0x6e, 0xab, 0x12, 0xbf, 0x7e, 0x2b, 0xf6, 0xb6, 0x1e, 0x16, 0x37, 0x54, 0x99, 0x28, 0xe5, 0xd, 0x8f, 0xa4, 0x2c, 0xbd, 0x79, 0xc5, 0x94, 0xf7, 0x84, 0x20, 0x46, 0x32, 0x49, 0xf0, 0x70, 0x83}}
 	return a, nil
 }
@@ -227,8 +227,8 @@ var _bindata = map[string]func() (*asset, error){
 	"appengine/template/u.html":         appengineTemplateUHtml,
 }
 
-// Debug is true if the assets were built with the debug flag enabled.
-const Debug = false
+// AssetDebug is true if the assets were built with the debug flag enabled.
+const AssetDebug = false
 
 // AssetDir returns the file names below a certain
 // directory embedded in the file by go-bindata.
@@ -271,11 +271,11 @@ type bintree struct {
 }
 
 var _bintree = &bintree{nil, map[string]*bintree{
-	"appengine": &bintree{nil, map[string]*bintree{
-		"template": &bintree{nil, map[string]*bintree{
-			"dashboard.html": &bintree{appengineTemplateDashboardHtml, map[string]*bintree{}},
-			"home.html":      &bintree{appengineTemplateHomeHtml, map[string]*bintree{}},
-			"u.html":         &bintree{appengineTemplateUHtml, map[string]*bintree{}},
+	"appengine": {nil, map[string]*bintree{
+		"template": {nil, map[string]*bintree{
+			"dashboard.html": {appengineTemplateDashboardHtml, map[string]*bintree{}},
+			"home.html": {appengineTemplateHomeHtml, map[string]*bintree{}},
+			"u.html": {appengineTemplateUHtml, map[string]*bintree{}},
 		}},
 	}},
 }}

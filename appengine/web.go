@@ -463,6 +463,18 @@ func ptrStruct() *struct{} {
 	return &struct{}{}
 }
 
+const terms = `THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+`
+
 const privacyPolicy = `Your privacy is important to us. It is Littleroot's policy to respect your
 privacy regarding any information we may collect from you across our
 website, https://` + AppDomain + `, and other sites we own and operate.
@@ -498,6 +510,14 @@ This policy is effective as of 12 April 2020.
 
 [Privacy Policy created with GetTerms.](https://getterms.io/)
 `
+
+func (s *server) termsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
+	io.WriteString(w, terms)
+}
 
 func (s *server) privacyPolicyHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {

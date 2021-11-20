@@ -108,6 +108,7 @@ func run(ctx context.Context) error {
 	http.Handle("/login", webMiddleware(http.HandlerFunc(s.loginHandler)))
 	http.Handle("/googleAuth", webMiddleware(http.HandlerFunc(s.googleAuthHandler)))
 	http.Handle("/logout", webMiddleware(http.HandlerFunc(s.logoutHandler)))
+	http.Handle("/terms", webMiddleware(http.HandlerFunc(s.termsHandler)))
 	http.Handle("/privacy-policy", webMiddleware(http.HandlerFunc(s.privacyPolicyHandler)))
 
 	// doc handlers
