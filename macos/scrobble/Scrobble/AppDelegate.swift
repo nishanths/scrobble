@@ -42,7 +42,7 @@ struct State {
 
 
 struct Constants {
-    static let AppDomain = "scrobble.littleroot.org"
+    static let AppDomain = "scrobbl.es"
     static let BaseUrl = "selective-scrobble.appspot.com"
     static let HelpLink = "https://" + Constants.AppDomain
 }

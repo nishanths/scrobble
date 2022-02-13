@@ -17,7 +17,7 @@ Authentication is done by including the following HTTP header in requests.
 X-Scrobble-API-Key: <your API key>
 ```
 
-Your API key can be found in the [dashboard](https://scrobble.littleroot.org/dashboard/api-key) when signed in.
+Your API key can be found in the [dashboard](https://scrobbl.es/dashboard/api-key) when signed in.
 
 ## Types
 

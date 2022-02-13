@@ -22,7 +22,7 @@ history can then be seen by you, and optionally others, on the Scrobble website.
 
 # How do I sign up?
 
-Visit https://scrobble.littleroot.org, and click "Sign in with Google".
+Visit https://scrobbl.es, and click "Sign in with Google".
 
 Follow the prompt to set a username.
 
@@ -42,9 +42,9 @@ You're all set to scrobble!
 
 You can see scrobbled songs on the website.
 
-A user's scrobbled songs can be seen at `https://scrobble.littleroot.org/u/<username>`.
+A user's scrobbled songs can be seen at `https://scrobbl.es/u/<username>`.
 
-Here's an example: https://scrobble.littleroot.org/u/nishanth.
+Here's an example: https://scrobbl.es/u/nishanth.
 
 # Will my listening history on other devices (eg. iPhone) be scrobbled?
 
@@ -64,5 +64,5 @@ Songs have to be present in your Apple Music library to be scrobbled and to appe
 
 # Contact/Report issues
 
-Email [nishanth.gerrard@gmail.com](mailto:nishanth.gerrard@gmail.com), or create an issue
+Email [nishanths@utexas.edu](mailto:nishanths@utexas.edu), or create an issue
 in the [issue tracker](https://github.com/nishanths/scrobble/issues).
