@@ -18,4 +18,4 @@ require (
 	google.golang.org/genproto v0.0.0-20190418145605-e7d98fc518a7
 )
 
-go 1.13
+go 1.14
