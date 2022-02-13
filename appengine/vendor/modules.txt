@@ -1,4 +1,5 @@
 # cloud.google.com/go v0.38.0
+## explicit
 cloud.google.com/go/cloudtasks/apiv2
 cloud.google.com/go/compute/metadata
 cloud.google.com/go/datastore
@@ -10,14 +11,19 @@ cloud.google.com/go/internal/trace
 cloud.google.com/go/internal/version
 cloud.google.com/go/storage
 # github.com/RobCherry/vibrant v0.0.0-20160904011657-0680b8cf1c89
+## explicit
 github.com/RobCherry/vibrant
 # github.com/go-http-utils/etag v0.0.0-20161124023236-513ea8f21eb1
+## explicit
 github.com/go-http-utils/etag
 # github.com/go-http-utils/fresh v0.0.0-20161124030543-7231e26a4b27
+## explicit
 github.com/go-http-utils/fresh
 # github.com/go-http-utils/headers v0.0.0-20181008091004-fed159eddc2a
+## explicit
 github.com/go-http-utils/headers
 # github.com/golang/protobuf v1.2.0
+## explicit
 github.com/golang/protobuf/proto
 github.com/golang/protobuf/protoc-gen-go/descriptor
 github.com/golang/protobuf/ptypes
@@ -28,15 +34,20 @@ github.com/golang/protobuf/ptypes/struct
 github.com/golang/protobuf/ptypes/timestamp
 github.com/golang/protobuf/ptypes/wrappers
 # github.com/google/uuid v1.1.0
+## explicit
 github.com/google/uuid
 # github.com/googleapis/gax-go/v2 v2.0.4
 github.com/googleapis/gax-go/v2
 # github.com/gorilla/securecookie v1.1.1
+## explicit
 github.com/gorilla/securecookie
 # github.com/hashicorp/golang-lru v0.5.0
 github.com/hashicorp/golang-lru/simplelru
 # github.com/pkg/errors v0.8.0
+## explicit
 github.com/pkg/errors
+# github.com/stretchr/testify v1.6.1
+## explicit
 # go.opencensus.io v0.21.0
 go.opencensus.io
 go.opencensus.io/internal
@@ -56,6 +67,7 @@ go.opencensus.io/trace/internal
 go.opencensus.io/trace/propagation
 go.opencensus.io/trace/tracestate
 # golang.org/x/image v0.0.0-20200430140353-33d19683fad8
+## explicit
 golang.org/x/image/draw
 golang.org/x/image/math/f64
 # golang.org/x/net v0.0.0-20190311183353-d8887717615a
@@ -68,12 +80,14 @@ golang.org/x/net/idna
 golang.org/x/net/internal/timeseries
 golang.org/x/net/trace
 # golang.org/x/oauth2 v0.0.0-20190226205417-e64efc72b421
+## explicit
 golang.org/x/oauth2
 golang.org/x/oauth2/google
 golang.org/x/oauth2/internal
 golang.org/x/oauth2/jws
 golang.org/x/oauth2/jwt
 # golang.org/x/sync v0.0.0-20190227155943-e225da77a7e6
+## explicit
 golang.org/x/sync/errgroup
 # golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a
 golang.org/x/sys/unix
@@ -83,6 +97,7 @@ golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 # google.golang.org/api v0.4.0
+## explicit
 google.golang.org/api/gensupport
 google.golang.org/api/googleapi
 google.golang.org/api/googleapi/internal/uritemplates
@@ -109,6 +124,7 @@ google.golang.org/appengine/internal/urlfetch
 google.golang.org/appengine/socket
 google.golang.org/appengine/urlfetch
 # google.golang.org/genproto v0.0.0-20190418145605-e7d98fc518a7
+## explicit
 google.golang.org/genproto/googleapis/api/annotations
 google.golang.org/genproto/googleapis/cloud/tasks/v2
 google.golang.org/genproto/googleapis/datastore/v1
