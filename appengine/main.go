@@ -112,8 +112,8 @@ func run(ctx context.Context) error {
 	http.Handle("/privacy-policy", webMiddleware(http.HandlerFunc(s.privacyPolicyHandler)))
 
 	// doc handlers
-	http.Handle("/doc/api/v1/", http.StripPrefix("/doc/api/v1/", http.FileServer(http.Dir(filepath.Join("doccontent", "api", "dst")))))
-	http.Handle("/doc/guide/", http.StripPrefix("/doc/guide/", http.FileServer(http.Dir(filepath.Join("doccontent", "guide", "dst")))))
+	http.Handle("/doc/api/v1/", webMiddleware(http.StripPrefix("/doc/api/v1/", http.FileServer(http.Dir(filepath.Join("doccontent", "api", "dst"))))))
+	http.Handle("/doc/guide/", webMiddleware(http.StripPrefix("/doc/guide/", http.FileServer(http.Dir(filepath.Join("doccontent", "guide", "dst"))))))
 	if isDev() {
 		// in production this is handled by app.yaml
 		http.HandleFunc("/doc/style.css", func(w http.ResponseWriter, r *http.Request) {
