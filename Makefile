@@ -37,7 +37,7 @@ dev-deps:
 .PHONY: go
 go:
 	@go version
-	cd appengine && go build -mod=vendor -o=main
+	cd appengine && go build -o=main
 
 .PHONY: web
 web:
@@ -72,7 +72,7 @@ test: go-test
 
 .PHONY: go-test
 go-test:
-	cd appengine && go test -mod=vendor -race ./...
+	cd appengine && go test -race ./...
 
 .PHONY: doc
 doc:
