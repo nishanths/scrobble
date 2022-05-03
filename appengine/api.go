@@ -247,6 +247,24 @@ func (s *server) deleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
+		deleteObjects := []string{
+			statsArtistAddedStoragePath(namespace),
+			statsArtistPlayCountStoragePath(namespace),
+		}
+
+		for _, o := range deleteObjects {
+			req, err := jsonPostTask("/internal/deleteStorageObject", deleteStorageObjectTask{
+				Bucket: DefaultBucketName,
+				Object: o,
+			}, s.secret.TasksSecret)
+			if err != nil {
+				return errors.Wrapf(err, "failed to build task")
+			}
+			if _, err := s.tasks.CreateTask(ctx, req); err != nil {
+				return errors.Wrapf(err, "failed to add task for %s,%s", namespace, o)
+			}
+		}
+
 		return nil
 	}); err != nil {
 		log.Errorf("%v", err.Error())

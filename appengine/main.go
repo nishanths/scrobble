@@ -152,6 +152,7 @@ func run(ctx context.Context) error {
 	http.Handle("/internal/fillITunesFields", s.requireTasksSecretHeader(http.HandlerFunc(s.fillITunesFieldsHandler)))
 	http.Handle("/internal/markParentComplete", s.requireTasksSecretHeader(http.HandlerFunc(s.markParentCompleteHandler)))
 	http.Handle("/internal/deleteEntities", s.requireTasksSecretHeader(http.HandlerFunc(s.deleteEntitiesHandler)))
+	http.Handle("/internal/deleteStorageObject", s.requireTasksSecretHeader(http.HandlerFunc(s.deleteStorageObjectHandler)))
 	http.Handle("/internal/fillArtworkScore", s.requireTasksSecretHeader(http.HandlerFunc(s.fillArtworkScoreHandler)))
 	http.Handle("/internal/computeArtistStats", s.requireTasksSecretHeader(http.HandlerFunc(s.computeArtistStatsHandler)))
 

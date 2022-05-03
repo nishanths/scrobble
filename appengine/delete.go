@@ -160,3 +160,32 @@ func trimSongParents(ctx context.Context, namespace string, createdBefore int64,
 
 	return f()
 }
+
+type deleteStorageObjectTask struct {
+	Bucket string
+	Object string
+}
+
+func (s *server) deleteStorageObjectHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+
+	if r.Method != "POST" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	var t deleteStorageObjectTask
+	if err := json.NewDecoder(r.Body).Decode(&t); err != nil {
+		log.Errorf("%v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if err := s.storage.Bucket(t.Bucket).Object(t.Object).Delete(ctx); err != nil {
+		log.Errorf("%v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
