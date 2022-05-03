@@ -38,7 +38,16 @@ sb:
 
 .PHONY: deps
 deps:
-	# NOTE: Needs node version 14; node version 16 is known to fail.
+	# NOTE: Needs node version 14; node version >=16 is known to fail.
+	# Typically sass fails with the following error:
+	#
+	#  Error: Node Sass does not yet support your current environment: OS X
+	#  64-bit with Unsupported runtime (102)
+	#  ... https://github.com/sass/node-sass/releases/tag/v4.14.1
+	#
+	# To fix:
+	#   make sure you have nodenv init-ed in your shell
+	#   if necessary, re-open a new terminal tab, so that nodenv picks up the .node-version file in this repo.
 	npm i
 	# remove bad types file
 	rm node_modules/flexsearch/index.d.ts

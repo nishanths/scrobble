@@ -32,8 +32,7 @@ bindata:
 
 .PHONY: dev-deps
 dev-deps:
-	go get github.com/kevinburke/go-bindata/...
-	go get gopkg.in/russross/blackfriday.v2
+	go install github.com/kevinburke/go-bindata/go-bindata@latest
 
 .PHONY: go
 go:
