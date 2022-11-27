@@ -1005,8 +1005,8 @@ func (s *server) markParentCompleteHandler(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusOK)
 }
 
-// Marks a SongParent as complete, and deletes any other SongParents and their
-// child Songs.
+// Marks a SongParent as complete, and deletes any earlier SongParents and
+// their child Songs.
 func (s *server) markParentComplete(ctx context.Context, namespace, songParentIdent string, songParentCreated int64) error {
 	// Create parent link.
 	newParentKey := songParentKey(namespace, songParentIdent)
