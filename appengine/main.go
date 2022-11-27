@@ -22,7 +22,7 @@ const (
 )
 
 const (
-	AppDomain = "scrobbl.es"
+	AppDomain = "scrobble.allele.cc"
 )
 
 type server struct {
@@ -195,9 +195,11 @@ func maybeRedirectHTTPS(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
+var oldHosts = map[string]struct{}{}
+
 func withOldHostsRedirect(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Host == "scrobble.allele.cc" || r.Host == "scrobble.littleroot.org" {
+		if _, ok := oldHosts[r.Host]; ok {
 			u := *r.URL
 			u.Host = AppDomain
 			http.Redirect(w, r, u.String(), http.StatusFound)
