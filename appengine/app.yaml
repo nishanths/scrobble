@@ -1,4 +1,4 @@
-runtime: go114
+runtime: go116
 
 handlers:
 - url: /favicon.ico
