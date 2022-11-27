@@ -2,7 +2,7 @@
 
 # /api/v1/artwork
 
-**This endpoint is not functional and will return a 410 HTTP status code.
+**This endpoint is not functional and will respond with a 410 HTTP status.
 Previous documentation is below.**
 
 Upload any missing artwork, previously determined using [`/api/v1/artwork/missing`](/artwork__missing).
