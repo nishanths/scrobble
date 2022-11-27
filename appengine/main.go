@@ -129,10 +129,10 @@ func run(ctx context.Context) error {
 		http.Handle("/api/v1/scrobbled", etag.Handler(http.HandlerFunc(s.scrobbledHandler), false))
 		http.Handle("/api/v1/scrobbled/color", etag.Handler(http.HandlerFunc(s.scrobbledColorHandler), false))
 	}
-	http.HandleFunc("/api/v1/scrobble", s.scrobbleHandler)
+	http.Handle("/api/v1/scrobble", gone(http.HandlerFunc(s.scrobbleHandler)))
 	http.HandleFunc("/api/v1/account", s.accountHandler)
 	http.HandleFunc("/api/v1/account/delete", s.deleteAccountHandler)
-	http.HandleFunc("/api/v1/artwork", s.artworkHandler)
+	http.Handle("/api/v1/artwork", gone(http.HandlerFunc(s.artworkHandler)))
 	http.HandleFunc("/api/v1/artwork/missing", s.artworkMissingHandler)
 
 	// data API handlers
@@ -206,6 +206,12 @@ func withOldHostsRedirect(h http.Handler) http.Handler {
 			return
 		}
 		h.ServeHTTP(w, r)
+	})
+}
+
+func gone(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(410)
 	})
 }
 
