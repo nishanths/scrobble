@@ -2,8 +2,8 @@
 
 # /api/v1/scrobble
 
-**This endpoint is not available and will always return a 400 HTTP status**
-**code. Previous documentation is below.**
+**This endpoint is not functional and will return a 410 HTTP status code.
+Previous documentation is below.**
 
 Scrobble your listening history. The list of scrobbled items in the request
 is used to _entirely replace_ your old listening history.
