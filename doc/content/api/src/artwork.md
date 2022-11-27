@@ -2,6 +2,9 @@
 
 # /api/v1/artwork
 
+**This endpoint is not available and will always return a 400 HTTP status**
+**code. Previous documentation is below.**
+
 Upload any missing artwork, previously determined using [`/api/v1/artwork/missing`](/artwork__missing).
 
 ## HTTP method
