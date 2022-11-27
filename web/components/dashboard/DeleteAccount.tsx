@@ -40,6 +40,6 @@ export const DeleteAccount: React.SFC<DeleteAccountProps> = ({ wnd, logoutURL, n
 	}
 
 	return <div className="DeleteAccount">
-		<div>Click to <a className="danger" href="" onClick={onClick}>delete account</a>.</div>
+		<div>Proceed to <a className="danger" href="" onClick={onClick}>delete account</a>.</div>
 	</div>
 }

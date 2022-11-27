@@ -5,7 +5,7 @@ service, with a client app available for macOS.
 
 See an [example profile](https://scrobble.allele.cc/u/nishanth).
 
-![Scrobbled by color: white](assets/scrobbled_color_white.png)
+![Scrobbled by color: white](assets/scrobbled_color_white_2022.png)
 
 ## Getting Started
 
