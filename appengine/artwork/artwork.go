@@ -11,8 +11,9 @@ import (
 )
 
 const (
-	KindArtworkScore  = "ArtworkScore"  // namespace: [default]
-	KindArtworkRecord = "ArtworkRecord" // namespace: account
+	KindArtworkScore      = "ArtworkScore"      // namespace: [default]
+	KindArtworkRecord     = "ArtworkRecord"     // namespace: account
+	KindArtworkUploadInfo = "ArtworkUploadInfo" // namespace: [default]
 )
 
 func ArtworkScoreKey(hash string) *datastore.Key {
@@ -27,7 +28,10 @@ func ArtworkRecordKey(namespace string, hash string) *datastore.Key {
 	}
 }
 
-// Namespace: [default]
+func ArtworkUploadInfoKey(hash string) *datastore.Key {
+	return &datastore.Key{Kind: KindArtworkUploadInfo, Name: hash}
+}
+
 // Key: artwork hash
 type ArtworkScore struct {
 	Red,
@@ -43,11 +47,18 @@ type ArtworkScore struct {
 	White int
 }
 
-// Namespace: account
 // Key: artwork hash
 type ArtworkRecord struct {
 	Score     ArtworkScore
 	SongIdent string
+}
+
+// Key: auto-generated
+type ArtworkUploadInfo struct {
+	At   int64  // unix seconds
+	By   string // account ID
+	From string // request ip
+	Hash string // artwork hash
 }
 
 type HSL struct {

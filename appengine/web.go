@@ -463,56 +463,31 @@ func ptrStruct() *struct{} {
 	return &struct{}{}
 }
 
-const terms = `Copyright 2021 Littleroot
+const terms = `You are solely responsible for the content of, and for any harm resulting
+from, any content that you post, upload, link to or otherwise make available
+via the service, regardless of the form of that content. The service copyright
+holders, the service authors, or the service contributors are not responsible
+for any public display or misuse of your content.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
-CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
-IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
-OF SUCH DAMAGE.
+It is possible that any uploaded artwork is not removed upon account deletion.
+
+THE SERVICE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+
+IN NO EVENT SHALL THE SERVICE COPYRIGHT HOLDERS, THE SERVICE AUTHORS, OR THE
+SERVICE CONTRIBUTORS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR
+IN CONNECTION WITH THE SERVICE OR THE USE OR OTHER DEALINGS IN THE SERVICE.
 `
 
-const privacyPolicy = `Your privacy is important to us. It is Littleroot's policy to respect your
-privacy regarding any information we may collect from you across our
-website, https://` + AppDomain + `, and other sites we own and operate.
+const privacyPolicy = `For artwork uploaded before January 2023, the email address of your account
+may be publicly associated with the uploaded image. For artwork uploaded after
+January 2023, the time of the request, the account email address, and the
+request IP address are saved in an internal, non-public datastore.
 
-We only ask for personal information when we truly need it to provide a
-service to you. We collect it by fair and lawful means, with your knowledge
-and consent. We also let you know why we're collecting it and how it will be
-used.
-
-We only retain collected information for as long as necessary to provide you
-with your requested service. What data we store, we'll protect within
-commercially acceptable means to prevent loss and theft, as well as
-unauthorized access, disclosure, copying, use or modification.
-
-We don't share any personally identifying information publicly or with
-third-parties, except when required to by law.
-
-Our website may link to external sites that are not operated by us. Please
-be aware that we have no control over the content and practices of these
-sites, and cannot accept responsibility or liability for their respective
-privacy policies.
-
-You are free to refuse our request for your personal information, with the
-understanding that we may be unable to provide you with some of your desired
-services.
-
-Your continued use of our website will be regarded as acceptance of our
-practices around privacy and personal information. If you have any questions
-about how we handle user data and personal information, feel free to contact
-us.
-
-This policy is effective as of 12 April 2020.
-
-[Privacy Policy created with GetTerms.](https://getterms.io/)
-`
+Data in the insights tab may be publicly accessible even if your profile is
+set to private.`
 
 func (s *server) termsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {

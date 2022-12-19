@@ -71,7 +71,6 @@ func songident(album, artist, title string, year int) string {
 		base64encode([]byte((strconv.Itoa(year)))))
 }
 
-// Namespace: [default]
 // Key: email
 type Account struct {
 	APIKey   string `json:"apiKey"`
@@ -79,7 +78,6 @@ type Account struct {
 	Private  bool   `json:"private"`
 }
 
-// Namespace: account
 // Key: <unix seconds>|<uuid>
 type SongParent struct {
 	Complete bool
@@ -90,7 +88,6 @@ func songParentKey(namespace, ident string) *datastore.Key {
 	return &datastore.Key{Kind: KindSongParent, Name: ident, Namespace: namespace}
 }
 
-// Namespace: account
 // Key: see Ident() method
 type Song struct {
 	// basic properties
@@ -836,15 +833,25 @@ func (s *server) artworkHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	now := time.Now()
 	format := r.FormValue("format")
 	hash := artworkHash(artworkBytes, format)
 
+	// write uploader's info.
+	if _, err := s.ds.Put(ctx, datastore.IncompleteKey(artwork.KindArtworkUploadInfo, nil), &artwork.ArtworkUploadInfo{
+		At:   now.Unix(),
+		By:   accID,
+		From: r.Header.Get("x-forwarded-for"),
+		Hash: hash,
+	}); err != nil {
+		log.Errorf("failed datastore put: %v", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	// upload to GCS
 	wr := s.storage.Bucket(DefaultBucketName).Object(artworkStorageDirectory + "/" + hash).NewWriter(ctx)
-	wr.Metadata = map[string]string{
-		"format":     format,
-		"uploadedBy": accID,
-	}
+	wr.Metadata = map[string]string{"format": format}
 	if _, err := wr.Write(artworkBytes); err != nil {
 		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)

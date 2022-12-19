@@ -23,7 +23,6 @@ func statsArtistAddedStoragePath(namespace string) string {
 	return statsStorageDirectory + "/" + namespace + "/" + "artist-added"
 }
 
-// namespace: account
 type ArtistPlayCountStats struct {
 	Data []ArtistPlayCountDatum `datastore:",noindex" json:"data"`
 }
