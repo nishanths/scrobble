@@ -1,9 +1,9 @@
 import React from "react";
-import { Notie } from "../../shared/types"
-import "../../scss/dashboard/delete-account.scss"
+import "../../scss/dashboard/delete-account.scss";
+import { Notie } from "../../shared/types";
 
 const deletePrompt = `Delete account?`
-const failedDelete = `Failed to delete account. Try again or contact nishanths@utexas.edu.`
+const failedDelete = `Failed to delete account. Try again or email bambooparch@gmail.com.`
 
 interface DeleteAccountProps {
 	wnd: Window

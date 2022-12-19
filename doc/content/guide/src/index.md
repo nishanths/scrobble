@@ -64,5 +64,5 @@ Songs have to be present in your Apple Music library to be scrobbled and to appe
 
 # Contact/Report issues
 
-Email [nishanths@utexas.edu](mailto:nishanths@utexas.edu), or create an issue
+Email [bambooparch@gmail.com](mailto:bambooparch@gmail.com), or create an issue
 in the [issue tracker](https://github.com/nishanths/scrobble/issues).
