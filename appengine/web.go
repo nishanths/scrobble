@@ -481,10 +481,10 @@ WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR
 IN CONNECTION WITH THE SERVICE OR THE USE OR OTHER DEALINGS IN THE SERVICE.
 `
 
-const privacyPolicy = `For artwork uploaded before January 2023, the email address of your account
-may be publicly associated with the uploaded image. For artwork uploaded after
-January 2023, the time of the request, the account email address, and the
-request IP address are saved in an internal, non-public datastore.
+const privacyPolicy = `For artwork uploaded before 20 Dec 2022, the email address of your account may
+be publicly associated with the uploaded image. For artwork uploaded after 20
+Dec 2022, the time of the request, the account email address, and the request
+IP address are saved in an internal, non-public datastore.
 
 Data in the insights tab may be publicly accessible even if your profile is
 set to private.`
