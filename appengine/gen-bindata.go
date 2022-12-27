@@ -12,6 +12,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -226,20 +227,15 @@ var _bindata = map[string]func() (*asset, error){
 	"appengine/template/u.html":         appengineTemplateUHtml,
 }
 
-// AssetDebug is true if the assets were built with the debug flag enabled.
-const AssetDebug = false
-
 // AssetDir returns the file names below a certain
 // directory embedded in the file by go-bindata.
 // For example if you run go-bindata on data/... and data contains the
 // following hierarchy:
-//
-//	data/
-//	  foo.txt
-//	  img/
-//	    a.png
-//	    b.png
-//
+//     data/
+//       foo.txt
+//       img/
+//         a.png
+//         b.png
 // then AssetDir("data") would return []string{"foo.txt", "img"},
 // AssetDir("data/img") would return []string{"a.png", "b.png"},
 // AssetDir("foo.txt") and AssetDir("notexist") would return an error, and
@@ -272,11 +268,11 @@ type bintree struct {
 }
 
 var _bintree = &bintree{nil, map[string]*bintree{
-	"appengine": {nil, map[string]*bintree{
-		"template": {nil, map[string]*bintree{
-			"dashboard.html": {appengineTemplateDashboardHtml, map[string]*bintree{}},
-			"home.html": {appengineTemplateHomeHtml, map[string]*bintree{}},
-			"u.html": {appengineTemplateUHtml, map[string]*bintree{}},
+	"appengine": &bintree{nil, map[string]*bintree{
+		"template": &bintree{nil, map[string]*bintree{
+			"dashboard.html": &bintree{appengineTemplateDashboardHtml, map[string]*bintree{}},
+			"home.html":      &bintree{appengineTemplateHomeHtml, map[string]*bintree{}},
+			"u.html":         &bintree{appengineTemplateUHtml, map[string]*bintree{}},
 		}},
 	}},
 }}
@@ -295,7 +291,7 @@ func RestoreAsset(dir, name string) error {
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(_filePath(dir, name), data, info.Mode())
+	err = ioutil.WriteFile(_filePath(dir, name), data, info.Mode())
 	if err != nil {
 		return err
 	}

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"net/http"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/nishanths/scrobble/appengine/log"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
+	"google.golang.org/api/googleapi"
 	"google.golang.org/api/iterator"
 )
 
@@ -182,6 +184,13 @@ func (s *server) deleteStorageObjectHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	if err := s.storage.Bucket(t.Bucket).Object(t.Object).Delete(ctx); err != nil {
+		var e *googleapi.Error
+		if stderrors.As(err, &e) && e.Code == 404 {
+			log.Infof("skipping delete %+v: %v", t, err.Error())
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
 		log.Errorf("%v", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return

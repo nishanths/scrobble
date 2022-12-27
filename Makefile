@@ -32,7 +32,7 @@ bindata:
 
 .PHONY: dev-deps
 dev-deps:
-	go install github.com/kevinburke/go-bindata/go-bindata@latest
+	go install github.com/kevinburke/go-bindata/go-bindata@ac65ee6
 
 .PHONY: go
 go:

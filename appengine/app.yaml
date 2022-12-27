@@ -25,6 +25,4 @@ handlers:
   upload: doccontent/style.css
 
 - url: /.*
-  secure: always
-  redirect_http_response_code: 302
   script: auto

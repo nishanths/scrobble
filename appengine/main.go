@@ -89,7 +89,7 @@ func run(ctx context.Context) error {
 	}
 
 	webMiddleware := func(h http.Handler) http.Handler {
-		return withHTTPS(withOldHostsRedirect(h))
+		return withOldHostsRedirect(h)
 	}
 
 	// Register handlers.
@@ -195,9 +195,7 @@ func maybeRedirectHTTPS(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-var oldHosts = map[string]struct{}{
-	"scrobble.allele.cc": {},
-}
+var oldHosts = map[string]struct{}{}
 
 func withOldHostsRedirect(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
