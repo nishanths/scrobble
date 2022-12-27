@@ -1,19 +1,19 @@
 # scrobble
 
-[`scrobble.allele.cc`](https://scrobble.allele.cc) is an Apple Music scrobbling
+[`scrobble.growl.space`](https://scrobble.growl.space) is an Apple Music scrobbling
 service, with a client app available for macOS.
 
-See an [example profile](https://scrobble.allele.cc/u/nishanth).
+See an [example profile](https://scrobble.growl.space/u/nishanth).
 
 ![Scrobbled by color: white](assets/scrobbled_color_white_2022.png)
 
 ## Getting Started
 
-See the [Guide](https://scrobble.allele.cc/doc/guide) on the website.
+See the [Guide](https://scrobble.growl.space/doc/guide) on the website.
 
 ## HTTP API
 
-Check out the [API documentation](https://scrobble.allele.cc/doc/api/v1).
+Check out the [API documentation](https://scrobble.growl.space/doc/api/v1).
 
 ## Download macOS app
 

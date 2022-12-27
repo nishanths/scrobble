@@ -18,7 +18,7 @@ X-Scrobble-API-Key: <your API key>
 ```
 
 Your API key can be found in the
-[dashboard](https://scrobble.allele.cc/dashboard/api-key) when signed in.
+[dashboard](https://scrobble.growl.space/dashboard/api-key) when signed in.
 
 ## Types
 
