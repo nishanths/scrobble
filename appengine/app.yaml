@@ -25,4 +25,5 @@ handlers:
   upload: doccontent/style.css
 
 - url: /.*
+  secure: always
   script: auto
