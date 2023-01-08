@@ -8,10 +8,10 @@ import (
 	"net/http"
 
 	"cloud.google.com/go/datastore"
+	"cloud.google.com/go/storage"
 	"github.com/nishanths/scrobble/appengine/log"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
-	"google.golang.org/api/googleapi"
 	"google.golang.org/api/iterator"
 )
 
@@ -184,10 +184,9 @@ func (s *server) deleteStorageObjectHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	if err := s.storage.Bucket(t.Bucket).Object(t.Object).Delete(ctx); err != nil {
-		var e *googleapi.Error
-		if stderrors.As(err, &e) && e.Code == 404 {
+		if stderrors.Is(err, storage.ErrObjectNotExist) {
 			log.Infof("skipping delete %+v: %v", t, err.Error())
-			w.WriteHeader(http.StatusOK)
+			w.WriteHeader(http.StatusNoContent)
 			return
 		}
 
