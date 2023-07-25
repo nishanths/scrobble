@@ -1,5 +1,5 @@
 import { ThunkAction, ThunkDispatch } from "redux-thunk"
-import { Song, ScrobbledResponse } from "../../shared/types"
+import { ScrobbledResponse, Song } from "../../shared/types"
 import { PartialState } from "../types/u"
 
 export type AllScrobblesAction =
@@ -74,7 +74,7 @@ const lovedScrobblesFail = (err: any) => {
 	}
 }
 
-export const fetchAllScrobbles = (username: string, limit: number): AllScrobblesThunkResult<void> => {
+export const fetchAllScrobbles = (username: string, limit: number | null): AllScrobblesThunkResult<void> => {
 	return async (dispatch) => {
 		dispatch(allScrobblesStart(username))
 

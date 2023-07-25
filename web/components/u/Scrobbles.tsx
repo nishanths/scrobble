@@ -1,27 +1,25 @@
-import React, { useEffect, useRef, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
+import { Index } from "flexsearch";
+import React, { useEffect, useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import { useDispatch, useSelector } from "react-redux";
 import { RouteComponentProps } from "react-router-dom";
-import { useHotkeys } from "react-hotkeys-hook"
-import { Index } from "flexsearch"
-import { State } from "../../redux/types/u"
-import { assertExhaustive, assert, debounce, copyMap } from "../../shared/util"
-import { useStateRef } from "../../shared/hooks"
-import { NProgress, Song } from "../../shared/types"
-import { Mode, DetailKind, modeFromControlValue, fullPath } from "./shared"
-import { Color } from "../colorpicker"
-import { Songs } from "../Songs"
-import { setLastColor, setLastScrobblesEndIdx, setLastScrobblesScrollY, setLastSearch } from "../../redux/actions/last"
-import { fetchAllScrobbles, fetchLovedScrobbles, fetchColorScrobbles } from "../../redux/actions/scrobbles"
-import { Header, SegmentedControl, ColorPicker, Top } from "./top"
-import { SearchBox } from "../searchbox"
-import { createIndex, Doc, indexID, hasActiveSearch } from "./search"
+import { setLastColor, setLastScrobblesEndIdx, setLastScrobblesScrollY, setLastSearch } from "../../redux/actions/last";
+import { fetchAllScrobbles, fetchColorScrobbles, fetchLovedScrobbles } from "../../redux/actions/scrobbles";
+import { State } from "../../redux/types/u";
+import { useStateRef } from "../../shared/hooks";
+import { NProgress, Song } from "../../shared/types";
+import { assert, assertExhaustive, copyMap, debounce } from "../../shared/util";
+import { Songs } from "../Songs";
+import { Color } from "../colorpicker";
+import { SearchBox } from "../searchbox";
+import { Doc, createIndex, hasActiveSearch, indexID } from "./search";
+import { DetailKind, Mode, fullPath, modeFromControlValue } from "./shared";
+import { ColorPicker, Header, SegmentedControl, Top } from "./top";
 
 // Divisble by 2, 3, and 4. This is appropriate because these are the number
 // of cards typically displayed per row. Using such a number ensures that
 // the last row isn't an incomplete row.
 const moreIncrement = 36;
-
-const limit = 504; // `moreIncrement` * 14
 
 const nextEndIdx = (currentEndIdx: number, total: number): number => {
 	// increment, but don't go over the number of items itself
@@ -162,7 +160,7 @@ export const Scrobbles: React.FC<{
 			switch (mode) {
 				case Mode.All: {
 					if ((s!.done === false && s!.fetching === false) || s!.error === true) {
-						dispatch(fetchAllScrobbles(profileUsername, limit))
+						dispatch(fetchAllScrobbles(profileUsername, null))
 					}
 					break
 				}
