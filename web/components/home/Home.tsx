@@ -1,7 +1,7 @@
 import React from "react"
-import { GoogleSignIn } from "../GoogleSignIn"
+import { apiDocLink, appDomain, guideLink, macOSAppLink } from "../../shared/const"
 import { randInt } from "../../shared/util"
-import { macOSAppLink, guideLink, apiDocLink, appDomain } from "../../shared/const"
+import { GoogleSignIn } from "../GoogleSignIn"
 
 interface HomeProps {
 	loginURL: string
@@ -14,8 +14,6 @@ const artworks = [
 ]
 
 const taglines = [
-	"an Apple Music scrobbling service.",
-	"showcase your Apple Music library like never before.",
 	"a beautiful way to scrobble your Apple Music songs.",
 ]
 
